@@ -17,8 +17,13 @@
   align-items: center;
   gap: 10px;
 }
-.panel-detail-head .btn {
+.panel-detail-actions {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.panel-detail-head .btn {
   font-size: 12px;
 }
 .panel-detail-title {
@@ -88,6 +93,12 @@
   border-radius: 999px;
   padding: 3px 11px;
 }
+.panel-counts {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--color-neutral-600);
+}
+
 /* --- lists --- */
 .panel-list-head {
   display: flex;

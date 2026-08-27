@@ -1,4 +1,4 @@
-import { ProvenanceDot } from '../../components';
+import { Tag } from '../../components';
 import { useProject } from '../../state/projectStore';
 import { Trail } from './Trail';
 
@@ -11,10 +11,10 @@ export function Header() {
       {project && <Trail />}
       <div className="shell-header-tools">
         <div className="shell-legend" aria-label="Provenance legend">
-          <ProvenanceDot source="human-verified" />
-          <span>Verified human-checked</span>
-          <ProvenanceDot source="ai-inferred" />
-          <span>AI inferred</span>
+          <Tag variant="legend-verified">Verified</Tag>
+          <span>human-checked</span>
+          <Tag variant="legend-ai">AI</Tag>
+          <span>inferred</span>
         </div>
       </div>
     </header>

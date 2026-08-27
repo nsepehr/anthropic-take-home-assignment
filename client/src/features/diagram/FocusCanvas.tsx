@@ -18,8 +18,8 @@ interface Props {
 
 /**
  * System focus: the ego graph of one system — inbound neighbours left, outbound right — from
- * the pure `egoLayout`, no ELK. Clicking any card opens it (a neighbour walks, the focus card
- * re-centres the panel on it); an edge selects it; the pane returns the panel to the focus.
+ * the pure `egoLayout`, no ELK. A click selects a card or edge (panel); a double-click walks
+ * to a neighbour; the pane clears the selection so the panel returns to the focused system.
  */
 export function FocusCanvas({ project, systemId }: Props) {
   const view = useMemo(() => focusView(project, systemId), [project, systemId]);
@@ -37,11 +37,14 @@ export function FocusCanvas({ project, systemId }: Props) {
       layout,
     };
   }, [view]);
-  const { select } = useSelection();
+  const { select, clear } = useSelection();
   const { open } = useNavigation();
 
-  // Opening the focus itself rewinds the trail to it and re-selects it (the panel returns to it).
   const onNodeClick = useCallback<NodeMouseHandler<SystemNode>>(
+    (_e, node) => select(node.id),
+    [select],
+  );
+  const onNodeDoubleClick = useCallback<NodeMouseHandler<SystemNode>>(
     (_e, node) => open(node.id),
     [open],
   );
@@ -49,14 +52,16 @@ export function FocusCanvas({ project, systemId }: Props) {
     (_e, edge) => select(edge.id),
     [select],
   );
-  const onPaneClick = useCallback(() => select(systemId), [select, systemId]);
+  const onPaneClick = clear;
 
   if (!view) return <p className="diagram-error">Unknown system: {systemId}</p>;
   return (
     <FlowCanvas
       nodes={nodes}
       edges={edges}
+      className="diagram--focus"
       onNodeClick={onNodeClick}
+      onNodeDoubleClick={onNodeDoubleClick}
       onEdgeClick={onEdgeClick}
       onPaneClick={onPaneClick}
     >

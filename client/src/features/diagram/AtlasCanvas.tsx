@@ -13,8 +13,8 @@ import { LaneLayer } from './components/LaneLayer';
 import { FlowCanvas } from './FlowCanvas';
 
 /**
- * The atlas: every system in ELK-laid-out lanes. Hovering a card previews its neighbourhood;
- * clicking opens the system's focus view.
+ * The atlas: every system in ELK-laid-out lanes. Hovering a card previews its neighbourhood,
+ * a click selects it (panel), a double-click opens its focus view.
  */
 export function AtlasCanvas({ project }: { project: Project }) {
   const elements = useMemo(() => toFlowElements(project), [project]);
@@ -30,13 +30,17 @@ export function AtlasCanvas({ project }: { project: Project }) {
   } = useLayout(sizedNodes, elements.edges, undefined, partitionOf);
   const { nodes, lanes: laneRects } = useAlignedLanes(placed, index);
   const edges = useMemo(() => attachEdgeSides(nodes, elements.edges), [nodes, elements.edges]);
-  const { hover, clear } = useSelection();
+  const { select, hover, clear } = useSelection();
   const { open } = useNavigation();
   // Once laid out, keep the canvas mounted through re-layouts so the viewport survives.
   const laidOut = useRef(false);
   if (status === 'ready') laidOut.current = true;
 
   const onNodeClick = useCallback<NodeMouseHandler<SystemNode>>(
+    (_e, node) => select(node.id),
+    [select],
+  );
+  const onNodeDoubleClick = useCallback<NodeMouseHandler<SystemNode>>(
     (_e, node) => open(node.id),
     [open],
   );
@@ -50,6 +54,7 @@ export function AtlasCanvas({ project }: { project: Project }) {
       nodes={nodes}
       edges={edges}
       onNodeClick={onNodeClick}
+      onNodeDoubleClick={onNodeDoubleClick}
       onNodeMouseEnter={onEnter}
       onNodeMouseLeave={onLeave}
       onPaneClick={clear}

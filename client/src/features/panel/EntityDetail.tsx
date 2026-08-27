@@ -1,4 +1,6 @@
 import { connectionsFor, findEntity, intentsFor, requirementsFor } from '../../model/entities';
+import { panelEntityId } from '../../model/panelAction';
+import { useNavigation } from '../../state/navigation';
 import { useProject } from '../../state/projectStore';
 import { useSelection } from '../../state/selection';
 import { ConnectedChips } from './ConnectedChips';
@@ -7,10 +9,14 @@ import { EntityList } from './EntityList';
 import { IntentCard } from './IntentCard';
 import { RequirementCard } from './RequirementCard';
 
-/** The panel with something selected: headline card, its requirements/intents, connections. */
+/**
+ * The panel's entity view: the selection, or in a focus view the focused system itself —
+ * headline card, its requirements/intents, connections.
+ */
 export function EntityDetail() {
   const { project } = useProject();
-  const { selectedId } = useSelection();
+  const { scope } = useNavigation();
+  const selectedId = panelEntityId(scope, useSelection().selectedId);
   if (!project || !selectedId) return null;
   const found = findEntity(project, selectedId);
   if (!found) return <div className="panel-empty">Unknown entity: {selectedId}</div>;

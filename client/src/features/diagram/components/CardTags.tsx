@@ -13,10 +13,10 @@ export function CardTags({ kind, requirementCount, intentCount, provenance }: Pr
   const human = provenance === 'human-verified';
   return (
     <div className="diagram-card__tags">
-      <Tag>{kind}</Tag>
-      {requirementCount > 0 && <Tag>{`${requirementCount} req`}</Tag>}
-      {intentCount > 0 && <Tag variant="accent">{`${intentCount} why`}</Tag>}
-      <Tag variant={human ? 'accent-2' : 'outline'}>{human ? 'Verified' : 'AI'}</Tag>
+      <Tag variant="card-kind">{kind}</Tag>
+      {requirementCount > 0 && <Tag variant="card-req">{`${requirementCount} req`}</Tag>}
+      {intentCount > 0 && <Tag variant="card-why">{`${intentCount} why`}</Tag>}
+      <Tag variant={human ? 'card-verified' : 'card-ai'}>{human ? 'Verified' : 'AI'}</Tag>
     </div>
   );
 }

@@ -98,6 +98,24 @@
   color: var(--color-neutral-600);
   pointer-events: none;
 }
+/* First-time coach-mark: same spot as the hint, on a surface, with one dismiss button. */
+.canvas-coach {
+  position: absolute;
+  left: 20px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 8px 8px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  font-size: 13px;
+  color: var(--color-neutral-800);
+}
+.canvas-coach .btn {
+  font-size: 12px;
+}
 
 .side-panel {
   width: 380px;

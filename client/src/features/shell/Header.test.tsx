@@ -9,8 +9,10 @@ describe('Header', () => {
     expect(html).toContain(seedProject.name);
     expect(html).toContain('>Architecture<');
     expect(html).toContain('aria-current="page"');
-    expect(html).toContain('Verified human-checked');
-    expect(html).toContain('AI inferred');
+    expect(html).toContain('tag-legend-verified');
+    expect(html).toContain('human-checked');
+    expect(html).toContain('tag-legend-ai');
+    expect(html).toContain('inferred');
   });
 
   it('shows each hop of the trail, the current one last', () => {

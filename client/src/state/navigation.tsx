@@ -23,7 +23,7 @@ export interface Navigation {
   scope: Scope;
   /** Systems opened so far, last = current focus; empty on the atlas. */
   trail: string[];
-  /** Open a system's focus view (appends to the trail, or rewinds to it) and select it. */
+  /** Open a system's focus view (appends to the trail, or rewinds to it). */
   open: (id: string) => void;
   /** One hop back; from the first hop, back to the atlas. */
   back: () => void;
@@ -41,12 +41,11 @@ interface Props {
 
 /**
  * Holds the trail; must sit inside <ProjectProvider> and <SelectionProvider>. Every scope change
- * resets the selection to the new focus (or nothing on the atlas) and drops any hover. Esc goes
- * back one hop.
+ * clears the selection and any hover. Esc goes back one hop.
  */
 export function NavigationProvider({ children, initialTrail = [] }: Props) {
   const { project } = useProject();
-  const { select, clear, hover } = useSelection();
+  const { clear, hover } = useSelection();
   const [trail, setTrail] = useState(initialTrail);
   // The actions read the latest trail through a ref so their identities never change.
   const trailRef = useRef(trail);
@@ -56,11 +55,9 @@ export function NavigationProvider({ children, initialTrail = [] }: Props) {
     (next: string[]) => {
       setTrail(next);
       hover(null); // the canvas under the pointer is about to be replaced; no leave event fires
-      const focus = next[next.length - 1];
-      if (focus === undefined) clear();
-      else select(focus);
+      clear(); // in a focus view the panel shows the focused system until something is selected
     },
-    [select, clear, hover],
+    [clear, hover],
   );
   const open = useCallback((id: string) => apply(openIn(trailRef.current, id)), [apply]);
   const back = useCallback(() => apply(trailRef.current.slice(0, -1)), [apply]);

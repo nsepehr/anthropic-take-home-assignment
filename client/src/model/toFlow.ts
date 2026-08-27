@@ -13,8 +13,11 @@ export type SystemNodeData = {
 };
 
 export type SystemNode = FlowNode<SystemNodeData, 'system'>;
-/** `label` is drawn when present: the focus view names edges by kind; the atlas leaves it unset. */
-export type SystemEdge = Edge<{ edge: ModelEdge }>;
+/**
+ * `label` is drawn when present and `accent` edges are always lit: the focus view sets both, the
+ * atlas leaves them unset so edges recede until something is selected.
+ */
+export type SystemEdge = Edge<{ edge: ModelEdge; accent?: boolean }>;
 
 export interface FlowElements {
   nodes: SystemNode[];

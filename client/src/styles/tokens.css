@@ -85,6 +85,23 @@
   --pill-prov-human-fg: var(--color-bg);
   --pill-prov-ai-bg: var(--color-neutral-200);
   --pill-prov-ai-fg: var(--color-neutral-800);
+  /* System-card tags and the header legend (design rev 4) */
+  --card-tag-kind-bg: var(--color-neutral-300);
+  --card-tag-kind-fg: var(--color-neutral-800);
+  --card-tag-req-bg: var(--color-neutral-200);
+  --card-tag-req-fg: var(--color-neutral-800);
+  --card-tag-req-border: var(--color-neutral-400);
+  --card-tag-why-bg: var(--color-accent-300);
+  --card-tag-why-fg: var(--color-accent-800);
+  --card-tag-verified-bg: var(--color-accent-2-300);
+  --card-tag-verified-fg: var(--color-accent-2-800);
+  --card-tag-ai-fg: var(--color-neutral-700);
+  --card-tag-ai-border: var(--color-neutral-400);
+  --legend-verified-bg: var(--color-accent-2-600);
+  --legend-verified-fg: var(--color-bg);
+  --legend-ai-bg: var(--color-neutral-200);
+  --legend-ai-fg: var(--color-neutral-800);
+  --legend-ai-border: var(--color-neutral-500);
 
   /* Provenance */
   --prov-human: var(--color-accent-2-600);

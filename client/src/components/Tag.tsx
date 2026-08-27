@@ -1,6 +1,18 @@
 import type { ReactNode } from 'react';
 
-export type TagVariant = 'accent' | 'accent-2' | 'neutral' | 'outline';
+/** Generic ramps, plus the card-tag and header-legend pills of design revision 4. */
+export type TagVariant =
+  | 'accent'
+  | 'accent-2'
+  | 'neutral'
+  | 'outline'
+  | 'card-kind'
+  | 'card-req'
+  | 'card-why'
+  | 'card-verified'
+  | 'card-ai'
+  | 'legend-verified'
+  | 'legend-ai';
 
 export interface TagProps {
   variant?: TagVariant;

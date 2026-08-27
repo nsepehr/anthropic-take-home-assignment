@@ -21,14 +21,14 @@ export interface SelectionView {
 
 /**
  * Pure: given the project, the selected id and the hovered id, derive what the UI highlights and
- * dims. A hover previews its own neighbourhood without disturbing the selection underneath.
+ * dims. The selection drives the highlight; a hover does only while nothing is selected.
  */
 export function deriveSelection(
   project: Project | null,
   selectedId: string | null,
   hoveredId: string | null = null,
 ): SelectionView {
-  const focusId = hoveredId ?? selectedId;
+  const focusId = selectedId ?? hoveredId;
   const related = project && focusId ? relatedTo(project, focusId) : EMPTY_RELATED;
   const highlighted = new Set<string>([
     ...related.systemIds,
@@ -39,7 +39,7 @@ export function deriveSelection(
   if (focusId) highlighted.add(focusId);
   const isHighlighted = (id: string) => highlighted.has(id);
   return {
-    selectedId: focusId,
+    selectedId,
     hoveredId,
     related,
     isHighlighted,

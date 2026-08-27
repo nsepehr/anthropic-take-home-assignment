@@ -36,7 +36,7 @@ export function focusFlowElements(view: FocusView, placed: Placed[]): FlowElemen
     source: edge.from,
     target: edge.to,
     label: edge.label ?? edge.kind,
-    data: { edge },
+    data: { edge, accent: true },
   }));
   return { nodes, edges };
 }

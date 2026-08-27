@@ -60,6 +60,32 @@
   font-family: var(--font-heading);
   font-size: 15px;
   line-height: 1.15;
+  flex: 1;
+}
+/* "Open" affordance: hidden until the card is hovered; the title row keeps a trailing slot. */
+.diagram-card__open {
+  flex: none;
+  font: inherit;
+  font-size: 11px;
+  padding: 2px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-accent-800);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+.diagram-card:hover .diagram-card__open,
+.diagram-card__open:focus-visible {
+  opacity: 1;
+}
+.diagram-card__open:hover {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+/* Focus view: a selected neighbour sits on the lighter accent (design rev 4). */
+.diagram--focus .diagram-card.is-selected:not(.diagram-card--focus) {
+  background: var(--color-accent-100);
 }
 .diagram-card__body {
   flex: 1;
@@ -156,14 +182,14 @@
 .diagram-edge.is-dimmed {
   opacity: var(--dim-opacity);
 }
-.diagram-edge__label {
+.diagram-edge__pill rect {
+  fill: var(--color-neutral-100);
+}
+.diagram-edge__pill text {
   font-family: var(--font-body);
   font-size: 11px;
+  letter-spacing: 0.04em;
   fill: var(--color-accent-800);
-  paint-order: stroke;
-  stroke: var(--canvas-bg);
-  stroke-width: 4px;
-  stroke-linejoin: round;
 }
 /* Arrowheads live in a zero-size svg; colour follows the edge state via the marker id. */
 .diagram-markers {

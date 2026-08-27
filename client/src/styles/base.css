@@ -235,6 +235,37 @@ a {
   background: var(--pill-prov-ai-bg);
   color: var(--pill-prov-ai-fg);
 }
+/* system-card tags and the header legend (design rev 4) */
+.tag-card-kind {
+  background: var(--card-tag-kind-bg);
+  color: var(--card-tag-kind-fg);
+}
+.tag-card-req {
+  background: var(--card-tag-req-bg);
+  color: var(--card-tag-req-fg);
+  border: 1px solid var(--card-tag-req-border);
+}
+.tag-card-why {
+  background: var(--card-tag-why-bg);
+  color: var(--card-tag-why-fg);
+}
+.tag-card-verified {
+  background: var(--card-tag-verified-bg);
+  color: var(--card-tag-verified-fg);
+}
+.tag-card-ai {
+  color: var(--card-tag-ai-fg);
+  border: 1px solid var(--card-tag-ai-border);
+}
+.tag-legend-verified {
+  background: var(--legend-verified-bg);
+  color: var(--legend-verified-fg);
+}
+.tag-legend-ai {
+  background: var(--legend-ai-bg);
+  color: var(--legend-ai-fg);
+  border: 1px dashed var(--legend-ai-border);
+}
 
 /* — rounded frame: everything softens, small controls go pill — */
 .card {

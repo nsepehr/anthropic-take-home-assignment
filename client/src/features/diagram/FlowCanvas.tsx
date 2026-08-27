@@ -21,19 +21,22 @@ export interface FlowCanvasProps {
   nodes: SystemNodeType[];
   edges: SystemEdgeType[];
   onNodeClick: NodeMouseHandler<SystemNodeType>;
+  onNodeDoubleClick?: NodeMouseHandler<SystemNodeType>;
   onEdgeClick?: EdgeMouseHandler<SystemEdgeType>;
   onPaneClick: () => void;
   onNodeMouseEnter?: NodeMouseHandler<SystemNodeType>;
   onNodeMouseLeave?: NodeMouseHandler<SystemNodeType>;
   /** Overlays rendered as React Flow children (lanes, ego labels). */
   children?: ReactNode;
+  /** Extra class on the React Flow root (per-view styling hooks). */
+  className?: string;
 }
 
 /** The React Flow instance both views share: read-only, pannable, fitted on mount. */
-export function FlowCanvas({ nodes, edges, children, ...handlers }: FlowCanvasProps) {
+export function FlowCanvas({ nodes, edges, children, className, ...handlers }: FlowCanvasProps) {
   return (
     <ReactFlow
-      className="diagram"
+      className={['diagram', className].filter(Boolean).join(' ')}
       nodes={nodes}
       edges={edges}
       defaultEdgeOptions={defaultEdgeOptions}
@@ -45,6 +48,7 @@ export function FlowCanvas({ nodes, edges, children, ...handlers }: FlowCanvasPr
       nodesDraggable={false}
       nodesConnectable={false}
       zoomOnScroll
+      zoomOnDoubleClick={false}
       panOnDrag
       minZoom={MIN_ZOOM}
       fitView
