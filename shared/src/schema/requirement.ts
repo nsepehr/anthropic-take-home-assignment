@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { EntityBase } from './entity.js';
 
-export const RequirementKind = z.enum(['functional', 'non-functional', 'constraint']);
+export const RequirementKind = z.enum(['feature', 'functional', 'non-functional', 'constraint']);
 export const RequirementStatus = z.enum(['planned', 'partial', 'implemented']);
 
 /** Something the product must do or respect, with the systems serving it and proof of status. */

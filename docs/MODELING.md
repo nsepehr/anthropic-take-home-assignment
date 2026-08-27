@@ -45,12 +45,20 @@ links, and stay visible in the UI.
 - `summary` ≤ 20 words, plain language, one sentence: what the reader sees at a glance.
 - `detail` = **how it works**, for the deep dive. It is always longer than `summary`; if it is not,
   you wrote a second summary.
-- **Requirement** wording: "A user can …" (functional), "The system must …" (non-functional /
-  constraint). `status` `implemented` or `partial` needs `evidence` — file paths, tests, URLs.
-  `planned` needs none.
+- **Requirement** wording: "A user can …" (feature / functional), "The system must …"
+  (non-functional / constraint). `status` `implemented` or `partial` needs `evidence` — file paths,
+  tests, URLs. `planned` needs none.
 - **Intent** = a decision **and** its rationale. `statement` is the decision; `rationale` says
   _why_, including what was rejected and the trade-off, in at least 12 words. If the rationale only
   restates what the code does, it is a description — put that in a System's `detail` instead.
+
+A **feature is not a fourth entity** — it is a `Requirement` whose `kind` is `feature`: something a
+user can do with the product ("A user can open a system and walk its neighbours"). `functional` is
+what the system must do internally to make features work and is not itself a user capability ("the
+seed data stays current"); `non-functional` and `constraint` are unchanged — qualities the system
+must hold ("every claim shows its provenance") and conditions imposed on it ("no external services").
+When both readings fit, ask whether a user would name it when describing the product: if yes it is a
+feature. Features carry their own pill in the panel and sort to the top of every requirement list.
 
 ## Lifecycle
 

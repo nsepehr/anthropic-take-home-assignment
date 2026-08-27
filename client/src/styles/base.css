@@ -227,6 +227,10 @@ a {
   background: var(--pill-kind-bg);
   color: var(--pill-kind-fg);
 }
+.tag-kind-feature {
+  background: var(--pill-kind-feature-bg);
+  color: var(--pill-kind-feature-fg);
+}
 .tag-prov-human {
   background: var(--pill-prov-human-bg);
   color: var(--pill-prov-human-fg);

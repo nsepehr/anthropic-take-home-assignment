@@ -1,3 +1,4 @@
+import { featuresFirst } from '../../model/entities';
 import { useProject } from '../../state/projectStore';
 import { useSearch } from '../../state/search';
 import { Paragraphs } from './components/Paragraphs';
@@ -23,7 +24,7 @@ export function ProjectOverview() {
         </div>
       </article>
       <EntityList heading="Requirements" count={shownRequirements.length}>
-        {shownRequirements.map((r) => (
+        {featuresFirst(shownRequirements).map((r) => (
           <RequirementCard key={r.id} requirement={r} />
         ))}
       </EntityList>

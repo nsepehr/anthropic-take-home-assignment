@@ -24,7 +24,9 @@ export function RequirementCard({ requirement }: { requirement: Requirement }) {
       <div className="panel-card-body">{requirement.summary}</div>
       <div className="panel-card-tags">
         <Tag className={`tag-status-${requirement.status}`}>{requirement.status}</Tag>
-        <Tag className="tag-kind">{requirement.kind}</Tag>
+        <Tag className={`tag-kind${requirement.kind === 'feature' ? ' tag-kind-feature' : ''}`}>
+          {requirement.kind}
+        </Tag>
         <ProvenancePill source={requirement.provenance.source} />
       </div>
     </button>

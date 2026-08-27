@@ -81,6 +81,8 @@
   --pill-status-fg: var(--color-bg);
   --pill-kind-bg: var(--color-neutral-300);
   --pill-kind-fg: var(--color-neutral-900);
+  --pill-kind-feature-bg: var(--color-accent-100);
+  --pill-kind-feature-fg: var(--color-accent-900);
   --pill-prov-human-bg: var(--color-accent-2-700);
   --pill-prov-human-fg: var(--color-bg);
   --pill-prov-ai-bg: var(--color-neutral-200);

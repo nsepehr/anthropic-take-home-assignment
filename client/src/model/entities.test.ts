@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { seedProject } from '../test/seed';
-import { connectionsFor, findEntity, intentsFor, requirementsFor } from './entities';
+import { connectionsFor, featuresFirst, findEntity, intentsFor, requirementsFor } from './entities';
 
 describe('entities', () => {
   it('findEntity tags the entity with its type, null when unknown', () => {
@@ -27,6 +27,14 @@ describe('entities', () => {
     const expected = seedProject.intents.filter((i) => i.appliesTo.requirementIds.includes(id));
     expect(intentsFor(seedProject, id)).toEqual(expected);
     expect(expected.length).toBeGreaterThan(0);
+  });
+
+  it('featuresFirst puts features first and keeps the order within each group', () => {
+    const kinds = ['functional', 'feature', 'constraint', 'feature'] as const;
+    const base = seedProject.requirements[0]!;
+    const input = kinds.map((kind, i) => ({ ...base, id: `r${i}`, kind }));
+    expect(featuresFirst(input).map((r) => r.id)).toEqual(['r1', 'r3', 'r0', 'r2']);
+    expect(input.map((r) => r.id)).toEqual(['r0', 'r1', 'r2', 'r3']);
   });
 
   it('connectionsFor excludes self and dedupes', () => {

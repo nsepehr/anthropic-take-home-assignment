@@ -368,7 +368,7 @@
     {
       "id": "req-single-focused-interaction",
       "title": "One single, focused hero interaction",
-      "kind": "functional",
+      "kind": "feature",
       "status": "partial",
       "systemIds": ["sys-client-diagram", "sys-shared-model", "sys-client-state"],
       "evidence": [
@@ -418,7 +418,7 @@
     {
       "id": "req-one-view-understanding",
       "title": "Understand architecture, features and intent from one view",
-      "kind": "functional",
+      "kind": "feature",
       "status": "planned",
       "systemIds": ["sys-client-diagram"],
       "evidence": [],
@@ -433,7 +433,7 @@
     {
       "id": "req-overview-deep-dive",
       "title": "Overview and deep-dive language for every entity",
-      "kind": "functional",
+      "kind": "feature",
       "status": "partial",
       "systemIds": ["sys-shared-model", "sys-client-state"],
       "evidence": [
@@ -517,7 +517,7 @@
     {
       "id": "req-category-lanes",
       "title": "The diagram reads left-to-right by system role",
-      "kind": "functional",
+      "kind": "feature",
       "status": "implemented",
       "systemIds": ["sys-shared-model", "sys-client-layout", "sys-client-diagram"],
       "evidence": [
@@ -537,7 +537,7 @@
     {
       "id": "req-system-focus",
       "title": "Open any system to see its neighbours and walk the graph",
-      "kind": "functional",
+      "kind": "feature",
       "status": "implemented",
       "systemIds": [
         "sys-client-navigation",
@@ -1366,6 +1366,23 @@
       },
       "summary": "Substring search ships now because it is cheap and exact; semantic retrieval over the recorded reasoning is the goal.",
       "detail": "`searchProject(project, query)` is pure \u2014 whole project in, matching ids per kind out \u2014 so the ranking strategy is one module deep: swapping substring for an embedding search changes that file and nothing else. Matches ring on the canvas and non-matches drop to `--dim-opacity`, reusing the selection's own classes so search introduces no new visual language; the panel lists narrow to matches while a query is running.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T20:30:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, wrap-up"
+      }
+    },
+    {
+      "id": "int-feature-is-a-requirement-kind",
+      "statement": "A feature is a requirement of kind feature, not a fourth entity: it keeps one list and one linking rule, and the pill makes it visible",
+      "rationale": "A separate Feature entity would need its own systemIds, its own intent links and its own panel list, doubling the linking rules for something that is already \"a requirement a user can name\". Rejected: Feature as a fifth entity type; a boolean userFacing flag (invisible in the pill row). Trade-off: the kind enum now mixes one audience distinction with three qualities, so the panel sorts features to the top to make the distinction legible.",
+      "appliesTo": {
+        "systemIds": ["sys-shared-model", "sys-client-panel"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "summary": "Features are requirements with kind `feature`, shown by an accent pill and sorted to the top of every requirement list.",
+      "detail": "`RequirementKind` gained a fourth member, `feature`, additively: existing data keeps validating and every consumer that renders `requirement.kind` picks the new value up for free. The panel gives it an accent pill (`.tag-kind-feature`, `--pill-kind-feature-bg/fg`) so a feature reads differently from the neutral kinds, and `featuresFirst()` in `client/src/model/entities.ts` is a stable sort that lifts features to the top of ProjectOverview and EntityDetail without disturbing seed order inside each group. Five seed requirements that describe user capabilities were retagged; internal ones (`req-dogfood-seed`, `req-current-by-default`) and the constraints were left alone. Grouping requirements by feature is a later view, not part of this change.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T20:30:00+08:00",

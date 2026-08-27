@@ -61,3 +61,13 @@ export function entityLabel(found: FoundEntity): string {
       return found.entity.statement;
   }
 }
+
+/**
+ * Requirements with features first, the rest in their original order — a stable sort, so a list
+ * still reads in seed order inside each group.
+ */
+export function featuresFirst(requirements: Requirement[]): Requirement[] {
+  return [...requirements].sort(
+    (a, b) => Number(b.kind === 'feature') - Number(a.kind === 'feature'),
+  );
+}

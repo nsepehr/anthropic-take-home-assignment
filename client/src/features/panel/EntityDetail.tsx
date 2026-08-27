@@ -1,4 +1,10 @@
-import { connectionsFor, findEntity, intentsFor, requirementsFor } from '../../model/entities';
+import {
+  connectionsFor,
+  featuresFirst,
+  findEntity,
+  intentsFor,
+  requirementsFor,
+} from '../../model/entities';
 import { panelEntityId } from '../../model/panelAction';
 import { useNavigation } from '../../state/navigation';
 import { useProject } from '../../state/projectStore';
@@ -21,7 +27,7 @@ export function EntityDetail() {
   if (!project || !selectedId) return null;
   const found = findEntity(project, selectedId);
   if (!found) return <div className="panel-empty">Unknown entity: {selectedId}</div>;
-  const requirements = requirementsFor(project, selectedId);
+  const requirements = featuresFirst(requirementsFor(project, selectedId));
   const intents = intentsFor(project, selectedId);
   return (
     <div className="panel">
