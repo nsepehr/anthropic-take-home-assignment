@@ -1,4 +1,4 @@
-import type { Edge, Project, System } from '@app/shared';
+import { getSystem, type Edge, type Project, type System } from '@app/shared';
 import { countBy } from './countBy';
 
 /** A system on the focus canvas with how much requirement/intent hangs on it. */
@@ -21,7 +21,7 @@ export interface FocusView {
 
 /** Pure: the ego graph of `id`; null when the id is not a system. */
 export function focusView(project: Project, id: string): FocusView | null {
-  const focus = project.systems.find((s) => s.id === id);
+  const focus = getSystem(project, id);
   if (!focus) return null;
   const requirementCounts = countBy(project.requirements.flatMap((r) => r.systemIds));
   const intentCounts = countBy(project.intents.flatMap((i) => i.appliesTo.systemIds));

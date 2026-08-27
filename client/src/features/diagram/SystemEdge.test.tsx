@@ -12,7 +12,6 @@ const props = {
   id: modelEdge.id,
   source: modelEdge.from,
   target: modelEdge.to,
-  label: 'talks to',
   data: { edge: modelEdge },
   sourceX: 0,
   sourceY: 0,
@@ -22,13 +21,13 @@ const props = {
   targetPosition: Position.Left,
 } as EdgeProps<SystemEdgeType>;
 
-function render(selectedId?: string, showLabel = false) {
+function render(selectedId?: string, label?: string) {
   return renderToString(
     <ProjectProvider initialProject={seedProject}>
       <SelectionProvider initialSelectedId={selectedId}>
         <ReactFlowProvider>
           <svg>
-            <SystemEdge {...props} data={{ edge: modelEdge, showLabel }} />
+            <SystemEdge {...props} label={label} />
           </svg>
         </ReactFlowProvider>
       </SelectionProvider>
@@ -37,8 +36,8 @@ function render(selectedId?: string, showLabel = false) {
 }
 
 describe('SystemEdge', () => {
-  it('names the edge only when the view asks for labels (focus view)', () => {
-    expect(render(undefined, true)).toContain('talks to');
+  it('draws the label when the view sets one (focus view)', () => {
+    expect(render(undefined, 'talks to')).toContain('talks to');
   });
 
   it('draws a path with an arrowhead and no label on the atlas', () => {

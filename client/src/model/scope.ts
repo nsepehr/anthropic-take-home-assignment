@@ -1,4 +1,4 @@
-import type { Project } from '@app/shared';
+import { getSystem, type Project } from '@app/shared';
 
 /** What the canvas shows: the whole atlas, or one system with its neighbours (system focus). */
 export type Scope = { level: 'atlas' } | { level: 'system'; id: string };
@@ -8,11 +8,6 @@ export const ATLAS: Scope = { level: 'atlas' };
 /** A stable string identity for a scope (React keys, memo deps). */
 export function scopeKey(scope: Scope): string {
   return scope.level === 'atlas' ? 'atlas' : `system:${scope.id}`;
-}
-
-/** The scope that shows `entityId` on the canvas: a system's own focus; null for anything else. */
-export function scopeOf(project: Project, entityId: string): Scope | null {
-  return project.systems.some((s) => s.id === entityId) ? { level: 'system', id: entityId } : null;
 }
 
 /**
@@ -41,7 +36,7 @@ export interface Crumb {
 
 /** `Architecture / hop / hop / current` — the header trail; the last crumb is the current scope. */
 export function breadcrumbFor(project: Project, trail: string[]): Crumb[] {
-  const name = (id: string) => project.systems.find((s) => s.id === id)?.name ?? id;
+  const name = (id: string) => getSystem(project, id)?.name ?? id;
   return [
     { label: 'Architecture', scope: ATLAS },
     ...trail.map<Crumb>((id) => ({ label: name(id), scope: { level: 'system', id } })),

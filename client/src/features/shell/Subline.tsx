@@ -1,3 +1,4 @@
+import { focusView } from '../../model/focusView';
 import { useNavigation } from '../../state/navigation';
 import { useProject } from '../../state/projectStore';
 
@@ -7,7 +8,7 @@ export function Subline() {
   const { scope } = useNavigation();
   if (!project) return null;
   if (scope.level === 'atlas') return <p className="shell-subline">{project.mission}</p>;
-  const connections = project.edges.filter((e) => e.from === scope.id || e.to === scope.id).length;
+  const connections = focusView(project, scope.id)?.edges.length ?? 0;
   const systems = project.systems.length;
   return (
     <p className="shell-subline">

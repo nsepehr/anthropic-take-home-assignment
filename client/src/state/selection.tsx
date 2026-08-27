@@ -5,6 +5,8 @@ import { deriveSelection, type SelectionView } from '../model/selection';
 export interface Selection extends SelectionView {
   select: (id: string) => void;
   clear: () => void;
+  /** Preview an entity's neighbourhood while the pointer is over it; `null` on leave. */
+  hover: (id: string | null) => void;
 }
 
 const SelectionContext = createContext<Selection | null>(null);
@@ -18,12 +20,14 @@ interface Props {
 export function SelectionProvider({ children, initialSelectedId }: Props) {
   const { project } = useProject();
   const [selectedId, setSelectedId] = useState<string | null>(initialSelectedId ?? null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const select = useCallback((id: string) => setSelectedId(id), []);
   const clear = useCallback(() => setSelectedId(null), []);
+  const hover = useCallback((id: string | null) => setHoveredId(id), []);
 
   const value = useMemo<Selection>(
-    () => ({ ...deriveSelection(project, selectedId), select, clear }),
-    [project, selectedId, select, clear],
+    () => ({ ...deriveSelection(project, selectedId, hoveredId), select, clear, hover }),
+    [project, selectedId, hoveredId, select, clear, hover],
   );
 
   return <SelectionContext.Provider value={value}>{children}</SelectionContext.Provider>;

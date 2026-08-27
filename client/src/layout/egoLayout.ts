@@ -1,3 +1,6 @@
+import { CARD_HEIGHT } from '../features/diagram/cardSize';
+import { NODE_SIZE } from '../model/toFlow';
+
 /**
  * Pure layout for the system-focus view (design revision 3): the focus card centered, inbound
  * neighbours stacked in a column on the left, outbound on the right. No ELK: the shape is fixed,
@@ -27,20 +30,19 @@ export const EGO = {
   frame: { width: 1000, minHeight: 580 },
   margin: 40,
   focus: { width: 260, height: 176 },
-  neighbour: { width: 210, height: 152 },
+  neighbour: { width: NODE_SIZE.width, height: CARD_HEIGHT },
   gap: 18,
 } as const;
 
 export function egoLayout({ focusId, inboundIds, outboundIds }: EgoInput): EgoLayout {
   const { frame, margin, focus, neighbour, gap } = EGO;
-  const tallest = Math.max(inboundIds.length, outboundIds.length);
-  const column = tallest * neighbour.height + Math.max(0, tallest - 1) * gap;
-  const height = Math.max(frame.minHeight, column + margin * 2);
+  const columnHeight = (n: number) => n * neighbour.height + Math.max(0, n - 1) * gap;
+  const tallest = columnHeight(Math.max(inboundIds.length, outboundIds.length));
+  const height = Math.max(frame.minHeight, tallest + margin * 2);
   const width = frame.width;
 
   const stack = (ids: string[], x: number): Placed[] => {
-    const total = ids.length * neighbour.height + Math.max(0, ids.length - 1) * gap;
-    const top = (height - total) / 2;
+    const top = (height - columnHeight(ids.length)) / 2;
     return ids.map((id, i) => ({
       id,
       position: { x, y: top + i * (neighbour.height + gap) },

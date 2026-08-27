@@ -1,5 +1,6 @@
 import type { Edge as ModelEdge, Project, System } from '@app/shared';
 import type { Edge, Node as FlowNode } from '@xyflow/react';
+import { countBy } from './countBy';
 
 /** What a diagram node carries: the System itself plus how much intent/requirement hangs on it. */
 export type SystemNodeData = {
@@ -12,8 +13,8 @@ export type SystemNodeData = {
 };
 
 export type SystemNode = FlowNode<SystemNodeData, 'system'>;
-/** `showLabel`: the focus view names each edge by its kind; the atlas keeps edges silent. */
-export type SystemEdge = Edge<{ edge: ModelEdge; showLabel?: boolean }>;
+/** `label` is drawn when present: the focus view names edges by kind; the atlas leaves it unset. */
+export type SystemEdge = Edge<{ edge: ModelEdge }>;
 
 export interface FlowElements {
   nodes: SystemNode[];
@@ -29,8 +30,8 @@ export const NODE_SIZE = { width: 210, height: 112 } as const;
  * handle sides are chosen after layout by `edgeSides`.
  */
 export function toFlowElements(project: Project): FlowElements {
-  const requirementCounts = countByKey(project.requirements.map((r) => r.systemIds));
-  const intentCounts = countByKey(project.intents.map((i) => i.appliesTo.systemIds));
+  const requirementCounts = countBy(project.requirements.flatMap((r) => r.systemIds));
+  const intentCounts = countBy(project.intents.flatMap((i) => i.appliesTo.systemIds));
 
   const nodes = sortParentsFirst(project.systems).map<SystemNode>((system) => ({
     id: system.id,
@@ -50,17 +51,10 @@ export function toFlowElements(project: Project): FlowElements {
     id: edge.id,
     source: edge.from,
     target: edge.to,
-    label: edge.label ?? edge.kind,
     data: { edge },
   }));
 
   return { nodes, edges };
-}
-
-function countByKey(lists: string[][]): Map<string, number> {
-  const counts = new Map<string, number>();
-  for (const list of lists) for (const id of list) counts.set(id, (counts.get(id) ?? 0) + 1);
-  return counts;
 }
 
 function sortParentsFirst(systems: System[]): System[] {

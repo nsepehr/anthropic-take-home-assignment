@@ -1,18 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { seedProject } from '../test/seed';
-import { ATLAS, breadcrumbFor, openIn, scopeKey, scopeOf, scopeOfTrail, trailTo } from './scope';
+import { ATLAS, breadcrumbFor, openIn, scopeKey, scopeOfTrail, trailTo } from './scope';
 
 const project = seedProject;
-
-describe('scopeOf', () => {
-  it('a system is shown by its own focus; requirements and intents have no canvas scope', () => {
-    expect(scopeOf(project, 'sys-client-diagram')).toEqual({
-      level: 'system',
-      id: 'sys-client-diagram',
-    });
-    expect(scopeOf(project, 'req-dogfood-seed')).toBeNull();
-  });
-});
 
 describe('trail', () => {
   it('opening appends; reopening a system on the trail rewinds to it', () => {

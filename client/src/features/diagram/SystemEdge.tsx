@@ -6,12 +6,11 @@ import { elementState } from './cardState';
 import { ARROW_ID } from './components/ArrowMarkers';
 
 /**
- * Bezier edge lit in accent when it touches the selection. The label is drawn only when the view
- * asks for it (`data.showLabel`, the focus view); the atlas keeps the canvas at one altitude.
+ * Bezier edge lit in accent when it touches the selection. The label is drawn when the view set
+ * one (the focus view names edges by kind); the atlas leaves it unset to stay at one altitude.
  */
 export const SystemEdge = memo(function SystemEdge(props: EdgeProps<SystemEdgeType>) {
-  const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition } = props;
-  const label = props.data?.showLabel ? props.label : undefined;
+  const { id, label, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition } = props;
   const selection = useSelection();
   const state = elementState(id, selection);
   const lit = state === 'selected' || state === 'related';

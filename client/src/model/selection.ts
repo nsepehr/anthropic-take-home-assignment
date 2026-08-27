@@ -9,6 +9,8 @@ export const EMPTY_RELATED: Related = {
 
 export interface SelectionView {
   selectedId: string | null;
+  /** The entity under the pointer, if any; it takes over the highlight while it lasts. */
+  hoveredId: string | null;
   /** Closure of the selection per `relatedTo`; empty when nothing is selected. */
   related: Related;
   /** The selected entity and everything related to it. */
@@ -17,21 +19,30 @@ export interface SelectionView {
   isDimmed: (id: string) => boolean;
 }
 
-/** Pure: given the project and a selected id, derive what the UI highlights and dims. */
-export function deriveSelection(project: Project | null, selectedId: string | null): SelectionView {
-  const related = project && selectedId ? relatedTo(project, selectedId) : EMPTY_RELATED;
+/**
+ * Pure: given the project, the selected id and the hovered id, derive what the UI highlights and
+ * dims. A hover previews its own neighbourhood without disturbing the selection underneath.
+ */
+export function deriveSelection(
+  project: Project | null,
+  selectedId: string | null,
+  hoveredId: string | null = null,
+): SelectionView {
+  const focusId = hoveredId ?? selectedId;
+  const related = project && focusId ? relatedTo(project, focusId) : EMPTY_RELATED;
   const highlighted = new Set<string>([
     ...related.systemIds,
     ...related.requirementIds,
     ...related.intentIds,
     ...related.edgeIds,
   ]);
-  if (selectedId) highlighted.add(selectedId);
+  if (focusId) highlighted.add(focusId);
   const isHighlighted = (id: string) => highlighted.has(id);
   return {
-    selectedId,
+    selectedId: focusId,
+    hoveredId,
     related,
     isHighlighted,
-    isDimmed: (id) => selectedId !== null && !isHighlighted(id),
+    isDimmed: (id) => focusId !== null && !isHighlighted(id),
   };
 }

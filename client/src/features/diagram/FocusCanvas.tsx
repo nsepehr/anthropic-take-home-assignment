@@ -18,13 +18,13 @@ interface Props {
 
 /**
  * System focus: the ego graph of one system — inbound neighbours left, outbound right — from
- * the pure `egoLayout`, no ELK. Clicking a neighbour walks to it; clicking the focus card, an
- * edge or the pane sets what the panel shows.
+ * the pure `egoLayout`, no ELK. Clicking any card opens it (a neighbour walks, the focus card
+ * re-centres the panel on it); an edge selects it; the pane returns the panel to the focus.
  */
 export function FocusCanvas({ project, systemId }: Props) {
   const view = useMemo(() => focusView(project, systemId), [project, systemId]);
   const { nodes, edges, layout } = useMemo(() => {
-    if (!view) return { nodes: [], edges: [], layout: null };
+    if (!view) return { nodes: [], edges: [], layout: { width: 0, height: 0 } };
     const layout = egoLayout({
       focusId: view.focus.system.id,
       inboundIds: view.inbound.map((n) => n.system.id),
@@ -40,9 +40,10 @@ export function FocusCanvas({ project, systemId }: Props) {
   const { select } = useSelection();
   const { open } = useNavigation();
 
+  // Opening the focus itself rewinds the trail to it and re-selects it (the panel returns to it).
   const onNodeClick = useCallback<NodeMouseHandler<SystemNode>>(
-    (_e, node) => (node.id === systemId ? select(node.id) : open(node.id)),
-    [systemId, select, open],
+    (_e, node) => open(node.id),
+    [open],
   );
   const onEdgeClick = useCallback<EdgeMouseHandler<SystemEdge>>(
     (_e, edge) => select(edge.id),
@@ -50,7 +51,7 @@ export function FocusCanvas({ project, systemId }: Props) {
   );
   const onPaneClick = useCallback(() => select(systemId), [select, systemId]);
 
-  if (!view || !layout) return <p className="diagram-error">Unknown system: {systemId}</p>;
+  if (!view) return <p className="diagram-error">Unknown system: {systemId}</p>;
   return (
     <FlowCanvas
       nodes={nodes}
