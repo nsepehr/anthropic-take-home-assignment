@@ -59,6 +59,7 @@ export function FocusCanvas({ project, systemId }: Props) {
     <FlowCanvas
       nodes={nodes}
       edges={edges}
+      bounds={{ x: 0, y: 0, width: layout.width, height: layout.height }}
       className="diagram--focus"
       onNodeClick={onNodeClick}
       onNodeDoubleClick={onNodeDoubleClick}

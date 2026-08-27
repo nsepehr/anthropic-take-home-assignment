@@ -1,5 +1,11 @@
 /* Diagram feature styles. Every value comes from the Organic tokens (client/src/styles). */
 
+/* The box the canvas fits itself to; React Flow fills it. */
+.diagram-host {
+  width: 100%;
+  height: 100%;
+}
+
 .diagram .react-flow__node {
   cursor: pointer;
 }
@@ -94,9 +100,32 @@
   color: var(--color-neutral-700);
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  /* Clamp so the card stays near the placeholder height ELK laid out with (cardSize.ts). */
+  /* Clamp so the card stays near the height the layout allotted it (cardSize.ts). */
   -webkit-line-clamp: 3;
   overflow: hidden;
+}
+
+/* Atlas: the card is exactly as tall as `COLUMN.card.height` in layout/columns.ts, so the stacks
+   the layout computes are the stacks the browser draws. Short cards are what let four columns of
+   the seed fit 1440×900 at a legible scale; the summary's rest is one click away in the panel. */
+.diagram--atlas .diagram-card {
+  position: relative;
+  height: 124px;
+  overflow: hidden;
+}
+/* Two lines exactly. The height is what does the truncating: Chrome blockifies a flex item's
+   `display: -webkit-box`, so the clamp alone would draw its ellipsis and then keep painting the
+   lines below it. Clamping to the same two lines puts that ellipsis where the text really stops. */
+.diagram--atlas .diagram-card__body {
+  flex: none;
+  height: 2.8em;
+  -webkit-line-clamp: 2;
+}
+/* Out of the title row's flow, so a system's name gets the full card width and stays on one line. */
+.diagram--atlas .diagram-card__open {
+  position: absolute;
+  top: 8px;
+  right: 10px;
 }
 .diagram-card__tags {
   display: flex;
@@ -171,6 +200,13 @@
 /* With nothing selected, edges recede so the cards read first; selecting lights the relevant ones. */
 .diagram-edge.is-idle {
   opacity: var(--edge-idle-opacity);
+}
+/* Inside a stage the stack is the story, so its arcs stay quiet until the selection lights them. */
+.diagram-edge--arc {
+  opacity: var(--edge-idle-opacity);
+}
+.diagram-edge--arc .react-flow__edge-path {
+  stroke-width: 1.1;
 }
 .diagram-edge.is-lit {
   opacity: 1;

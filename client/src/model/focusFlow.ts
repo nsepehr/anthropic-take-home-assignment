@@ -10,13 +10,13 @@ import type { FlowElements, SystemEdge, SystemNode } from './toFlow';
 export function focusFlowElements(view: FocusView, placed: Placed[]): FlowElements {
   const byId = new Map(placed.map((p) => [p.id, p]));
   const node = (n: FocusNode, focus?: true): SystemNode => {
-    const { position, width, height } = byId.get(n.system.id)!;
+    // Position only: a node that arrives pre-sized skips React Flow's measuring pass, which is
+    // also what gives its edges their handle positions.
+    const { position } = byId.get(n.system.id)!;
     return {
       id: n.system.id,
       type: 'system',
       position,
-      width,
-      height,
       data: {
         label: n.system.name,
         system: n.system,

@@ -1,5 +1,4 @@
-import { CARD_HEIGHT } from '../features/diagram/cardSize';
-import { NODE_SIZE } from '../model/toFlow';
+import { CARD_HEIGHT, CARD_WIDTH } from '../features/diagram/cardSize';
 
 /**
  * Pure layout for the system-focus view (design revision 3): the focus card centered, inbound
@@ -30,7 +29,7 @@ export const EGO = {
   frame: { width: 1000, minHeight: 580 },
   margin: 40,
   focus: { width: 260, height: 176 },
-  neighbour: { width: NODE_SIZE.width, height: CARD_HEIGHT },
+  neighbour: { width: CARD_WIDTH, height: CARD_HEIGHT },
   gap: 18,
 } as const;
 

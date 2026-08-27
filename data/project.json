@@ -174,18 +174,21 @@
       "kind": "module",
       "category": "Client",
       "paths": [
-        "client/src/layout/elk.ts",
-        "client/src/layout/useLayout.ts",
-        "client/src/layout/useLanes.ts",
+        "client/src/layout/columns.ts",
+        "client/src/layout/columnOrder.ts",
+        "client/src/layout/columnEdges.ts",
+        "client/src/layout/columnFlow.ts",
+        "client/src/layout/fitViewport.ts",
+        "client/src/layout/egoLayout.ts",
         "client/src/model/toFlow.ts",
         "client/src/model/lanes.ts"
       ],
-      "summary": "Pure ELK layout pipeline: flow elements in, positioned nodes out.",
-      "detail": "`model/toFlow.ts` maps Systems/Edges to React Flow elements. `layoutWithElk` builds a compound ELK graph (children nested by `parentId`, `INCLUDE_CHILDREN` so cross-group edges route, one partition per category) and returns nodes with parent-relative positions and ELK-computed parent sizes. `useLayout` wraps the async call and reports `idle | layouting | ready | error`. `model/lanes.ts` is pure: `categoryOf` walks `parentId` to the top-level ancestor, `laneOrder` orders categories by first appearance, `laneBounds` pads the positioned top-level nodes of each category; `useLanes` turns that into the `partitionOf` callback for ELK and the lane rectangles the diagram draws.",
+      "summary": "Pure layout: flow elements in, positioned nodes out — stage columns for the atlas, an ego graph for focus.",
+      "detail": "`model/toFlow.ts` maps Systems/Edges to React Flow elements, positions only. `columns.ts` lays the atlas out from one rule: each category is a column on a 280px pitch and its systems stack inside it. `columnOrder.ts` orders a column by the average row of each system's neighbours in the column to its left, ties broken by seed order, neighbourless systems last, and pins locked systems to the row they already had. `columnEdges.ts` splits the edges the two ends of which share a column off into side arcs; `columnFlow.ts` puts a layout onto React Flow elements and drops nested systems, which belong to their parent's focus view. `fitViewport.ts` turns the layout's own bounds into a viewport, so the diagram is whole on the first paint instead of waiting for a measuring pass. `egoLayout.ts` is the focus view's fixed shape. `model/lanes.ts` is pure: `categoryOf` walks `parentId` to the top-level ancestor and `laneOrder` orders the categories along the edge flow, which is the column order.",
       "provenance": {
         "source": "ai-inferred",
-        "capturedAt": "2026-08-27T15:00:00Z",
-        "sessionRef": "agent: client-foundation (task 03)"
+        "capturedAt": "2026-08-27T19:10:00+08:00",
+        "sessionRef": "agent: columns (task 18-column-layout)"
       }
     },
     {
@@ -239,8 +242,8 @@
         "client/src/features/diagram/",
         "client/src/features/diagram/components/LaneLayer.tsx"
       ],
-      "summary": "The architecture canvas: designed system cards and arrowed edges, laid out by ELK, lit by the selection.",
-      "detail": "`DiagramCanvas` wraps React Flow with `nodeTypes={{ system: SystemNode }}` and `edgeTypes={{ system: SystemEdge }}`, sizes leaf nodes per view mode (`cardSize.ts`) before `useLayout`, and maps clicks to `useSelection().select/clear`. `SystemNode` renders a `SystemCard` (kind dot, name, summary or detail, `kind · N req · N why · Verified/AI` tags) or a `GroupCard` frame for parents. `SystemEdge` is a bezier with an arrowhead marker, accent when related and neutral otherwise; labels only in deep dive. All colours come from tokens via `diagram.css`; `elementState` (selected | related | dimmed | idle) is the one pure function both cards and edges use. `LaneLayer` (from task 08-category-lanes) draws a translucent lane with an uppercase label behind each category inside React Flow's `ViewportPortal` (z-index below nodes) so lanes pan and zoom with the graph; the lane geometry itself comes from the layout module.",
+      "summary": "The architecture canvas: designed system cards and arrowed edges in stage columns, lit by the selection.",
+      "detail": "`DiagramCanvas` wraps React Flow with `nodeTypes={{ system: SystemNode }}` and `edgeTypes={{ system: SystemEdge }}`, takes a finished pure layout and fits the viewport to it, and maps clicks to `useSelection().select/clear`. `SystemNode` renders a `SystemCard` (kind dot, name, summary or detail, `kind · N req · N why · Verified/AI` tags) or a `GroupCard` frame for parents. `SystemEdge` is a bezier with an arrowhead marker, accent when related and neutral otherwise, and `ArcEdge` draws the edges inside one column as quiet arcs down its side; labels only in deep dive. All colours come from tokens via `diagram.css`; `elementState` (selected | related | dimmed | idle) is the one pure function both cards and edges use. `LaneLayer` (from task 08-category-lanes) draws a translucent lane with an uppercase label behind each category inside React Flow's `ViewportPortal` (z-index below nodes) so lanes pan and zoom with the graph; the lane geometry itself comes from the layout module.",
       "provenance": {
         "source": "ai-inferred",
         "capturedAt": "2026-08-27T16:00:00+08:00",
@@ -1224,6 +1227,23 @@
         "source": "human-verified",
         "capturedAt": "2026-08-27T19:00:00+08:00",
         "sessionRef": "planning chat 2026-08-27, phase-2 planning"
+      }
+    },
+    {
+      "id": "int-columns-are-stages",
+      "statement": "The atlas is a left-to-right flow of stage columns with systems stacked inside; a general layout engine was replaced by this one rule",
+      "rationale": "The design's simplification: because a category is a stage, the diagram's width becomes columns × card instead of whatever a solver returns, so it stays legible at one screen. The rule is deterministic and stable — a card moves only when the model changes — so a developer re-opening the atlas sees the same picture. ELK could be removed entirely.",
+      "appliesTo": {
+        "systemIds": ["sys-client-layout", "sys-client-diagram"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "summary": "One column per category in flow order; systems stack by neighbour barycenter, ties by seed order; intra-column edges arc.",
+      "detail": "`columnLayout` is pure and synchronous, so the whole atlas is on screen at first paint. Column order stays `orderLanesByFlow`. Inside a column, a system sorts by the average row of its neighbours in the previous column, ties broken by seed order, and a system with no neighbour there keeps seed order at the bottom — so a newly modelled system appends instead of shuffling the stack. Locked systems (task 19) are pinned to their previous row and the rest fill in around them. Cards are pinned to the layout's height in CSS so the stacks computed are the stacks drawn, and the viewport is fitted from the layout's own bounds rather than a measuring pass. Removing elkjs took ~1.44 MB of JavaScript out of the atlas.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T19:10:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, design revision 4"
       }
     }
   ],

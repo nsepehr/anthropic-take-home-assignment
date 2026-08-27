@@ -24,13 +24,12 @@ export interface FlowElements {
   edges: SystemEdge[];
 }
 
-/** Placeholder size before ELK sizes nodes; parents grow to fit their children. */
-export const NODE_SIZE = { width: 210, height: 112 } as const;
-
 /**
  * Pure: Project → React Flow elements. Nodes are ordered so every parent precedes its children
- * (a React Flow requirement); positions start at 0,0 and are relative to the parent. Edge
- * handle sides are chosen after layout by `edgeSides`.
+ * (a React Flow requirement); positions start at 0,0 and are placed by a layout. Nodes carry no
+ * size: React Flow measures the cards from the DOM (their size is CSS), and a node that arrives
+ * pre-sized skips that pass and loses the handle positions its edges need. Edge handle sides are
+ * chosen after layout by `edgeSides`.
  */
 export function toFlowElements(project: Project): FlowElements {
   const requirementCounts = countBy(project.requirements.flatMap((r) => r.systemIds));
@@ -40,7 +39,6 @@ export function toFlowElements(project: Project): FlowElements {
     id: system.id,
     type: 'system',
     position: { x: 0, y: 0 },
-    ...NODE_SIZE,
     ...(system.parentId ? { parentId: system.parentId, extent: 'parent' as const } : {}),
     data: {
       label: system.name,

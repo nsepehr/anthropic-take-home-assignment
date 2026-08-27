@@ -1,9 +1,7 @@
 import { memo } from 'react';
 import { BaseEdge, getBezierPath, type EdgeProps } from '@xyflow/react';
 import type { SystemEdge as SystemEdgeType } from '../../model/toFlow';
-import { useSelection } from '../../state/selection';
-import { elementState } from './cardState';
-import { ARROW_ID } from './components/ArrowMarkers';
+import { useEdgeLook } from './edgeLook';
 
 /**
  * Bezier edge lit in accent when it touches the selection. The label is drawn when the view set
@@ -11,12 +9,7 @@ import { ARROW_ID } from './components/ArrowMarkers';
  */
 export const SystemEdge = memo(function SystemEdge(props: EdgeProps<SystemEdgeType>) {
   const { id, label, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition } = props;
-  const selection = useSelection();
-  const state = elementState(id, selection);
-  const lit =
-    state === 'selected' ||
-    state === 'related' ||
-    (props.data?.accent === true && state !== 'dimmed');
+  const { state, lit, markerEnd } = useEdgeLook(id, props.data?.accent);
   const [path] = getBezierPath({
     sourceX,
     sourceY,
@@ -28,7 +21,7 @@ export const SystemEdge = memo(function SystemEdge(props: EdgeProps<SystemEdgeTy
 
   return (
     <g className={`diagram-edge is-${state}${lit ? ' is-lit' : ''}`}>
-      <BaseEdge id={id} path={path} markerEnd={`url(#${lit ? ARROW_ID.lit : ARROW_ID.idle})`} />
+      <BaseEdge id={id} path={path} markerEnd={markerEnd} />
       {label !== undefined && (
         <EdgePill x={sourceX + (targetX - sourceX) * 0.5} y={sourceY + (targetY - sourceY) * 0.3}>
           {String(label)}

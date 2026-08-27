@@ -1,5 +1,5 @@
 import { ViewportPortal } from '@xyflow/react';
-import { LANE_PADDING, type LaneBounds } from '../../../model/lanes';
+import type { LaneBounds } from '../../../model/lanes';
 
 const LANE_STYLE = {
   position: 'absolute',
@@ -9,10 +9,11 @@ const LANE_STYLE = {
   zIndex: -1,
 } as const;
 
+/** Sits in the label band the layout reserves above the first card (`COLUMN.labelBand`). */
 const LABEL_STYLE = {
   position: 'absolute',
-  left: LANE_PADDING.side + 4,
-  top: 8,
+  left: 20,
+  top: 7,
   fontSize: 10,
   letterSpacing: '0.1em',
   textTransform: 'uppercase',
