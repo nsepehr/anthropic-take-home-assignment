@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "A post-IDE interface for understanding a codebase: an interactive architecture diagram with human intent front and center.",
   "engines": {
-    "node": ">=20"
+    "node": "22.x"
   },
   "workspaces": [
     "shared",

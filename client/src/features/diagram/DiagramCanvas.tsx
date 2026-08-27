@@ -20,6 +20,8 @@ const defaultEdgeOptions = { type: 'system' };
 /** Fit the whole graph on load with a slim margin; the floor only matters for huge projects. */
 const FIT_VIEW = { padding: 0.08 };
 const MIN_ZOOM = 0.2;
+/** Pixels the pointer may drift between mousedown/up and still count as a click. */
+const CLICK_DISTANCE = 6;
 
 interface Props {
   project: Project;
@@ -68,6 +70,8 @@ export function DiagramCanvas({ project, overlay = defaultOverlay }: Props) {
       onNodeClick={onNodeClick}
       onEdgeClick={onEdgeClick}
       onPaneClick={clear}
+      nodeClickDistance={CLICK_DISTANCE}
+      paneClickDistance={CLICK_DISTANCE}
       nodesDraggable={false}
       nodesConnectable={false}
       zoomOnScroll
