@@ -18,7 +18,7 @@ export interface FlowElements {
 }
 
 /** Placeholder size before ELK sizes nodes; parents grow to fit their children. */
-export const NODE_SIZE = { width: 180, height: 60 } as const;
+export const NODE_SIZE = { width: 210, height: 112 } as const;
 
 /**
  * Pure: Project → React Flow elements. Nodes are ordered so every parent precedes its children

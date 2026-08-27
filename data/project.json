@@ -239,6 +239,20 @@
         "capturedAt": "2026-08-27T16:00:00+08:00",
         "sessionRef": "agent: detail-panel (task 07)"
       }
+    },
+    {
+      "id": "sys-client-diagram",
+      "name": "Diagram",
+      "kind": "ui",
+      "parentId": "sys-client-app",
+      "paths": ["client/src/features/diagram/"],
+      "summary": "The architecture canvas: designed system cards and arrowed edges, laid out by ELK, lit by the selection.",
+      "detail": "`DiagramCanvas` wraps React Flow with `nodeTypes={{ system: SystemNode }}` and `edgeTypes={{ system: SystemEdge }}`, sizes leaf nodes per view mode (`cardSize.ts`) before `useLayout`, and maps clicks to `useSelection().select/clear`. `SystemNode` renders a `SystemCard` (kind dot, name, summary or detail, `kind · N req · N why · Verified/AI` tags) or a `GroupCard` frame for parents. `SystemEdge` is a bezier with an arrowhead marker, accent when related and neutral otherwise; labels only in deep dive. All colours come from tokens via `diagram.css`; `elementState` (selected | related | dimmed | idle) is the one pure function both cards and edges use.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T16:00:00+08:00",
+        "sessionRef": "agent: system-node (task 06)"
+      }
     }
   ],
   "requirements": [
@@ -285,7 +299,8 @@
       "evidence": [
         "shared/src/related.ts",
         "shared/src/related.test.ts",
-        "client/src/model/selection.ts"
+        "client/src/model/selection.ts",
+        "client/src/features/diagram/"
       ],
       "summary": "Select one thing and everything connected to it — systems, requirements, intents, edges — lights up.",
       "detail": "From the assignment's guidance to do one interaction well. The chosen interaction is select-to-highlight. The data side is done: `relatedTo(project, id)` returns the closure in both directions and is tested. The UI side does not exist yet, hence `partial`.",
@@ -826,6 +841,24 @@
         "source": "human-verified",
         "capturedAt": "2026-08-27T16:00:00+08:00",
         "sessionRef": "planning chat 2026-08-27, design review"
+      }
+    },
+    {
+      "id": "int-node-is-a-card",
+      "statement": "A system on the canvas is a rich card (summary, counts of requirements and intents, provenance), not a labeled box",
+      "rationale": "The product thesis is that intent and requirements are front-and-center content, not tooltips. If a node is only a name, the reader has to click every box to learn anything; a card that already shows what the system does, how much is asked of it (N req), how many decisions shaped it (N why) and whether a human vouched for it lets the whole diagram be read at a glance and makes the click a deepening rather than a discovery. The cost is a larger node and a fixed-size layout placeholder, accepted for a small model.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-client-diagram"],
+        "requirementIds": ["req-single-focused-interaction"],
+        "edgeIds": []
+      },
+      "summary": "Every system card carries its summary, its counts and its provenance so the diagram reads without clicking.",
+      "detail": "Card spec from the Claude Design 'Project Atlas' work: 210px wide, kind dot + Caprasimo name, summary (overview) or detail (deep dive), tag row `kind · N req · N why · Verified/AI`. Selection states: ring + accent-200 fill when selected, accent-100 fill when related, `--dim-opacity` otherwise. Parent systems are a lighter frame with a legend label rather than a card.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T16:00:00+08:00",
+        "sessionRef": "Claude Design 'Project Atlas' + planning chat 2026-08-27"
       }
     }
   ],
