@@ -66,5 +66,10 @@ Ports: `CLIENT_PORT` (default 5173) and `SERVER_PORT` (default 3001) come from `
    - Report: what was built, what was skipped/deferred and why, how to verify (exact commands),
      any `shared/` changes, any decisions the human should know about.
 8. **Dependencies:** prefer none. Adding one requires a one-line justification in the report.
+9. **Dogfood the model.** This project is its own demo. When you finish a task, append to
+   `data/project.json`: the System(s) you built or changed, the Requirement(s) they serve (update
+   `status`), and the Intent(s) behind non-obvious choices — with honest `provenance` (your brief's
+   stated decisions are `human-verified`; your own inferences are `ai-inferred`). Run
+   `npm run validate:data`. Until task 01 lands this file doesn't exist; then it's mandatory.
 
 See `docs/AGENT_WORKFLOW.md` for the full lifecycle and merge/conflict guidance.

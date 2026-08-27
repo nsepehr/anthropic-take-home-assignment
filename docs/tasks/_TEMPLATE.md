@@ -48,6 +48,10 @@ The intent each test pins (one line each). Keep it to what another agent could b
 
 - `…test.ts`: "given …, returns …"
 
+## Seed data update (mandatory — see CLAUDE.md rule 9)
+
+Which systems / requirements / intents this task adds or updates in `data/project.json`.
+
 ## Report format
 
 When done, reply with:
