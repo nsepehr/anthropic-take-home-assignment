@@ -54,14 +54,14 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 5d  | `19-locks`               | 5     | P1       | cut         | agent: locks (opus)      | 17         | Lock a box / a layer; persisted; header counter; feeds 18                                      |
 | 5e  | `20-lifecycle`           | 5     | P0       | done        | agent: lifecycle         | 16         | lifecycle {superseded,withdrawn} on every entity; current-only views; per-system history panel |
 | 5f  | `21-chat-scope-ui`       | 5     | P1       | in-progress | agent: chat (opus)       | 17         | Ask Claude drawer: @-mentions, scope chips, canvas attention, scripted reply; client-only      |
-| 4   | `04-selection-linking`   | 5     | P0       | todo        | —                        | 03         | Hero interaction: select entity → connected entities highlight                                 |
+| 4   | `04-selection-linking`   | 5     | P0       | done        | —                        | 03         | Delivered by 11-highlight-neighbors + 17                                                       |
 | 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                                |
-| 5   | `05-detail-panels`       | 5     | P1       | todo        | —                        | 03         | Requirement list, intent panel, overview/deep-dive toggle                                      |
-| 6   | `06-trust-layer`         | 6     | P1       | todo        | —                        | 04         | Provenance badges, evidence links, gaps view                                                   |
+| 5   | `05-detail-panels`       | 5     | P1       | done        | —                        | 03         | Delivered by 07 + 10-per-item-deep-dive                                                        |
+| 6   | `06-trust-layer`         | 6     | P1       | done        | —                        | 04         | Provenance pills (15), advisories (16), history (20); gaps view not surfaced in UI             |
 | 7   | `09-deploy-vercel`       | 7     | P1       | done        | agent: deploy-vercel     | 02, 03     | Live: https://anthropic-take-home-assignment.vercel.app (vercel.json, api/, DEPLOY.md)         |
 | 8   | `08-seed-complete`       | 7     | P1       | todo        | —                        | 01         | Seed describes the finished project, honest provenance                                         |
 | 9   | `09-readme`              | 7     | P1       | todo        | —                        | —          | How to run, architecture, links                                                                |
-| 10  | `10-chat`                | 8     | P2       | todo        | —                        | 04         | Stretch: AI chat that @-tags systems/requirements/intents                                      |
+| 10  | `10-chat`                | 8     | P2       | done        | —                        | 04         | Client-only scope UI delivered by 21; write-side in backlog                                    |
 
 ## Backlog (client)
 
@@ -161,3 +161,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 19-locks → cut (human): idle lock icon makes cards look inactive; branch kept unmerged for a redesign
 - 2026-08-27 — 18-column-layout → review (agent: columns): atlas laid out by one rule — one column per category in `laneOrder` flow order, systems stacked inside, ordered by neighbour barycenter with seed order as the tie-break so a new system appends instead of shuffling; intra-column edges drawn as quiet side arcs (`ArcEdge`), cross-column edges keep the bezier + nearest-side handles; `lockedIds` + `previous` accepted so task 19 can pin a row; viewport fitted from the layout's own bounds (React Flow's `fitView` never fires for pre-sized nodes); atlas cards pinned to 124px with a 2-line summary, legible at 1440×900 (fit scale 0.65 ≥ 0.6); `elkjs` removed — the 1.44 MB `elk.bundled` chunk is gone; `int-columns-are-stages` appended and the stale ELK text in sys-client-layout / sys-client-diagram refreshed; worktree left running for inspection
 - 2026-08-27 — 18-column-layout → done (human, visually approved): stage columns, ELK removed
+- 2026-08-27 — tracker reconciled after hour-4: stale phase-1 rows marked done/superseded
