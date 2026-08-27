@@ -174,6 +174,20 @@
         "capturedAt": "2026-08-27T15:00:00Z",
         "sessionRef": "agent: client-foundation (task 03)"
       }
+    },
+    {
+      "id": "sys-client-styles",
+      "name": "Client styles",
+      "kind": "module",
+      "parentId": "sys-client-app",
+      "paths": ["client/src/styles/", "client/src/components/"],
+      "summary": "The Organic design tokens and base classes, plus the shared presentational components that consume them.",
+      "detail": "`styles/tokens.css` holds the `:root` variables ported verbatim from `docs/design/organic.css` plus app semantic tokens (`--kind-*`, `--status-*`, `--prov-*`, `--dim-opacity`, `--canvas-*`) derived from the ramps. `styles/base.css` carries the base rules and `.btn/.tag/.card/.seg` classes; `styles/index.css` is the single stylesheet entry. `components/` has `Tag`, `Button`, `KindDot`, `StatusDot`, `ProvenanceDot` — presentational only, typed from `@app/shared`.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T20:00:00+08:00",
+        "sessionRef": "agent: design-tokens (task 04)"
+      }
     }
   ],
   "requirements": [
@@ -651,6 +665,24 @@
         "source": "human-verified",
         "capturedAt": "2026-08-27T18:00:00+08:00",
         "sessionRef": "claude-code session 2026-08-27, planning chat (API review)"
+      }
+    },
+    {
+      "id": "int-design-tokens-single-source",
+      "statement": "All visual values come from the Organic token sheet designed in Claude Design; components never hard-code colors or fonts, so restyling never touches logic",
+      "rationale": "The look was designed once, by the human, in Claude Design (\"Project Atlas\"). Porting its `:root` block verbatim into `client/src/styles/tokens.css` and deriving every app-specific color (system kinds, requirement status, provenance, canvas) from the existing ramps means a restyle is an edit to one file. Components and features reference `var(--…)` or base classes only; `grep` for hex literals in `client/src` must stay empty.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-client-styles"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "summary": "One token sheet is the visual source of truth; no hex, font or radius in component code.",
+      "detail": "Semantic tokens: `--kind-ui/service/module/store/external/workflow`, `--status-implemented/partial/planned`, `--prov-human/ai`, `--dim-opacity`, `--canvas-bg/dot/dot-size`. Dark theme tokens are backlog.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T20:00:00+08:00",
+        "sessionRef": "Claude Design project 'Project Atlas' - planning chat 2026-08-27"
       }
     }
   ],

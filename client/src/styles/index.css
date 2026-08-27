@@ -1,0 +1,22 @@
+/* Single stylesheet entry: fonts, xyflow defaults, Organic tokens + base, app utilities. */
+@import url('https://fonts.googleapis.com/css2?family=Caprasimo:wght@400&family=Figtree:wght@400;600;700&display=swap');
+@import '@xyflow/react/dist/style.css';
+@import './tokens.css';
+@import './base.css';
+
+/* Thin themed scrollbar */
+.sb {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-neutral-400) transparent;
+}
+.sb::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.sb::-webkit-scrollbar-thumb {
+  background: var(--color-neutral-400);
+  border-radius: 999px;
+}
+.sb::-webkit-scrollbar-track {
+  background: transparent;
+}
