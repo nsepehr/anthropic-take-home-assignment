@@ -21,6 +21,15 @@ links, and stay visible in the UI.
   between them means anything to a reader.
 - `kind` is what it is (`ui`, `service`, `module`, `store`, `external`, `workflow`), not where.
 
+## Categories are stages
+
+- Categories are the **stages of a left-to-right flow**: one column each, systems stacked
+  vertically, and edges mostly crossing from one stage to the next. Order them by dependency flow
+  (here: Workflow → Client → Server → Model).
+- A category with many internal edges is not one stage. **Split it into two stages** along the
+  direction its internal edges point (e.g. `Client UI` → `Client state`).
+- Aim for **3–5 stages**; six is the hard limit.
+
 ## Edges
 
 - An edge exists **only when evidenced**: an import, a call, a read, a write, or an event. Cite the
@@ -64,6 +73,7 @@ links, and stay visible in the UI.
 | ------------------------- | ------------------------------------------------ | -------- |
 | `category-too-large`      | > 8 top-level systems in one category            | warn     |
 | `too-many-categories`     | > 6 categories                                   | warn     |
+| `category-internal-edges` | ≥ 3 internal edges and ≥ its cross-stage edges   | warn     |
 | `system-too-connected`    | > 6 edges touch one system                       | warn     |
 | `system-isolated`         | top-level system with 0 edges and no children    | warn     |
 | `edge-unlabeled`          | edge without a `label`                           | warn     |

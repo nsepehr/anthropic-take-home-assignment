@@ -49,6 +49,23 @@ describe('computeAdvisories', () => {
     expect(targets(p, 'too-many-categories')).toEqual(['Fixture']);
   });
 
+  it('category-internal-edges: >= 3 internal edges and at least as many as external', () => {
+    const p = cleanProject();
+    p.systems.push(system('sys-b1', { category: 'B' }), system('sys-b2', { category: 'B' }));
+    const edge = (id: string, from: string, to: string) =>
+      p.edges.push({ id, from, to, kind: 'calls' as const, label: 'l' });
+    edge('edge-i1', 'sys-b1', 'sys-b2');
+    edge('edge-i2', 'sys-b2', 'sys-b1');
+    edge('edge-x1', 'sys-b1', 'sys-other');
+    edge('edge-x2', 'sys-b2', 'sys-other');
+    expect(codes(p)).not.toContain('category-internal-edges'); // 2 internal < 3
+    edge('edge-i3', 'sys-b1', 'sys-b2');
+    expect(targets(p, 'category-internal-edges')).toEqual(['B']); // 3 internal >= 2 external
+    edge('edge-x3', 'sys-b1', 'sys-parent');
+    edge('edge-x4', 'sys-b2', 'sys-parent');
+    expect(codes(p)).not.toContain('category-internal-edges'); // 3 internal < 4 external
+  });
+
   it('system-too-connected: more than 6 edges touching one system', () => {
     const p = cleanProject();
     for (let i = 0; i < 6; i++) {
