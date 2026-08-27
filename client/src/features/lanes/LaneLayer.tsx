@@ -3,7 +3,7 @@ import { LANE_PADDING, type LaneBounds } from '../../model/lanes';
 
 const LANE_STYLE = {
   position: 'absolute',
-  borderRadius: 26,
+  borderRadius: 'var(--radius-lg)',
   background: 'color-mix(in srgb, var(--color-surface) 55%, transparent)',
   pointerEvents: 'none',
   zIndex: -1,
