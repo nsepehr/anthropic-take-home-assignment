@@ -53,6 +53,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 5c  | `18-column-layout`       | 5     | P0       | in-progress | agent: columns (opus)    | 17         | Stage columns, stable vertical order, side arcs; drop ELK; inspect before merge                |
 | 5d  | `19-locks`               | 5     | P1       | in-progress | agent: locks (opus)      | 17         | Lock a box / a layer; persisted; header counter; feeds 18                                      |
 | 5e  | `20-lifecycle`           | 5     | P0       | in-progress | agent: lifecycle         | 16         | lifecycle {current,superseded,retired} on every entity; current-only views; per-entity history |
+| 5f  | `21-chat-scope-ui`       | 5     | P1       | in-progress | agent: chat (opus)       | 17         | Ask Claude drawer: @-mentions, scope chips, canvas attention, scripted reply; client-only      |
 | 4   | `04-selection-linking`   | 5     | P0       | todo        | —                        | 03         | Hero interaction: select entity → connected entities highlight                                 |
 | 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                                |
 | 5   | `05-detail-panels`       | 5     | P1       | todo        | —                        | 03         | Requirement list, intent panel, overview/deep-dive toggle                                      |
@@ -77,6 +78,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
   reorder when edge flow actually flips (goes into 18-column-layout); (b) explicit lock: additive
   `System.pinned?: { category, rank }` honoured first by the layout and never reassigned by the
   write side; lock icon on the card toggles it (human-verified provenance).
+- **Chat write-side** (design rev 6 mock): rule-based/LLM drafting of changes → proposal card → Apply writes to the seed as ai-inferred → "Chat edit · review" pill until a human verifies. Server-side `POST /api/chat` with the project JSON as a cached system prompt.
 - Edge bundling / aggregated cross-lane edges in the overview.
 - Search / filter by requirement or intent.
 
@@ -152,3 +154,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 17-drill-down → review (agent: drilldown): atlas (hover previews neighbours, click selects, double-click / Open › enters focus) → system focus (pure `egoLayout` ego graph, labelled accent edges, 380px panel with Close/Clear/Back) → walk neighbours; header trail `Architecture / hop / current`, Esc = Back; first-time coach-mark; rev-4 tag/legend pills; `Project.categories` schema + validation + seed kept; `int-drill-down-by-category` superseded by `int-focus-ego-graph`; worktree left running for inspection
 - 2026-08-27 — 17-drill-down → done (human, visually approved): atlas → focus view, trail, helper, rev-4 tags
 - 2026-08-27 — 18-column-layout, 19-locks → in-progress (Opus agents)
+- 2026-08-27 — 21-chat-scope-ui → in-progress (agent: chat, Opus); design revision 6 recorded

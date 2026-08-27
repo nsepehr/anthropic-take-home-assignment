@@ -1,0 +1,47 @@
+<!-- Source: Claude Design project "Project Atlas — Landing Directions", revision 6 (2026-08-27).
+     DELTA over revision 5: "Ask Claude" CHAT DRAWER with @-mentions. (The mock also drafts and applies
+     edits; per the human, phase-1 scope is the CLIENT UI ONLY: drawer, mentions, scope chips, mention
+     buttons, canvas attention, a scripted scope reply. Drafting/Apply/"Chat edit · review" pills are
+     recorded here for the backlog, not built now.)
+
+     DRAWER (below the canvas+panel row, full width, `margin: 0 22px 20px`):
+       container: bg --color-surface, 1.5px border neutral-300, radius 28, shadow-md, overflow hidden.
+       HEADER BUTTON (toggles open/closed; padding 15px 24px): accent dot (10px) · "Ask Claude" (heading 17px)
+         · hint 12.5px neutral-700: "Mention a part with @ and ask for a change" (no messages) /
+           "Explains a part, then changes it" (after messages)
+         · right side 11.5px neutral-600: "<n> in scope" | "nothing in scope yet" · chevron (rotates 180° when open).
+       BODY (border-top divider), when open:
+         THREAD: height min(232px, 26vh), min 132px, scroll, padding 16px 24px 12px, gap 13px.
+           Empty state (max-width 680px): text 13px neutral-700: "Type @ to point me at a system, requirement or intent,
+           then say what should change. I explain that part, draft the edit, and write it only when you apply."
+           + 2 example buttons (dashed neutral-400 border, neutral-100 bg, radius 16, 12.5px) that fill the input.
+           Messages: column, max-width min(680px, 88%); user → align flex-end, bg accent-200; assistant → flex-start,
+           bg --color-bg with divider border; bubble radius 18, padding 10px 14px, 13px, pre-line.
+           Above a user bubble: mention chips "@<short label>" (11px, accent-2-300 bg / accent-2-900 fg, radius 999).
+         COMPOSER (border-top divider, padding 13px 24px 17px, position relative):
+           @-MENU (absolute above the input, left 24px, width 460px, max-height 244px, bg --color-bg, 1.5px neutral-300
+             border, radius 20, shadow-lg, padding 6px): rows = dot (kind/status colour) · label 12.5px · class label
+             uppercase 10px neutral-600 ("SYSTEM" / "REQUIREMENT" / "INTENT"); first row bg accent-100; up to 7 matches
+             filtered by the text after the last "@"; "Nothing by that name." when empty. Enter/click picks, Esc closes.
+           SCOPE CHIPS row (when any): "@<short>" pill buttons (accent-2-300 / accent-2-900) with an × to remove;
+             Backspace on an empty input removes the last one.
+           INPUT `.input` (13.5px, padding 10px 17px) placeholder "@requirement or @intent, then what should change…"
+             + primary icon button (arrow-right) "Send". Enter sends.
+
+     MENTION BUTTONS: a small round "@" button (heading font) on the panel's DetailCard title row (30px, before the
+       action button), on each RequirementCard (24px, right of the title) and IntentCard (24px, right of the statement).
+       Idle: transparent bg, accent-2-800 fg; when already in scope: accent-2-600 bg, --color-bg fg.
+       Title: "Tag <name> into the chat" / "… is already in the chat scope". Clicking opens the drawer and focuses the input.
+
+     CANVAS ATTENTION: while anything is in scope, the systems it resolves to (a System itself; a Requirement's
+       systemIds; an Intent's appliesTo.systemIds) get a 3px ring in accent-2-500 and full opacity; everything else
+       dims to 0.22 — this overrides hover/selection dimming until the scope is cleared.
+
+     SCRIPTED REPLY (client-only): "Scoped to <system names>. …" — for phase 1 the assistant bubble summarises the
+       resolved context (which systems, how many connections, requirements and intents they carry) and, with no
+       mentions: "Type @ and pick a system, requirement or intent first, so I know what to change."
+
+     BACKLOG (mock only, not built): rule-based drafting of changes (retire / set status / reword / add requirement /
+       record intent) as a proposal card with "Apply changes" / "Discard", "Written to the map, tagged AI — pending
+       review." confirmation, and a dashed "Chat edit · review" pill on edited cards.
+-->
