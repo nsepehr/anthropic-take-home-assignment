@@ -59,6 +59,15 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 
 - dark theme tokens — a `[data-theme="dark"]` override block in `client/src/styles/tokens.css`
 
+## Backlog (product — next phase)
+
+- **Progressive disclosure / drill-down** — the core scaling problem surfaced on 2026-08-27 when the seed
+  grew to ~25 edges: the overview should show categories as collapsed nodes with the edges between
+  them aggregated; clicking a category drills into its modules; a breadcrumb backs out. Phase 1 stays
+  flat and demo-clean instead of hiding edges ad hoc.
+- Edge bundling / aggregated cross-lane edges in the overview.
+- Search / filter by requirement or intent.
+
 ## Backlog (schema)
 
 Cut from the phase-1 model on 2026-08-27 to keep it minimal. Each is re-addable as an optional
