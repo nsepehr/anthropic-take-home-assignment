@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { LifecycleSchema } from './lifecycle.js';
 
 export const EdgeKind = z.enum(['calls', 'reads', 'writes', 'emits', 'depends']);
 
@@ -16,6 +17,8 @@ export const EdgeSchema = z.object({
   intentId: z.string().optional(),
   summary: z.string().optional(),
   detail: z.string().optional(),
+  /** Absent = current. See `schema/lifecycle.ts`. */
+  lifecycle: LifecycleSchema.optional(),
 });
 
 export type Edge = z.infer<typeof EdgeSchema>;

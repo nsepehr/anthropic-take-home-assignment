@@ -13,10 +13,12 @@
         "shared/src/gaps.ts",
         "shared/src/related.ts",
         "shared/src/advisories.ts",
+        "shared/src/lifecycle.ts",
+        "shared/src/history.ts",
         "shared/src/index.ts"
       ],
       "summary": "The contract between server and client: Zod schemas for System, Requirement, Intent and Edge, plus validation and graph helpers.",
-      "detail": "Package `@app/shared`. Defines the four entity schemas with Zod and infers the TypeScript types from them, so there is exactly one definition. `validateProject()` checks shape and then referential integrity (unique ids, references resolving to the right entity type, edge endpoints existing, no `parentId` cycles) and returns readable path+message errors. `computeGaps()` reports what the model cannot explain. `relatedTo()` returns everything linked to an entity in either direction — the closure the UI will highlight on selection. `computeAdvisories()` warns where the model breaks the rules in `docs/MODELING.md`. Has no runtime dependency except `zod`. Built by task 01-schema-and-seed.",
+      "detail": "Package `@app/shared`. Defines the four entity schemas with Zod and infers the TypeScript types from them, so there is exactly one definition. `validateProject()` checks shape and then referential integrity (unique ids, references resolving to the right entity type, edge endpoints existing, no `parentId` cycles) and returns readable path+message errors. `computeGaps()` reports what the model cannot explain. `relatedTo()` returns everything linked to an entity in either direction — the closure the UI will highlight on selection. `computeAdvisories()` warns where the model breaks the rules in `docs/MODELING.md`. `lifecycle.ts` answers what the system is *now*: `isCurrent()`, `currentOnly()` (drops superseded and withdrawn entries, and edges whose endpoints went with them) and `historyOf()` (walks `supersededBy` backwards). `history.ts` answers the opposite question for one system: `historyFor(project, systemId)` returns its superseded and withdrawn requirements and intents, newest first. Gaps and advisories run on `currentOnly()`. Has no runtime dependency except `zod`. Built by task 01-schema-and-seed.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T15:00:00+08:00",
@@ -159,7 +161,7 @@
         "client/src/model/selection.ts"
       ],
       "summary": "Project and selection state exposed as React hooks.",
-      "detail": "`ProjectProvider`/`useProject` load the project once through `api/project.ts` (the client's only fetch call site). `SelectionProvider`/`useSelection` hold one selected id and derive `related`, `isHighlighted`, `isDimmed` with `relatedTo` from the shared model — no network round-trip. The global view-mode switch that used to live here was removed by task 10 (deep dive is per item, in the detail card).",
+      "detail": "`ProjectProvider`/`useProject` load the project once through `api/project.ts` (the client's only fetch call site). `SelectionProvider`/`useSelection` hold one selected id and derive `related`, `isHighlighted`, `isDimmed` with `relatedTo` from the shared model — no network round-trip. The global view-mode switch that used to live here was removed by task 10 (deep dive is per item, in the detail card). `ProjectProvider` filters the payload through `currentOnly()` once, so `project` is what is true now everywhere in the app; `fullProject` keeps the whole file for the one view that shows history.",
       "provenance": {
         "source": "ai-inferred",
         "capturedAt": "2026-08-27T15:00:00Z",
@@ -221,7 +223,7 @@
       "category": "Client",
       "paths": ["client/src/features/panel/", "client/src/model/entities.ts"],
       "summary": "The right panel: the selected entity's what / must-do / why, or the whole project when nothing is selected.",
-      "detail": "`EntityDetail` dispatches on the selected id: a headline `DetailCard` (kicker, title, summary, and in deep dive the system's how-it-works, the requirement's evidence, or the intent's rationale), then the entity's requirements and intents as clickable cards, then `ConnectedChips` for every linked entity. `ProjectOverview` shows mission, counts and every requirement and intent. The pure lookups (`findEntity`, `requirementsFor`, `intentsFor`, `connectionsFor`) live in `client/src/model/entities.ts` and derive everything from `relatedTo`.",
+      "detail": "`EntityDetail` dispatches on the selected id: a headline `DetailCard` (kicker, title, summary, and in deep dive the system's how-it-works, the requirement's evidence, or the intent's rationale), then the entity's requirements and intents as clickable cards, then `ConnectedChips` for every linked entity. `ProjectOverview` shows mission, counts and every requirement and intent. The pure lookups (`findEntity`, `requirementsFor`, `intentsFor`, `connectionsFor`) live in `client/src/model/entities.ts` and derive everything from `relatedTo`. For a system, `HistorySection` follows the intents list with a \"Show history (N)\" control that reveals the system's superseded and withdrawn requirements and intents — read from `fullProject` via `historyFor`, greyed, struck through and pilled with what happened to them.",
       "provenance": {
         "source": "ai-inferred",
         "capturedAt": "2026-08-27T16:00:00+08:00",
@@ -512,6 +514,25 @@
         "capturedAt": "2026-08-27T18:30:00+08:00",
         "sessionRef": "agent: drilldown (task 17)"
       }
+    },
+    {
+      "id": "req-current-by-default",
+      "title": "The tool shows what is true now; history is on demand, per system",
+      "kind": "functional",
+      "status": "implemented",
+      "systemIds": ["sys-shared-model", "sys-client-state", "sys-client-panel"],
+      "evidence": [
+        "shared/src/lifecycle.test.ts",
+        "shared/src/history.test.ts",
+        "client/src/features/panel/HistorySection.test.tsx"
+      ],
+      "summary": "Superseded and withdrawn entries never appear in the lists or on the canvas; a system's panel reveals its own history.",
+      "detail": "`currentOnly()` filters the payload once, in `ProjectProvider`, so no feature has to remember what is still true. The only view that looks past it is `HistorySection`, which asks `historyFor(fullProject, systemId)` for the requirements and intents that system used to have and renders them greyed, struck through and labelled Superseded or Withdrawn. Built by task 20-lifecycle after design revision 5 replaced the global \"Show retired\" switch.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T20:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, design revision 5"
+      }
     }
   ],
   "intents": [
@@ -519,7 +540,6 @@
       "id": "int-intent-first-class",
       "statement": "Intent is a first-class entity, not a field on System.",
       "rationale": "One decision typically explains several systems and edges at once. Modelling it as its own entity with `appliesTo` lets the UI put intent front and center and cross-link it, instead of burying it in a tooltip on one node. Alternatives rejected: A `rationale` string field on each System; Free-text notes attached to edges. Trade-off: More ids to keep consistent by hand; the validator and gaps report exist partly to make that manageable.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model"],
         "requirementIds": ["req-one-view-understanding"],
@@ -537,7 +557,6 @@
       "id": "int-summary-and-detail",
       "statement": "Every entity carries both a one-sentence summary and a deep-dive detail.",
       "rationale": "Different readers need different depth: a newcomer wants plain language, a maintainer wants the full story. Baking both into the schema means the UI can toggle overview/deep dive globally without any entity being left out. Alternatives rejected: A single description field, truncated for overview mode; Generating the summary at render time. Trade-off: Authors must write two texts per entity; the seed is longer to maintain.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model"],
         "requirementIds": ["req-overview-deep-dive"],
@@ -555,7 +574,6 @@
       "id": "int-project-is-own-demo",
       "statement": "The project is its own demo; the seed data is captured from the build process, not mocked.",
       "rationale": "A mocked example codebase would prove nothing about whether the model captures real intent. Recording this repo's own decisions as they are made tests the model for real and gives the demo honest content. Alternatives rejected: A fictional sample project; Analysing a well-known open-source repo. Trade-off: The demo content is small and about a tooling project, which is less flashy than a big product codebase.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-seed-data", "sys-agent-rules"],
         "requirementIds": [
@@ -577,7 +595,6 @@
       "id": "int-react-flow-elk",
       "statement": "Use React Flow (@xyflow/react) with elkjs layout, rather than LikeC4, Cytoscape or Mermaid.",
       "rationale": "Nodes must be rich React components showing requirements and intent as content, so the rendering layer has to be React-native. React Flow gives full control over nodes and edges; elkjs supplies a proper layered layout for nested systems. Alternatives rejected: LikeC4 — too opinionated for an intent-first UI; Cytoscape — canvas-only, no React nodes; Mermaid — static output, no interaction. Trade-off: More layout and interaction code to write ourselves; elkjs adds bundle weight.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-client-diagram", "sys-client-layout"],
         "requirementIds": ["req-one-view-understanding"],
@@ -595,7 +612,6 @@
       "id": "int-isolated-worktrees",
       "statement": "Each parallel agent works in its own git worktree with its own allocated ports.",
       "rationale": "Agents run concurrently and each starts dev servers. Worktrees give file-level isolation and a private branch; the ports allocator prevents `EADDRINUSE` collisions and hardcoded 5173/3001. Alternatives rejected: All agents on one checkout with feature branches; Fixed port offsets per task. Trade-off: A full `npm install` per worktree and some disk use; the human does all merges by hand, fast-forward only.",
-      "status": "active",
       "appliesTo": {
         "systemIds": [
           "sys-agent-rules",
@@ -624,7 +640,6 @@
       "id": "int-trust-provenance-gaps",
       "statement": "Trust is explicit: provenance on every claim, and the tool reports gaps instead of hiding them.",
       "rationale": "A map that mixes verified facts with AI guesses without saying which is which is worse than no map. Showing provenance and an honest 'unexplained' list lets the reader calibrate. Alternatives rejected: Treating all generated content as equally trustworthy; Omitting entities the model cannot explain so the diagram looks complete. Trade-off: The demo will visibly show gaps and `ai-inferred` badges, which looks less polished but is the point.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model", "sys-seed-data"],
         "requirementIds": ["req-provenance-on-claims"],
@@ -642,7 +657,6 @@
       "id": "int-chat-last",
       "statement": "Chat and AI generation features come deliberately last.",
       "rationale": "The core question is whether a human can understand a system from the map, not whether an AI can generate text about it. Building understanding first keeps the prototype focused and keeps the demo self-contained with no API keys. Alternatives rejected: Leading with an LLM chat over the codebase; Generating the architecture model from the repo with an LLM in task 01. Trade-off: The first demo has no generative feature, which some reviewers may expect.",
-      "status": "active",
       "appliesTo": {
         "systemIds": [],
         "requirementIds": ["req-self-contained-demo"],
@@ -660,7 +674,6 @@
       "id": "int-backend-first",
       "statement": "Build the model and backend first; design the UI look-and-feel separately with Claude Design.",
       "rationale": "The data model is the contract everything depends on and is where the product thesis lives. Locking it first lets server and client tasks run in parallel, while visual design happens in a dedicated tool rather than by iterating CSS in code. Alternatives rejected: UI-first prototyping with hardcoded data; Designing look-and-feel inline in React components. Trade-off: The client is a bare hello page for longer than a UI-first approach would leave it.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model", "sys-server-api", "sys-client-api"],
         "requirementIds": ["req-single-focused-interaction"],
@@ -678,7 +691,6 @@
       "id": "int-zod-single-definition",
       "statement": "Zod defines the schema once; TypeScript types are inferred from it.",
       "rationale": "Runtime validation at the API boundary and compile-time types must never drift. `z.infer` gives both from one definition. It is the one runtime dependency `shared/` is allowed. Alternatives rejected: Hand-written interfaces plus a separate JSON Schema; TypeScript types only, trusting the JSON. Trade-off: One dependency in the otherwise dependency-free contract package.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model"],
         "requirementIds": [],
@@ -696,7 +708,6 @@
       "id": "int-edges-lightweight",
       "statement": "Edges have optional summary/detail and no provenance of their own; their explanation lives in the Intent they point to.",
       "rationale": "An edge is a fact about two systems that already carry provenance. Requiring two paragraphs and a provenance block per arrow would make the seed tedious and push authors to omit edges. Keeping edges thin and hanging the 'why' on `intentId` keeps intent as the single place decisions are explained. Alternatives rejected: Edges as full entities with required summary, detail and provenance; Edges with no explanatory fields at all. Trade-off: An edge without an `intentId` is unexplained, which the gaps report surfaces as `edgesWithoutIntent`.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model"],
         "requirementIds": [],
@@ -714,7 +725,6 @@
       "id": "int-tests-pin-intent",
       "statement": "Every module ships with a small test that pins its intent, not its implementation.",
       "rationale": "With several agents editing in parallel, the danger is a silent behaviour change in something another task relies on. A test stating what the module must do fails loudly at `finish-worktree.sh` time. Coverage is not the goal. Alternatives rejected: Coverage thresholds; No tests during the prototype phase. Trade-off: Some duplication between tests and briefs; tests stay deliberately shallow.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-check-suite"],
         "requirementIds": ["req-parallel-agents-safe"],
@@ -732,7 +742,6 @@
       "id": "int-minimal-phase1-schema",
       "statement": "Schema kept minimal for phase 1; links stored once and derived; everything cut is re-addable as optional fields.",
       "rationale": "With several agents appending to the seed in parallel, bidirectional links (System.intentIds mirroring Intent.appliesTo, Requirement.intentIds mirroring the same) drift: one side gets updated and the other does not, and the validator cannot tell which side is right. Storing each link once — Requirement.systemIds, Intent.appliesTo, Edge endpoints/intentId, System.parentId — and deriving the reverse in relatedTo removes that failure mode. Intent.alternativesRejected and tradeoffs were folded into rationale prose for now. Every removed field can return later as an optional field or enum value without breaking existing data; the backlog in docs/TASKS.md lists them.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model", "sys-seed-data"],
         "requirementIds": ["req-parallel-agents-safe"],
@@ -750,7 +759,6 @@
       "id": "int-server-thin-validate-once",
       "statement": "The server validates the project once at boot and stays thin; a broken seed is surfaced, not hidden.",
       "rationale": "The server's whole job is load, validate, serve. Validating once and caching keeps the one project route a pure read of the cached model, and keeps analysis or AI out of the server so it can be added as a separate task later. If the seed fails validation the server must still boot: `/api/project` returns 500 with the readable path+message errors and `/api/health` reports `loaded: false`, so an author sees exactly what is wrong instead of a crash loop or a silently empty diagram. Alternatives rejected: crashing at startup on an invalid file; validating on every request; serving whatever parses even if references dangle. Trade-off: editing the seed needs `POST /api/project/reload` (dev only) or a restart.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-server-api"],
         "requirementIds": ["req-self-contained-demo", "req-provenance-on-claims"],
@@ -768,7 +776,6 @@
       "id": "int-selection-client-side",
       "statement": "The selection closure is computed client-side from the shared model, not via the API.",
       "rationale": "Highlighting must be instant and there should be one source of truth: `relatedTo` in `@app/shared` runs in the browser over the already-loaded project. The per-entity API routes were removed (see int-api-single-payload); the UI only ever had the whole model.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-client-state", "sys-shared-model"],
         "requirementIds": ["req-single-focused-interaction"],
@@ -790,7 +797,6 @@
       "id": "int-layout-pure-pipeline",
       "statement": "Layout is a pure pipeline: model → flow elements → ELK positions.",
       "rationale": "The design pass restyles nodes without touching logic: `toFlowElements` and `layoutWithElk` take model data and return plain data, so custom node components and tokens can be swapped in on top. React Flow 12 needs parents before children and parent-relative child positions; the pipeline guarantees both.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-client-layout"],
         "requirementIds": ["req-one-view-understanding"],
@@ -808,7 +814,6 @@
       "id": "int-api-single-payload",
       "statement": "The API is one payload: the whole model in one call; the client derives selection, highlighting and gaps locally",
       "rationale": "The model is small and the product's point is seeing it all at once, so there is nothing to gain from paging or per-entity fetches. Holding one immutable object on the client means one source of truth: selection closures (`relatedTo`) and gaps (`computeGaps`) are derived from it with the same `@app/shared` functions the validator uses, so the UI can never disagree with the data. The API response is byte-identical in shape to `data/project.json`, which is a trust property: what you see in the diagram is what is in the file. The original task 02 added `GET /api/project/related/:id`, `/entities/:id` and `/gaps`; human review found they duplicated client logic for a hypothetical curl user, and they were removed.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-server-api", "sys-client-api"],
         "requirementIds": [],
@@ -826,7 +831,6 @@
       "id": "int-design-tokens-single-source",
       "statement": "All visual values come from the Organic token sheet designed in Claude Design; components never hard-code colors or fonts, so restyling never touches logic",
       "rationale": "The look was designed once, by the human, in Claude Design (\"Project Atlas\"). Porting its `:root` block verbatim into `client/src/styles/tokens.css` and deriving every app-specific color (system kinds, requirement status, provenance, canvas) from the existing ramps means a restyle is an edit to one file. Components and features reference `var(--…)` or base classes only; `grep` for hex literals in `client/src` must stay empty.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-client-styles"],
         "requirementIds": [],
@@ -844,7 +848,6 @@
       "id": "int-category-is-classification",
       "statement": "Category is a lane (classification), separate from parentId (containment); lanes give the diagram a left-to-right reading order",
       "rationale": "Two different questions get two different fields. `parentId` says what a system is inside of; `category` says what role it plays (Model, Server, Client, Workflow) and therefore which column it belongs in. Folding category into the tree (e.g. a synthetic parent per category) was rejected because it would force every top-level system into an artificial box and break real containment. Only top-level systems carry a category; nested systems inherit their ancestor's, so they always land inside their parent's lane. ELK's `partitioning` option turns each category into a vertical column ordered by first appearance in `project.systems`, which makes the reading order a property of the data, not of the layout engine.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model", "sys-client-layout", "sys-client-diagram"],
         "requirementIds": ["req-category-lanes"],
@@ -864,7 +867,6 @@
       "detail": "Overrides the Claude Design mock, which hid the panel until a click. `SidePanel` takes both views as slots and switches on `selectedId`, so later panel tasks fill content without touching the frame.",
       "statement": "The right panel always shows something: the whole project when nothing is selected, the entity when something is",
       "rationale": "Newcomers need the overview before they click; no empty states. The design hid the panel until a selection was made — the human overrode that so the screen always answers 'what is this project?' or 'what is this thing?'.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-client-shell"],
         "requirementIds": [],
@@ -882,8 +884,12 @@
       "detail": "Overrides the per-card button in the design mock. The `.seg` control in `Header` binds to `useViewMode()`, which persists the choice in localStorage so a reload keeps the reader at the same altitude.",
       "statement": "Overview vs deep dive is one global switch, not per card",
       "rationale": "summary/detail is baked into the schema for every entity; one switch keeps the whole screen at one altitude. The design had a per-item button; the human moved it to the header, bound to `useViewMode()`, which persists across reloads.",
-      "status": "superseded",
-      "supersededBy": "int-per-item-deep-dive",
+      "lifecycle": {
+        "state": "superseded",
+        "supersededBy": "int-per-item-deep-dive",
+        "since": "2026-08-27T16:04:03+08:00",
+        "reason": "Human review preferred per-item depth"
+      },
       "appliesTo": {
         "systemIds": ["sys-client-shell", "sys-client-state"],
         "requirementIds": [],
@@ -899,7 +905,6 @@
       "id": "int-panel-answers-three-questions",
       "statement": "Selecting a system answers, in one panel: what it is, what it must do (requirements + evidence), and why it is built this way (intents + rationale)",
       "rationale": "The product thesis is that intent and requirements are content, not tooltips. One panel with a fixed order — what, must-do, why — means a newcomer reads a system the same way every time, and the evidence and rationale sit right next to the claim they support instead of behind a click. Requirements and intents re-center the same panel so the reading flow never changes shape.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-client-panel"],
         "requirementIds": ["req-single-focused-interaction", "req-overview-deep-dive"],
@@ -917,7 +922,6 @@
       "id": "int-node-is-a-card",
       "statement": "A system on the canvas is a rich card (summary, counts of requirements and intents, provenance), not a labeled box",
       "rationale": "The product thesis is that intent and requirements are front-and-center content, not tooltips. If a node is only a name, the reader has to click every box to learn anything; a card that already shows what the system does, how much is asked of it (N req), how many decisions shaped it (N why) and whether a human vouched for it lets the whole diagram be read at a glance and makes the click a deepening rather than a discovery. The cost is a larger node and a fixed-size layout placeholder, accepted for a small model.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-client-diagram"],
         "requirementIds": ["req-single-focused-interaction"],
@@ -935,7 +939,6 @@
       "id": "int-one-function-same-app",
       "statement": "Deploy wraps the same Fastify app in one serverless function instead of maintaining a second server; static client on the CDN",
       "rationale": "A second server implementation for production would drift from the one developers run locally. Wrapping `buildApp()` in a single Vercel function keeps one code path for routes, validation and config; the dev workflow (`npm run dev`, Vite proxy) is untouched. Vercel was chosen over Fly.io because `git push` deploys with no Dockerfile.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-deploy-vercel", "sys-server-api"],
         "requirementIds": ["req-deployed-prototype"],
@@ -953,7 +956,6 @@
       "id": "int-selection-closure-includes-neighbors",
       "statement": "Selecting a thing lights up everything one hop away — connected systems, not just the arrows",
       "rationale": "The question a selection answers is \"how does this fit together?\"; a lit arrow into a dimmed box answers half of it. Matches the design's related() rule. Fixed at the shared model (relatedTo) so canvas and panel agree.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model", "sys-client-diagram"],
         "requirementIds": ["req-single-focused-interaction"],
@@ -971,7 +973,6 @@
       "id": "int-per-item-deep-dive",
       "statement": "Deep dive is per selection, opened from the detail card, not a global mode",
       "rationale": "The human reviewed the first build and preferred the design's model: the canvas stays at one altitude, and depth is asked for on the thing you're looking at. A global switch changed the whole screen at once and made the panel harder to read. The button lives in the detail card and its state is local, so it resets whenever the selection changes.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-client-panel", "sys-client-shell"],
         "requirementIds": ["req-overview-deep-dive"],
@@ -989,7 +990,6 @@
       "id": "int-client-is-a-graph",
       "statement": "The client is modeled as its real modules with the edges between them, not one container",
       "rationale": "A stack of boxes answers nothing; the interesting question is how shell, diagram, panel, state, api and layout depend on each other. Edges are derived from imports in `client/src` so the picture is evidence, not decoration. The first build nested every client module under one `Client app` container with no edges, and ELK stacked them into a column — the human review called it 'not interesting'. The container was removed rather than kept as an empty parent; the styles module gets a single edge from the shell (every feature uses it, drawing all three would add noise without information).",
-      "status": "active",
       "appliesTo": {
         "systemIds": [
           "sys-client-shell",
@@ -1015,7 +1015,6 @@
       "id": "int-workflow-is-a-graph",
       "statement": "The agent workflow is modeled as its real modules with the edges between them, not one container",
       "rationale": "The workflow that built this repo is itself a system worth understanding. As one `Agent workflow` box with four stacked children it said nothing; as rules → worktree scripts → ports / check suite, dev runner → both servers, and rules → seed data it shows how agents are kept from colliding and, most importantly, makes the dogfooding loop visible: rule 9 is the edge by which every task writes itself into the diagram. Edges are cited from the scripts and CLAUDE.md so the picture is evidence, not decoration.",
-      "status": "active",
       "appliesTo": {
         "systemIds": [
           "sys-agent-rules",
@@ -1039,7 +1038,6 @@
       "id": "int-edges-attach-nearest-side",
       "statement": "Arrows attach to the side of a card that faces the other end",
       "rationale": "Fixed right\u2192left handles read wrong for backward or vertical connections; the reader should follow an arrow without tracing a loop. Decided after human review of the first build.",
-      "status": "active",
       "appliesTo": { "systemIds": ["sys-client-diagram"], "requirementIds": [], "edgeIds": [] },
       "summary": "Each card has four hidden handles; after layout, pure `chooseHandles` picks the sides by the dominant axis between centers.",
       "detail": "Every card renders four hidden handles; after ELK layout a pure `chooseHandles(sourceRect, targetRect)` picks sides by the dominant axis of the center-to-center vector and edges get those handle ids. Option chosen over ELK orthogonal edge sections (more code, coordinate transforms for nested nodes) and React Flow floating edges (rect intersections). Ties resolve horizontally, matching the left-to-right lane flow. Container edges use the container's absolute rect, so child\u2192parent arrows meet the nearest container side.",
@@ -1053,7 +1051,6 @@
       "id": "int-lane-order-from-edges",
       "statement": "Lanes are ordered by the direction of the edges, so the diagram reads along the dependency flow",
       "rationale": "Ordering lanes by seed position produced backward arrows looping across the canvas; deriving the order from the data keeps the picture honest as the project grows. Ties fall back to seed order.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-client-layout", "sys-client-diagram"],
         "requirementIds": [],
@@ -1071,7 +1068,6 @@
       "id": "int-rules-make-compact-models",
       "statement": "Compactness is enforced by written modeling rules and advisories, so the diagram stays legible as the project grows",
       "rationale": "Once the seed reached about 25 edges the flat view got hard to read. Rules written for humans and LLMs alike shape what gets captured, and `computeAdvisories` turns them into warnings the validator prints without failing the file, so the signal a human already spots by eye is surfaced automatically.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model", "sys-seed-data", "sys-agent-rules"],
         "requirementIds": [],
@@ -1089,7 +1085,6 @@
       "id": "int-phase1-flat-drilldown-next",
       "statement": "Phase 1 stays a flat view; the scaling answer is drill-down by category, not hiding edges",
       "rationale": "Hiding edges ad hoc would make the overview lie about the dependency graph. Collapsing categories into nodes with aggregated edges, then drilling in, keeps every edge reachable while the top level stays readable.",
-      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-client-diagram"],
         "requirementIds": [],
@@ -1107,8 +1102,12 @@
       "id": "int-drill-down-by-category",
       "statement": "The canvas shows one level at a time: categories, then a category's systems, then a system's parts",
       "rationale": "The flat view stopped being legible past ~25 edges. Hiding edges ad hoc would lie about the graph; disclosing it level by level through the same fields that already classify (`category`) and contain (`parentId`) systems keeps one model and one truth.",
-      "status": "superseded",
-      "supersededBy": "int-focus-ego-graph",
+      "lifecycle": {
+        "state": "superseded",
+        "supersededBy": "int-focus-ego-graph",
+        "since": "2026-08-27T18:30:00+08:00",
+        "reason": "Category levels solved the atlas's scale, which is not the problem at 16 systems"
+      },
       "appliesTo": {
         "systemIds": ["sys-client-diagram", "sys-client-state", "sys-shared-model"],
         "requirementIds": [],
@@ -1126,7 +1125,6 @@
       "id": "int-focus-ego-graph",
       "statement": "Opening a system shows its ego graph — inbound left, the system centred, outbound right — and walking neighbour to neighbour replaces drilling through levels",
       "rationale": "The ego graph scales by edges-per-system, not total edges, and walking neighbour to neighbour answers \"how is this connected?\" directly. Category levels solved the atlas's scale, which is not the problem at 16 systems. The atlas keeps hover-highlighting and drops the panel so it reads as a map; the panel belongs to the system you are inside.",
-      "status": "active",
       "appliesTo": {
         "systemIds": [
           "sys-client-navigation",
@@ -1147,6 +1145,85 @@
         "source": "human-verified",
         "capturedAt": "2026-08-27T18:30:00+08:00",
         "sessionRef": "planning chat 2026-08-27, design revision 3"
+      }
+    },
+    {
+      "id": "int-lifecycle-never-delete",
+      "statement": "Nothing is deleted from the model; changed things are superseded or withdrawn, and the tool shows only what is true now",
+      "rationale": "Requirements and intents go stale as a system evolves, and deleting them loses the why — the record stops being able to explain how the code got here. Rewriting an entry in place is worse: it makes the file lie about what was once true. The trade-off accepted is that the file only grows, and that reading history costs a click; a full timeline product was rejected as not the focus, so history is answered per system, on demand.",
+      "appliesTo": {
+        "systemIds": ["sys-shared-model", "sys-seed-data", "sys-client-panel"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "summary": "Entries are superseded or withdrawn, never deleted; the tool shows what the system is now.",
+      "detail": "Every entity and edge may carry an optional `lifecycle` block (`state: superseded | withdrawn`, `supersededBy`, `since`, `reason`); absent means current, so nothing needs annotating until it changes. `validateProject` requires `supersededBy` exactly on `superseded`, insists it names another entry of the same type, rejects chains that loop or dead-end in something no longer current, and makes a withdrawn entry give a one-line reason. Gaps and advisories run on `currentOnly()` so history is never modeling debt, and the `requirement-orphaned` advisory catches a live requirement whose systems have all gone. The client filters in one place — `ProjectProvider` — and only a system's history section reads `fullProject`.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T19:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, phase-2 planning"
+      }
+    },
+    {
+      "id": "int-history-per-system",
+      "statement": "History is shown per system, behind a \"Show history\" control, never as a global mode",
+      "rationale": "The point of the tool is the current picture, so nothing that is no longer true may sit in the lists or on the canvas competing with it. But the question \"what did this used to ask for?\" is always about one thing you are already looking at, so the answer belongs in that thing's panel, one click away, and rendered so it can never be mistaken for the present: dashed, greyed, struck through, with a Superseded or Withdrawn pill. Alternatives rejected: a global switch that reveals old entries in place (it makes every list ambiguous); a timeline view (a different product). Trade-off: history attached to an edge or to a system itself has no home in this UI yet.",
+      "appliesTo": {
+        "systemIds": ["sys-client-panel", "sys-client-state"],
+        "requirementIds": ["req-current-by-default"],
+        "edgeIds": []
+      },
+      "summary": "A system's detail panel offers \"Show history (N)\"; non-current entries appear nowhere else.",
+      "detail": "`HistorySection` sits after \"Why it is built this way\" in `EntityDetail` and is omitted entirely when the system has no history. It is the one component that reads `fullProject`; everything else gets the filtered `project` from `ProjectProvider`. Markup follows `docs/design/landing-v5.dc.html`.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T20:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, design revision 5"
+      }
+    },
+    {
+      "id": "int-global-retired-toggle",
+      "statement": "One \"Show retired\" switch in the header reveals superseded and retired entries everywhere",
+      "rationale": "Phase-2 planning wanted history reachable without leaving the current view, and a single header switch was the cheapest way to get there: one flag in state, one branch in the store, no new components. It also meant every list could show its own past in place.",
+      "lifecycle": {
+        "state": "superseded",
+        "supersededBy": "int-history-per-system",
+        "since": "2026-08-27T20:00:00+08:00",
+        "reason": "Design revision 5 scoped history to the system you are looking at"
+      },
+      "appliesTo": {
+        "systemIds": ["sys-client-shell", "sys-client-state"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "summary": "A header switch, off by default, turned the current-only filter off for the whole app.",
+      "detail": "Built as `ShowRetiredProvider`/`useShowRetired` plus a checkbox in `Header`; `ProjectProvider` read the flag and skipped `currentOnly()` while it was on. Removed before merge: the switch is gone and the state module with it.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T19:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, phase-2 planning"
+      }
+    },
+    {
+      "id": "int-retired-inline-greyed",
+      "statement": "Non-current entries stay in the main lists and on the canvas, rendered greyed and struck through",
+      "rationale": "Keeping a superseded requirement where it always was seemed to make its replacement easier to understand — you would see the old and the new side by side, with the old dimmed — and it cost one CSS class rather than a new component.",
+      "lifecycle": {
+        "state": "withdrawn",
+        "since": "2026-08-27T20:00:00+08:00",
+        "reason": "Design revision 5: the current view must contain only what is true now, or every list becomes ambiguous"
+      },
+      "appliesTo": {
+        "systemIds": ["sys-client-panel"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "summary": "Old entries were to be dimmed in place rather than hidden; nothing renders them in the main lists now.",
+      "detail": "The `.is-retired` class (opacity token plus a line-through on the title) was applied to list cards and the headline card. Withdrawn with no replacement: the current view simply does not carry them, and `HistorySection` re-uses the greyed treatment inside its own section.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T19:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, phase-2 planning"
       }
     }
   ],

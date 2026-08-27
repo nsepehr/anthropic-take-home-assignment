@@ -22,6 +22,7 @@ export type AdvisoryCode =
   | 'detail-missing-how'
   | 'intent-is-description'
   | 'requirement-no-evidence'
+  | 'requirement-orphaned'
   | 'ai-inferred-unreviewed';
 
 export const LIMITS = {

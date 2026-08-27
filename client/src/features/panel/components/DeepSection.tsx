@@ -32,8 +32,8 @@ function body(found: FoundEntity): ReactNode {
       return (
         <>
           <Block label="Rationale" text={found.entity.rationale} />
-          {found.entity.status === 'superseded' && found.entity.supersededBy && (
-            <SupersededBy id={found.entity.supersededBy} />
+          {found.entity.lifecycle?.supersededBy && (
+            <SupersededBy id={found.entity.lifecycle.supersededBy} />
           )}
         </>
       );

@@ -32,12 +32,33 @@ an edge is evidenced, how to word requirements and intents.
    `category` is classification; `parentId` is containment — they are independent.
 2. Add or update the `Requirement`(s) they serve; set `status` honestly and cite `evidence`.
 3. Add an `Intent` for each non-obvious choice: statement, rationale (fold rejected alternatives
-   and trade-offs into the prose), `status: active` (or `superseded` + `supersededBy`), and
-   `appliesTo`. Links are stored **once**: a system's
+   and trade-offs into the prose), and `appliesTo`. Links are stored **once**: a system's
    requirements live on `Requirement.systemIds`, its intents on `Intent.appliesTo`; `relatedTo`
    derives the reverse. Decisions stated in your brief are `human-verified`; your own inferences
    are `ai-inferred`.
 4. Add `Edge`s for real dependencies only. Keep them thin; hang the "why" on `intentId`.
 5. Ids are slugs prefixed by type (`sys-`, `req-`, `int-`, `edge-`) and must be unique across all
    entity types. The model stores no coordinates; layout is computed by the client.
-6. Run `npm run validate:data` and `npm run check`.
+6. **Never delete and never change meaning in place.** Append the new entry and mark the old one
+   `lifecycle: { state: "superseded", supersededBy: "<new id>", since, reason }`; withdraw a system
+   whose code is gone with `lifecycle: { state: "withdrawn", since, reason }`. In-place edits are for
+   wording, `paths` and `status` only. See "Lifecycle" in [`docs/MODELING.md`](../docs/MODELING.md).
+7. Run `npm run validate:data` and `npm run check`.
+
+## Lifecycle
+
+Every entity and edge may carry an optional `lifecycle` block; **absent means current**, so nothing
+has to be annotated until it changes.
+
+```json
+"lifecycle": {
+  "state": "superseded",
+  "supersededBy": "int-per-item-deep-dive",
+  "since": "2026-08-27T16:04:03+08:00",
+  "reason": "Human review preferred per-item depth"
+}
+```
+
+The rules — when to supersede, when to withdraw, what `validateProject()` enforces, where the UI
+shows history, and the fact that `Intent.status`/`supersededBy` are deprecated — live in one place:
+[**Lifecycle** in `docs/MODELING.md`](../docs/MODELING.md#lifecycle).

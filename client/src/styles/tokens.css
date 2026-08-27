@@ -116,4 +116,7 @@
 
   /* Entity dots (kind / status / provenance) */
   --dot-size: 9px;
+
+  /* History: superseded / withdrawn entries, shown only inside a system's history section */
+  --history-opacity: 0.75;
 }

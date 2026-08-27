@@ -44,6 +44,13 @@ describe('EntityDetail', () => {
     expect(html).not.toContain('Evidence');
   });
 
+  it('a system lists only current entries, and puts its history behind one control', () => {
+    const html = renderPanel(<EntityDetail />, 'sys-client-shell');
+    expect(html).not.toContain('Overview vs deep dive is one global switch');
+    expect(html).toContain('Show history (2)');
+    expect(html.indexOf('Why it is built this way')).toBeLessThan(html.indexOf('Show history'));
+  });
+
   it('renders nothing with no selection', () => {
     expect(renderPanel(<EntityDetail />)).toBe('');
   });

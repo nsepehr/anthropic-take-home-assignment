@@ -8,6 +8,8 @@ export { validateProject, type ValidateResult, type ValidationError } from './va
 export { computeGaps, type Gaps } from './gaps.js';
 export { computeAdvisories, type Advisory, type AdvisoryCode } from './advisories.js';
 export { getSystem, relatedTo, type Related } from './related.js';
+export { allEntries, currentOnly, historyOf, isCurrent, type LifecycleEntry } from './lifecycle.js';
+export { historyFor, type HistoryEntry } from './history.js';
 
 /** Response shape of `GET /api/health`. */
 export interface HealthStatus {

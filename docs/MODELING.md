@@ -52,6 +52,37 @@ links, and stay visible in the UI.
   _why_, including what was rejected and the trade-off, in at least 12 words. If the rationale only
   restates what the code does, it is a description — put that in a System's `detail` instead.
 
+## Lifecycle
+
+**Nothing is ever deleted from the model.** Requirements and intents go stale as the system evolves;
+deleting them loses the _why_, and rewriting them in place quietly makes the record lie about what
+was once true. Instead, every entity and edge may carry an optional `lifecycle` block — **absent
+means current**, so untouched entries need no annotation:
+
+```json
+"lifecycle": { "state": "superseded", "supersededBy": "int-per-item-deep-dive",
+               "since": "2026-08-27T16:04:03+08:00", "reason": "Human review preferred per-item depth" }
+```
+
+- **Never change meaning in place.** A changed decision is a _new_ entry: append it, then mark the
+  old one `superseded` with `supersededBy` pointing at the new id and a one-line `reason`. In-place
+  edits are for **wording, `paths` and requirement `status`** only — the same entry, said better.
+- **Withdraw an entry that is simply gone** (`state: "withdrawn"`, no `supersededBy`, and a one-line
+  `reason` — required) rather than deleting it: a system whose code was removed, a requirement no
+  longer wanted, an edge that no longer exists.
+- `supersededBy` must name another entry of the **same type**, and the chain of replacements must
+  end at a current entry: no loops, no dead ends in something no longer current. `validateProject()`
+  enforces this; a broken chain is an error, not a warning.
+- **Gaps and advisories count current entries only.** A superseded decision must not keep explaining
+  live code, and a withdrawn box must not be reported as missing an intent.
+- **The tool shows only what is true now.** Superseded and withdrawn entries appear nowhere in the
+  main lists or on the canvas. History is per system, on demand: a system's detail panel offers
+  **Show history (N)** after "Why it is built this way", listing the requirements and intents it
+  used to have, greyed and struck through. There is deliberately no global toggle and no timeline
+  view (design revision 5).
+- `Intent.status` / `Intent.supersededBy` are **deprecated** in favour of `lifecycle`. Files still
+  using them validate; `npm run validate:data` prints a "Deprecated" note per intent to migrate.
+
 ## Provenance
 
 - `human-verified` only when a human said so: the decision is in your brief, or a human confirmed
@@ -63,25 +94,26 @@ links, and stay visible in the UI.
 
 - **Append at the end** of each array; never reorder or reformat existing entries. Several tasks
   edit the file in parallel and this keeps git auto-merging.
-- Fix a wrong entry in place (it is the same entry); supersede a changed decision with a new Intent
-  and `supersededBy` (it is a new decision).
+- Fix a wrong entry in place (it is the same entry); supersede a changed decision with a new entry
+  and a `lifecycle` block on the old one (it is a new decision). See "Lifecycle" above.
 - Ids: `sys-`, `req-`, `int-`, `edge-` + slug, unique across all types.
 
 ## Advisories
 
-| code                      | fires when                                       | severity |
-| ------------------------- | ------------------------------------------------ | -------- |
-| `category-too-large`      | > 8 top-level systems in one category            | warn     |
-| `too-many-categories`     | > 6 categories                                   | warn     |
-| `category-internal-edges` | ≥ 3 internal edges and ≥ its cross-stage edges   | warn     |
-| `system-too-connected`    | > 6 edges touch one system                       | warn     |
-| `system-isolated`         | top-level system with 0 edges and no children    | warn     |
-| `edge-unlabeled`          | edge without a `label`                           | warn     |
-| `summary-too-long`        | `summary` > 20 words (entities and edges)        | warn     |
-| `detail-missing-how`      | `detail` shorter than `summary`                  | warn     |
-| `intent-is-description`   | `rationale` < 12 words                           | warn     |
-| `requirement-no-evidence` | `implemented`/`partial` with empty `evidence`    | warn     |
-| `ai-inferred-unreviewed`  | `ai-inferred` and `capturedAt` older than 7 days | info     |
+| code                      | fires when                                           | severity |
+| ------------------------- | ---------------------------------------------------- | -------- |
+| `category-too-large`      | > 8 top-level systems in one category                | warn     |
+| `too-many-categories`     | > 6 categories                                       | warn     |
+| `category-internal-edges` | ≥ 3 internal edges and ≥ its cross-stage edges       | warn     |
+| `system-too-connected`    | > 6 edges touch one system                           | warn     |
+| `system-isolated`         | top-level system with 0 edges and no children        | warn     |
+| `edge-unlabeled`          | edge without a `label`                               | warn     |
+| `summary-too-long`        | `summary` > 20 words (entities and edges)            | warn     |
+| `detail-missing-how`      | `detail` shorter than `summary`                      | warn     |
+| `intent-is-description`   | `rationale` < 12 words                               | warn     |
+| `requirement-no-evidence` | `implemented`/`partial` with empty `evidence`        | warn     |
+| `requirement-orphaned`    | current requirement, every system serving it is gone | warn     |
+| `ai-inferred-unreviewed`  | `ai-inferred` and `capturedAt` older than 7 days     | info     |
 
 ## Worked examples from the seed
 

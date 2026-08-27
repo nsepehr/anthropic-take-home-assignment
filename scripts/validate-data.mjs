@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { computeAdvisories, validateProject } from '@app/shared';
+import { computeAdvisories, currentOnly, validateProject } from '@app/shared';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const file = path.join(root, 'data', 'project.json');
@@ -16,11 +16,24 @@ if (!result.ok) {
   process.exit(1);
 }
 
-const { project, gaps } = result;
+const { project, gaps, notices } = result;
+const current = currentOnly(project);
+const past =
+  project.requirements.length -
+  current.requirements.length +
+  (project.intents.length - current.intents.length) +
+  (project.systems.length - current.systems.length);
 console.log(
   `data/project.json OK — ${project.systems.length} systems, ${project.requirements.length} requirements, ` +
-    `${project.intents.length} intents, ${project.edges.length} edges`,
+    `${project.intents.length} intents, ${project.edges.length} edges` +
+    (past > 0 ? ` (${past} of them history: superseded or withdrawn)` : ''),
 );
+
+// Deprecated fields still validate; say so once so the file gets migrated rather than rotting.
+if (notices.length > 0) {
+  console.log(`Deprecated (${notices.length}, migrated in memory — please update the file):`);
+  for (const n of notices) console.log(`  ${n.path}: ${n.message}`);
+}
 console.log('Gaps (unexplained, shown honestly in the UI):');
 for (const [key, ids] of Object.entries(gaps)) {
   console.log(`  ${key}: ${ids.length ? ids.join(', ') : '(none)'}`);

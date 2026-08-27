@@ -6,6 +6,7 @@ import { useSelection } from '../../state/selection';
 import { ConnectedChips } from './ConnectedChips';
 import { DetailCard } from './DetailCard';
 import { EntityList } from './EntityList';
+import { HistorySection } from './HistorySection';
 import { IntentCard } from './IntentCard';
 import { RequirementCard } from './RequirementCard';
 
@@ -45,6 +46,7 @@ export function EntityDetail() {
           ))}
         </EntityList>
       )}
+      {found.type === 'system' && <HistorySection systemId={found.entity.id} />}
       <ConnectedChips connections={connectionsFor(project, selectedId)} />
     </div>
   );

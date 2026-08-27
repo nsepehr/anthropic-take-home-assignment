@@ -4,6 +4,7 @@ import { fullyLinkedProject } from './test/fixture.js';
 import { validateProject } from './validate.js';
 
 const seedPath = new URL('../../data/project.json', import.meta.url);
+const SINCE = '2026-08-27T00:00:00Z';
 
 function errorsOf(input: unknown) {
   const result = validateProject(input);
@@ -44,19 +45,92 @@ describe('validateProject', () => {
     ]);
   });
 
-  it('supersededBy must resolve to an intent and agree with status', () => {
+  it('seed file carries no notices: nothing still uses the deprecated Intent.status', () => {
+    const result = validateProject(JSON.parse(readFileSync(seedPath, 'utf8')));
+    expect(result.ok && result.notices).toEqual([]);
+  });
+
+  it('a file still on Intent.status validates, migrates to lifecycle, and gets a notice', () => {
     const project = fullyLinkedProject();
-    project.intents[0]!.supersededBy = 'int-b'; // status still 'active'
-    expect(errorsOf(project)).toEqual([
-      { path: 'intents.0.supersededBy', message: 'only allowed when status is "superseded"' },
-    ]);
     project.intents[0]!.status = 'superseded';
+    project.intents[0]!.supersededBy = 'int-b';
+    const result = validateProject(project);
+    if (!result.ok) throw new Error('expected the deprecated shape to still validate');
+    expect(result.project.intents[0]!.lifecycle?.state).toBe('superseded');
+    expect(result.notices).toEqual([
+      { path: 'intents.0', message: expect.stringMatching(/lifecycle/) },
+    ]);
+  });
+
+  it('supersededBy is required by, and only allowed on, state "superseded"', () => {
+    const project = fullyLinkedProject();
+    project.intents[0]!.lifecycle = {
+      state: 'withdrawn',
+      supersededBy: 'int-b',
+      since: SINCE,
+      reason: 'code removed',
+    };
+    expect(errorsOf(project)).toEqual([
+      {
+        path: 'intents.0.lifecycle.supersededBy',
+        message: 'only allowed when state is "superseded"',
+      },
+    ]);
+    project.intents[0]!.lifecycle = { state: 'superseded', since: SINCE };
+    expect(errorsOf(project)).toEqual([
+      { path: 'intents.0.lifecycle.supersededBy', message: 'required when state is "superseded"' },
+    ]);
+  });
+
+  it('a withdrawn entry owes the reader a reason', () => {
+    const project = fullyLinkedProject();
+    project.intents[0]!.lifecycle = { state: 'withdrawn', since: SINCE };
+    expect(errorsOf(project)).toEqual([
+      {
+        path: 'intents.0.lifecycle.reason',
+        message: 'required when state is "withdrawn": one line saying why',
+      },
+    ]);
+    project.intents[0]!.lifecycle.reason = 'the code it described is gone';
     expect(validateProject(project).ok).toBe(true);
-    project.intents[0]!.supersededBy = 'sys-parent';
-    expect(errorsOf(project)[0]?.path).toBe('intents.0.supersededBy');
-    project.intents[1]!.status = 'superseded';
-    project.intents[1]!.supersededBy = undefined;
-    expect(errorsOf(project).map((e) => e.path)).toContain('intents.1.supersededBy');
+  });
+
+  it('supersededBy must name another entry of the same type', () => {
+    const project = fullyLinkedProject();
+    project.intents[0]!.lifecycle = {
+      state: 'superseded',
+      supersededBy: 'sys-parent',
+      since: SINCE,
+    };
+    expect(errorsOf(project)).toEqual([
+      {
+        path: 'intents.0.lifecycle.supersededBy',
+        message: 'references unknown intent "sys-parent"',
+      },
+    ]);
+    project.intents[0]!.lifecycle.supersededBy = 'int-a';
+    expect(errorsOf(project)[0]?.message).toMatch(/cannot supersede itself/);
+    project.intents[0]!.lifecycle.supersededBy = 'int-b';
+    expect(validateProject(project).ok).toBe(true);
+  });
+
+  it('a supersession chain must end at a current entry, and must not loop', () => {
+    const project = fullyLinkedProject();
+    project.intents[0]!.lifecycle = { state: 'superseded', supersededBy: 'int-b', since: SINCE };
+    project.intents[1]!.lifecycle = { state: 'withdrawn', since: SINCE, reason: 'code removed' };
+    expect(errorsOf(project)[0]?.message).toMatch(/chain ends at "int-b", which is withdrawn/);
+    project.intents[1]!.lifecycle = { state: 'superseded', supersededBy: 'int-a', since: SINCE };
+    expect(errorsOf(project).map((e) => e.message)).toContain(
+      'supersession cycle: int-a -> int-b -> int-a',
+    );
+  });
+
+  it('edges carry a lifecycle too', () => {
+    const project = fullyLinkedProject();
+    project.edges[0]!.lifecycle = { state: 'superseded', supersededBy: 'edge-nope', since: SINCE };
+    expect(errorsOf(project)).toEqual([
+      { path: 'edges.0.lifecycle.supersededBy', message: 'references unknown edge "edge-nope"' },
+    ]);
   });
 
   it('duplicate id across entity types → error', () => {

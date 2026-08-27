@@ -34,4 +34,15 @@ describe('computeGaps', () => {
     expect(gaps.requirementsWithoutSystem).toEqual(['req-b']);
     expect(gaps.edgesWithoutIntent).toEqual(['edge-2']);
   });
+
+  it('non-current entries are ignored: a withdrawn system is not a gap, nor is it an explanation', () => {
+    const project = fullyLinkedProject();
+    const since = '2026-08-27T00:00:00Z';
+    project.intents[1]!.lifecycle = { state: 'withdrawn', since, reason: 'code removed' }; // the only intent for sys-other
+    project.systems[2]!.lifecycle = { state: 'withdrawn', since, reason: 'code removed' }; // sys-other itself
+    const gaps = computeGaps(project);
+    expect(gaps.systemsWithoutIntent).toEqual([]);
+    expect(gaps.intentsWithoutTarget).toEqual([]);
+    expect(gaps.edgesWithoutIntent).toEqual([]); // edge-1 ends at the withdrawn system
+  });
 });

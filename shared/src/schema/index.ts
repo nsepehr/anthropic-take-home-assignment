@@ -1,4 +1,5 @@
 export { ProvenanceSchema, type Provenance } from './provenance.js';
+export { LifecycleSchema, LifecycleState, type Lifecycle } from './lifecycle.js';
 export { SystemKind, SystemSchema, type System } from './system.js';
 export {
   RequirementKind,

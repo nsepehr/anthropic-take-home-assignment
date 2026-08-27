@@ -5,13 +5,15 @@ export const IntentStatus = z.enum(['active', 'superseded']);
 
 /**
  * A human decision and its reasoning. First-class because one decision explains many things.
- * `status`/`supersededBy` track whether the decision still stands; `provenance` (on every entity)
- * tracks whether a human verified the record. They answer different questions.
+ * `lifecycle` (on every entity) tracks whether the decision still stands; `provenance` tracks
+ * whether a human verified the record. They answer different questions.
  */
 export const IntentSchema = EntityBase.extend({
   statement: z.string().min(1),
   rationale: z.string().min(1),
-  status: IntentStatus,
+  /** @deprecated Use `lifecycle`. Still accepted; `validateProject` maps it and reports a notice. */
+  status: IntentStatus.optional(),
+  /** @deprecated Use `lifecycle.supersededBy`. */
   supersededBy: z.string().optional(),
   appliesTo: z.object({
     systemIds: z.array(z.string()),

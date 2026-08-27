@@ -1,3 +1,4 @@
+import { currentOnly } from './lifecycle.js';
 import type { Project } from './schema/index.js';
 
 /** Computed, never stored: what the model cannot explain. */
@@ -11,8 +12,11 @@ export interface Gaps {
 /**
  * Reports what the model leaves unexplained. Honest by design: gaps are surfaced, not hidden.
  * A system or edge is explained if any intent's `appliesTo` names it (or, for edges, `intentId`).
+ * Only current entries count — a superseded decision must not keep explaining live code, and a
+ * withdrawn box must not be reported as missing one.
  */
-export function computeGaps(project: Project): Gaps {
+export function computeGaps(full: Project): Gaps {
+  const project = currentOnly(full);
   const intentTargets = new Set<string>();
   for (const intent of project.intents) {
     for (const id of intent.appliesTo.systemIds) intentTargets.add(id);

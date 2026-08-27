@@ -1,11 +1,14 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import type { Project } from '@app/shared';
+import { currentOnly, type Project } from '@app/shared';
 import { fetchProject, type ApiResult } from '../api/project';
 
 export interface ProjectState {
   loading: boolean;
   error: string | null;
+  /** What the app renders everywhere: the current entries only. */
   project: Project | null;
+  /** Everything the file holds, superseded and withdrawn entries included — for history views. */
+  fullProject: Project | null;
 }
 
 const ProjectContext = createContext<ProjectState | null>(null);
@@ -31,14 +34,16 @@ export function ProjectProvider({ children, initialProject }: Props) {
     };
   }, [initialProject]);
 
-  const state = useMemo<ProjectState>(
-    () => ({
+  const state = useMemo<ProjectState>(() => {
+    const full = result?.ok ? result.data : null;
+    return {
       loading: result === null,
       error: result?.ok === false ? result.error : null,
-      project: result?.ok ? result.data : null,
-    }),
-    [result],
-  );
+      // The filter lives here, once, so no feature has to remember to apply it.
+      project: full && currentOnly(full),
+      fullProject: full,
+    };
+  }, [result]);
 
   return <ProjectContext.Provider value={state}>{children}</ProjectContext.Provider>;
 }

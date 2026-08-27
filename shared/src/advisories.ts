@@ -1,6 +1,7 @@
 import type { Project } from './schema/index.js';
 import { categoryRules, stageRules } from './advisoryCategories.js';
 import { advisory, entities, LIMITS, type Advisory } from './advisoryCore.js';
+import { currentOnly } from './lifecycle.js';
 
 export type { Advisory, AdvisoryCode } from './advisoryCore.js';
 
@@ -61,6 +62,20 @@ function evidenceRules(project: Project): Advisory[] {
     .map((r) => advisory('requirement-no-evidence', r.id, `status ${r.status} but no evidence`));
 }
 
+/** Runs on current entries only, so a system missing here is one that is no longer current. */
+function lifecycleRules(project: Project): Advisory[] {
+  const live = new Set(project.systems.map((s) => s.id));
+  return project.requirements
+    .filter((r) => r.systemIds.length > 0 && !r.systemIds.some((id) => live.has(id)))
+    .map((r) =>
+      advisory(
+        'requirement-orphaned',
+        r.id,
+        'every system that served it is gone; withdraw it too',
+      ),
+    );
+}
+
 function provenanceRules(project: Project, now: Date): Advisory[] {
   const cutoff = now.getTime() - LIMITS.unreviewedDays * DAY_MS;
   return entities(project)
@@ -83,10 +98,15 @@ const RULES = [
   connectivityRules,
   languageRules,
   evidenceRules,
+  lifecycleRules,
   provenanceRules,
 ];
 
-/** Pure: applies every modeling rule and returns the warnings. `now` is injectable for tests. */
-export function computeAdvisories(project: Project, now: Date = new Date()): Advisory[] {
+/**
+ * Pure: applies every modeling rule to the *current* entries and returns the warnings. Superseded
+ * and withdrawn entries are history, not live modeling debt. `now` is injectable for tests.
+ */
+export function computeAdvisories(full: Project, now: Date = new Date()): Advisory[] {
+  const project = currentOnly(full);
   return RULES.flatMap((rule) => rule(project, now));
 }

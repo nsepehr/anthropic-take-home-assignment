@@ -4,6 +4,7 @@ import type { Project, System } from './schema/index.js';
 import { fullyLinkedProject } from './test/fixture.js';
 
 const NOW = new Date('2026-08-27T00:00:00Z');
+const SINCE = '2026-08-27T00:00:00Z';
 const words = (n: number) => Array.from({ length: n }, (_, i) => `w${i}`).join(' ');
 
 /** The shared fixture, tidied until it yields zero advisories; each test breaks one rule. */
@@ -131,5 +132,26 @@ describe('computeAdvisories', () => {
     const found = computeAdvisories(p, NOW).filter((a) => a.code === 'ai-inferred-unreviewed');
     expect(found.map((a) => a.targetId)).toEqual(['sys-parent']);
     expect(found[0]!.severity).toBe('info');
+  });
+
+  it('requirement-orphaned: a current requirement whose systems have all gone away', () => {
+    const p = cleanProject();
+    p.systems[2]!.lifecycle = { state: 'withdrawn', since: SINCE, reason: 'code removed' }; // req-b's only system
+    expect(targets(p, 'requirement-orphaned')).toEqual(['req-b']);
+    p.requirements[1]!.lifecycle = { state: 'withdrawn', since: SINCE, reason: 'code removed' };
+    expect(codes(p)).not.toContain('requirement-orphaned');
+  });
+
+  it('a requirement with no systems at all is a gap, not an orphan', () => {
+    const p = cleanProject();
+    p.requirements[1]!.systemIds = [];
+    expect(codes(p)).not.toContain('requirement-orphaned');
+  });
+
+  it('non-current entries are exempt: a withdrawn system breaks no modeling rule', () => {
+    const p = cleanProject();
+    p.systems[0]!.summary = words(21); // would be summary-too-long
+    p.systems[0]!.lifecycle = { state: 'withdrawn', since: SINCE, reason: 'code removed' };
+    expect(codes(p)).not.toContain('summary-too-long');
   });
 });

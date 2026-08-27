@@ -250,3 +250,70 @@
   align-self: flex-start;
   font-size: 12px;
 }
+
+/* — history: what a system used to ask for, revealed on demand and visibly old (design rev 5) — */
+.panel-history {
+  border-top: 1px solid var(--color-divider);
+  padding-top: var(--space-3);
+}
+.panel-history-toggle {
+  font-size: 12.5px;
+  padding-inline: var(--space-1);
+}
+.panel-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: var(--space-2);
+}
+.panel-history-item {
+  border: 1px dashed var(--color-neutral-400);
+  border-radius: var(--radius-lg);
+  padding: 11px 14px;
+  opacity: var(--history-opacity);
+}
+.panel-history-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: 4px;
+}
+.panel-history-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  padding: 2px 10px;
+  border-radius: calc(var(--radius-md) * 0.75);
+}
+.panel-history-pill.is-superseded {
+  background: var(--color-neutral-300);
+  color: var(--color-neutral-800);
+}
+.panel-history-pill.is-withdrawn {
+  background: var(--color-accent-200);
+  color: var(--color-accent-800);
+}
+.panel-history-class {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-neutral-600);
+}
+.panel-history-date {
+  margin-left: auto;
+  font-size: 10.5px;
+  color: var(--color-neutral-600);
+}
+.panel-history-title {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--color-neutral-800);
+  text-decoration: line-through;
+  text-decoration-color: var(--color-neutral-400);
+}
+.panel-history-note {
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--color-neutral-700);
+  margin-top: 5px;
+}
