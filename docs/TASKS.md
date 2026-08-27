@@ -64,7 +64,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 6   | `06-trust-layer`         | 6     | P1       | done        | —                        | 04         | Provenance pills (15), advisories (16), history (20); gaps view not surfaced in UI             |
 | 7   | `09-deploy-vercel`       | 7     | P1       | done        | agent: deploy-vercel     | 02, 03     | Live: https://anthropic-take-home-assignment.vercel.app (vercel.json, api/, DEPLOY.md)         |
 | 8   | `08-seed-complete`       | 7     | P1       | todo        | —                        | 01         | Seed describes the finished project, honest provenance                                         |
-| 9   | `09-readme`              | 7     | P1       | todo        | —                        | —          | How to run, architecture, links                                                                |
+| 9   | `09-readme`              | 7     | P1       | review      | agent: readme            | —          | How to run, architecture, links                                                                |
 | 10  | `10-chat`                | 8     | P2       | done        | —                        | 04         | Client-only scope UI delivered by 21; write-side in backlog                                    |
 
 ## Backlog (client)
@@ -171,3 +171,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 21-chat-scope-ui → done (human, visually approved); Client split into UI/core stages
 - 2026-08-27 — 25-model-generator: docs/ONBOARDING.md + `.claude/skills/capture-model/SKILL.md` (the capture workflow: LLM proposes, human verifies); seed gains sys-capture-workflow + int-capture-is-the-product
 - 2026-08-27 — 25-model-generator → done (human): ONBOARDING.md + capture-model skill
+- 2026-08-27 — 09-readme → review (agent: readme): root README — thesis, live demo + 5-step walkthrough, self-demo seed, run locally, architecture + folder map, phase tags, how it was built, known limits; links docs/RATIONALE.md
