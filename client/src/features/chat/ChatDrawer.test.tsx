@@ -58,5 +58,17 @@ describe('ChatDrawer', () => {
     expect(html).toContain('chat-turn is-assistant');
     expect(html).toContain('Scoped to Client API.');
     expect(html).toContain('Explains a part, then changes it');
+    expect(html).toContain('See what Apply would do');
+  });
+
+  it('offers the apply walkthrough only once a reply had something in scope', () => {
+    const html = render({
+      open: true,
+      messages: [
+        { id: 'm0', role: 'user', text: 'hello', mentions: [] },
+        { id: 'm1', role: 'assistant', text: 'Type @ first.', mentions: [] },
+      ],
+    });
+    expect(html).not.toContain('See what Apply would do');
   });
 });

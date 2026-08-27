@@ -1388,6 +1388,23 @@
         "capturedAt": "2026-08-27T20:30:00+08:00",
         "sessionRef": "planning chat 2026-08-27, wrap-up"
       }
+    },
+    {
+      "id": "int-apply-demo-not-built",
+      "statement": "The write side is shown, not built: a modal explains the apply flow so the demo is honest about scope",
+      "rationale": "The chat is client-only by design — it resolves mentions and reads the context back, and never writes. Leaving that unexplained makes the prototype look either finished (it isn't) or aimless (it isn't). A five-step walkthrough behind a ghost button under the reply states exactly what Apply would do — draft a change, show it as a proposal, write it to data/project.json tagged AI-inferred, mark the card 'Chat edit · review' until a human verifies it, and gate every write on validate:data and the advisories — and its footer says none of it is built here. Cost: one modal and no write path, against a drafting engine the time box could not have finished honestly.",
+      "appliesTo": {
+        "systemIds": ["sys-client-chat"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "summary": "A 'See what Apply would do' modal describes the unbuilt write side instead of faking it.",
+      "detail": "`features/chat/ApplyDemo.tsx` renders the ghost button under any assistant reply whose turn had a mention, and the walkthrough inside the shared `components/Modal.tsx` (`.dialog-backdrop` / `.dialog`, Esc and backdrop close). Nothing in the flow touches `data/project.json`.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T22:30:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, wrap-up"
+      }
     }
   ],
   "edges": [

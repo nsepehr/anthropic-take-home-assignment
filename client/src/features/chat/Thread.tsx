@@ -1,4 +1,5 @@
 import { useChat } from '../../state/chat';
+import { ApplyDemo } from './ApplyDemo';
 import { ScopeChip } from './ScopeChip';
 
 const EMPTY_TEXT =
@@ -35,7 +36,7 @@ export function Thread() {
   }
   return (
     <div className="chat-thread sb">
-      {messages.map((message) => (
+      {messages.map((message, i) => (
         <div key={message.id} className={`chat-turn is-${message.role}`}>
           {message.mentions.length > 0 && (
             <div className="chat-turn-chips">
@@ -45,6 +46,10 @@ export function Thread() {
             </div>
           )}
           {message.text && <p className="chat-bubble">{message.text}</p>}
+          {/* The write side is only worth showing once the reply had something in scope. */}
+          {message.role === 'assistant' && (messages[i - 1]?.mentions.length ?? 0) > 0 && (
+            <ApplyDemo />
+          )}
         </div>
       ))}
     </div>

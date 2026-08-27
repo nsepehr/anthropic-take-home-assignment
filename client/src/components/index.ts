@@ -8,3 +8,5 @@ export { ProvenanceDot } from './ProvenanceDot';
 export { MentionButton } from './MentionButton';
 export type { MentionButtonProps } from './MentionButton';
 export { Dot } from './Dot';
+export { Modal } from './Modal';
+export type { ModalProps } from './Modal';
