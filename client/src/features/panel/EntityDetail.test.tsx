@@ -37,7 +37,7 @@ describe('EntityDetail', () => {
     for (const r of served) expect(html).toContain(r.title);
   });
 
-  it("requirement → 'Intents' heading and 'Evidence' only in deep dive", () => {
+  it("requirement → 'Intents' heading; 'Evidence' only once deep dive is expanded", () => {
     const html = renderPanel(<EntityDetail />, 'req-dogfood-seed');
     expect(html).toContain('Requirement · ');
     expect(html).toContain('>Intents<');

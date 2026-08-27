@@ -1,4 +1,4 @@
-/* Layout-only rules for the app shell. Colors, fonts, radii and the .seg/.sb/.tag classes come
+/* Layout-only rules for the app shell. Colors, fonts, radii and the .sb/.tag classes come
    from client/src/styles (task 04); only the variable/class names are used here. */
 
 .shell {
@@ -72,9 +72,9 @@
 }
 
 .side-panel {
-  width: 400px;
+  width: 360px;
   flex: none;
-  margin-left: 18px;
+  margin-left: 16px;
   overflow-y: auto;
   padding-right: 4px;
 }

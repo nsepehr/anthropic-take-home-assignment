@@ -8,7 +8,7 @@ export interface SidePanelProps {
   detail: ReactNode;
 }
 
-/** The always-visible 400px right panel: project overview or the selected entity's detail. */
+/** The always-visible 360px right panel: project overview or the selected entity's detail. */
 export function SidePanel({ overview, detail }: SidePanelProps) {
   const { selectedId } = useSelection();
   return (

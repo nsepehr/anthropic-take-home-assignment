@@ -2,7 +2,6 @@ import { memo } from 'react';
 import { Handle, Position, useStore, type NodeProps } from '@xyflow/react';
 import type { SystemNode as SystemNodeType } from '../../model/toFlow';
 import { useSelection } from '../../state/selection';
-import { useViewMode } from '../../state/viewMode';
 import { elementState } from './cardState';
 import { GroupCard } from './components/GroupCard';
 import { SystemCard } from './components/SystemCard';
@@ -10,7 +9,6 @@ import { SystemCard } from './components/SystemCard';
 /** React Flow node for a System: a card for leaves, a container frame for parents. */
 export const SystemNode = memo(function SystemNode({ id, data }: NodeProps<SystemNodeType>) {
   const selection = useSelection();
-  const { mode } = useViewMode();
   const isParent = useStore((s) => s.parentLookup.has(id));
   const state = elementState(id, selection);
 
@@ -24,7 +22,6 @@ export const SystemNode = memo(function SystemNode({ id, data }: NodeProps<Syste
           system={data.system}
           requirementCount={data.requirementCount}
           intentCount={data.intentCount}
-          mode={mode}
           state={state}
         />
       )}

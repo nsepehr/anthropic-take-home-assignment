@@ -1,13 +1,10 @@
-import type { ViewMode } from '../../state/viewMode';
+/** Height ELK lays out with: what a card renders at (title + clamped summary + tag row). */
+export const CARD_HEIGHT = 152;
 
-/** Heights ELK lays out with: what a card renders at (title + clamped body + two tag rows). */
-export const CARD_HEIGHT: Record<ViewMode, number> = { overview: 152, deepDive: 264 };
-
-/** Pure: give every leaf node the card height for the current view mode. */
-export function sizeForMode<N extends { id: string; parentId?: string; height?: number }>(
+/** Pure: give every leaf node the card height; parents are sized by ELK. */
+export function sizeLeaves<N extends { id: string; parentId?: string; height?: number }>(
   nodes: N[],
-  mode: ViewMode,
 ): N[] {
   const parents = new Set(nodes.map((n) => n.parentId).filter(Boolean));
-  return nodes.map((n) => (parents.has(n.id) ? n : { ...n, height: CARD_HEIGHT[mode] }));
+  return nodes.map((n) => (parents.has(n.id) ? n : { ...n, height: CARD_HEIGHT }));
 }

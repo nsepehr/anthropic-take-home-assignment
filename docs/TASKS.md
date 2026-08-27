@@ -41,7 +41,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 3c  | `06-system-node`         | 4     | P0       | done        | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                       |
 | 3d  | `07-detail-panel`        | 4     | P0       | in-progress | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                          |
 | 3e  | `08-category-lanes`      | 4     | P0       | done        | agent: category-lanes    | 03, 04, 05 | System.category in schema; ELK partitions; lane overlay                                 |
-| 3f  | `10-per-item-deep-dive`  | 4     | P0       | in-progress | agent: deep-dive         | 05, 06, 07 | Remove global toggle; per-selection Deep dive button; panel 360px; hide zero-count tags |
+| 3f  | `10-per-item-deep-dive`  | 4     | P0       | review      | agent: deep-dive         | 05, 06, 07 | Remove global toggle; per-selection Deep dive button; panel 360px; hide zero-count tags |
 | 3g  | `11-highlight-neighbors` | 4     | P0       | done        | agent: highlight         | 06, 07     | relatedTo includes edge-neighbor systems; connected cards tinted, not dimmed            |
 | 3h  | `12-seed-client-graph`   | 7     | P0       | in-progress | agent: seed-client       | 08         | Flatten client into real modules with import-evidenced edges                            |
 | 3i  | `13-edge-routing`        | 4     | P1       | in-progress | agent: edges             | 06         | Edges attach to the nearest side; human inspects before merge                           |
@@ -109,3 +109,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 11-highlight-neighbors → review (agent: highlight); relatedTo returns one-hop closure, connectionsFor edge walk removed
 - 2026-08-27 — 11-highlight-neighbors → done (human)
 - 2026-08-27 — 13-edge-routing → in-progress (agent: edges)
+- 2026-08-27 — 10-per-item-deep-dive → review (agent: deep-dive); global toggle removed, per-item Deep dive in detail card

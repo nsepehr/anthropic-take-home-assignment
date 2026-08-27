@@ -4,7 +4,6 @@ import { Position, ReactFlowProvider, type EdgeProps } from '@xyflow/react';
 import type { SystemEdge as SystemEdgeType } from '../../model/toFlow';
 import { ProjectProvider } from '../../state/projectStore';
 import { SelectionProvider } from '../../state/selection';
-import { ViewModeProvider } from '../../state/viewMode';
 import { seedProject } from '../../test/seed';
 import { SystemEdge } from './SystemEdge';
 
@@ -25,22 +24,20 @@ const props = {
 
 function render(selectedId?: string) {
   return renderToString(
-    <ViewModeProvider>
-      <ProjectProvider initialProject={seedProject}>
-        <SelectionProvider initialSelectedId={selectedId}>
-          <ReactFlowProvider>
-            <svg>
-              <SystemEdge {...props} />
-            </svg>
-          </ReactFlowProvider>
-        </SelectionProvider>
-      </ProjectProvider>
-    </ViewModeProvider>,
+    <ProjectProvider initialProject={seedProject}>
+      <SelectionProvider initialSelectedId={selectedId}>
+        <ReactFlowProvider>
+          <svg>
+            <SystemEdge {...props} />
+          </svg>
+        </ReactFlowProvider>
+      </SelectionProvider>
+    </ProjectProvider>,
   );
 }
 
 describe('SystemEdge', () => {
-  it('draws a path with an arrowhead and no label in overview mode', () => {
+  it('draws a path with an arrowhead and never a label', () => {
     const html = render();
     expect(html).toContain('marker-end="url(#diagram-arrow)"');
     expect(html).not.toContain('talks to');

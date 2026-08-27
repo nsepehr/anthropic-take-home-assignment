@@ -376,10 +376,10 @@
       "systemIds": ["sys-shared-model", "sys-client-state"],
       "evidence": [
         "shared/src/schema/entity.ts (EntityBase: summary + detail required)",
-        "client/src/state/viewMode.tsx"
+        "client/src/features/panel/DetailCard.tsx"
       ],
-      "summary": "Every system, requirement and intent can be read as a one-sentence overview or a deep dive, toggled globally.",
-      "detail": "The schema requires `summary` and `detail` on every first-class entity, and the seed fills both. The global overview/deep-dive toggle in the UI is not built. Partial.",
+      "summary": "Every system, requirement and intent reads as a one-sentence summary; a per-item Deep dive button in the detail card reveals its detail.",
+      "detail": "The schema requires `summary` and `detail` on every first-class entity, and the seed fills both. Canvas cards and list cards always show the summary; the detail card has a \"Deep dive\" / \"Hide deep dive\" button that reveals that entity's deep section (How it works / Evidence / Rationale) and collapses again when the selection changes. Partial: the button is built, but edges keep their label hidden and cards never show detail.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T15:00:00+08:00",
@@ -826,7 +826,8 @@
       "detail": "Overrides the per-card button in the design mock. The `.seg` control in `Header` binds to `useViewMode()`, which persists the choice in localStorage so a reload keeps the reader at the same altitude.",
       "statement": "Overview vs deep dive is one global switch, not per card",
       "rationale": "summary/detail is baked into the schema for every entity; one switch keeps the whole screen at one altitude. The design had a per-item button; the human moved it to the header, bound to `useViewMode()`, which persists across reloads.",
-      "status": "active",
+      "status": "superseded",
+      "supersededBy": "int-per-item-deep-dive",
       "appliesTo": {
         "systemIds": ["sys-client-shell", "sys-client-state"],
         "requirementIds": [],
@@ -908,6 +909,24 @@
         "source": "human-verified",
         "capturedAt": "2026-08-27T16:00:00+08:00",
         "sessionRef": "planning chat 2026-08-27, review of first build"
+      }
+    },
+    {
+      "id": "int-per-item-deep-dive",
+      "statement": "Deep dive is per selection, opened from the detail card, not a global mode",
+      "rationale": "The human reviewed the first build and preferred the design's model: the canvas stays at one altitude, and depth is asked for on the thing you're looking at. A global switch changed the whole screen at once and made the panel harder to read. The button lives in the detail card and its state is local, so it resets whenever the selection changes.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-client-panel", "sys-client-shell"],
+        "requirementIds": ["req-overview-deep-dive"],
+        "edgeIds": []
+      },
+      "summary": "A \"Deep dive\" button in the detail card reveals one entity's depth; there is no global Overview / Deep dive switch.",
+      "detail": "Supersedes int-global-view-mode. `DetailCard` holds an `expanded` flag and renders `DeepSection` when set; `SidePanel` remounts the card on selection (`key={selectedId}`), so the flag resets for free. The header keeps only name, mission and the provenance legend. Canvas cards, list cards and edges never show detail or labels.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T18:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, design revision 2"
       }
     }
   ],

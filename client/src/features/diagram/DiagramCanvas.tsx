@@ -6,8 +6,7 @@ import { useLayout } from '../../layout/useLayout';
 import { laneBounds, laneIndex, type LaneBounds } from '../../model/lanes';
 import { toFlowElements } from '../../model/toFlow';
 import { useSelection } from '../../state/selection';
-import { useViewMode } from '../../state/viewMode';
-import { sizeForMode } from './cardSize';
+import { sizeLeaves } from './cardSize';
 import { ArrowMarkers } from './components/ArrowMarkers';
 import { LaneLayer } from './components/LaneLayer';
 import { SystemEdge } from './SystemEdge';
@@ -32,8 +31,7 @@ const defaultOverlay = (lanes: LaneBounds[]) => <LaneLayer lanes={lanes} />;
 /** The architecture diagram: ELK-laid-out system cards and edges, selection via click. */
 export function DiagramCanvas({ project, overlay = defaultOverlay }: Props) {
   const elements = useMemo(() => toFlowElements(project), [project]);
-  const { mode } = useViewMode();
-  const sizedNodes = useMemo(() => sizeForMode(elements.nodes, mode), [elements.nodes, mode]);
+  const sizedNodes = useMemo(() => sizeLeaves(elements.nodes), [elements.nodes]);
   // Lanes: categories partition the ELK layout; their bounds follow from the positioned nodes.
   const lanes = useMemo(() => laneIndex(project), [project]);
   const partitionOf = useCallback<PartitionOf>(
@@ -46,7 +44,7 @@ export function DiagramCanvas({ project, overlay = defaultOverlay }: Props) {
   const { nodes, status, error } = useLayout(sizedNodes, elements.edges, undefined, partitionOf);
   const laneRects = useMemo(() => laneBounds(nodes, lanes), [nodes, lanes]);
   const { select, clear } = useSelection();
-  // Once laid out, keep the canvas mounted through re-layouts (mode toggle) so the viewport survives.
+  // Once laid out, keep the canvas mounted through re-layouts so the viewport survives.
   const laidOut = useRef(false);
   if (status === 'ready') laidOut.current = true;
 

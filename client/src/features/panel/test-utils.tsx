@@ -3,7 +3,6 @@ import { renderToString } from 'react-dom/server';
 import { seedProject } from '../../test/seed';
 import { ProjectProvider } from '../../state/projectStore';
 import { SelectionProvider } from '../../state/selection';
-import { ViewModeProvider } from '../../state/viewMode';
 
 const ENTITIES: Record<string, string> = {
   '&#x27;': "'",
@@ -17,11 +16,9 @@ const ENTITIES: Record<string, string> = {
 export function renderPanel(ui: ReactNode, selectedId?: string): string {
   return decode(
     renderToString(
-      <ViewModeProvider>
-        <ProjectProvider initialProject={seedProject}>
-          <SelectionProvider initialSelectedId={selectedId}>{ui}</SelectionProvider>
-        </ProjectProvider>
-      </ViewModeProvider>,
+      <ProjectProvider initialProject={seedProject}>
+        <SelectionProvider initialSelectedId={selectedId}>{ui}</SelectionProvider>
+      </ProjectProvider>,
     ),
   );
 }

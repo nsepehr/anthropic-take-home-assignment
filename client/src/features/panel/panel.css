@@ -32,6 +32,10 @@
   line-height: 1.5;
   color: var(--color-neutral-800);
 }
+.panel-deep-toggle {
+  font-size: 13px;
+  margin-top: 14px;
+}
 .panel-deep {
   margin-top: 12px;
   padding-top: 12px;

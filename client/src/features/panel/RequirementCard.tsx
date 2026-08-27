@@ -1,5 +1,4 @@
 import type { Requirement } from '@app/shared';
-import { useViewMode } from '../../state/viewMode';
 import { ProvenanceDot, StatusDot, Tag, type TagVariant } from '../../components';
 import { useCardState } from './components/useCardState';
 
@@ -9,9 +8,8 @@ const STATUS_TAG: Record<Requirement['status'], TagVariant> = {
   planned: 'neutral',
 };
 
-/** One requirement in a list: status, title, provenance, summary|detail per view mode, tags. */
+/** One requirement in a list: status, title, provenance, one-line summary, tags. */
 export function RequirementCard({ requirement }: { requirement: Requirement }) {
-  const { mode } = useViewMode();
   const card = useCardState(requirement.id);
   return (
     <button type="button" {...card}>
@@ -20,9 +18,7 @@ export function RequirementCard({ requirement }: { requirement: Requirement }) {
         <span className="panel-card-title">{requirement.title}</span>
         <ProvenanceDot source={requirement.provenance.source} className="panel-dot" />
       </div>
-      <div className="panel-card-body">
-        {mode === 'deepDive' ? requirement.detail : requirement.summary}
-      </div>
+      <div className="panel-card-body">{requirement.summary}</div>
       <div className="panel-card-tags">
         <Tag variant={STATUS_TAG[requirement.status]}>{requirement.status}</Tag>
         <Tag>{requirement.kind}</Tag>

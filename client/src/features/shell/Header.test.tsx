@@ -12,9 +12,9 @@ describe('Header', () => {
     expect(html).toContain('AI inferred');
   });
 
-  it('checks the segment matching the current view mode (overview by default)', () => {
+  it('has no global view-mode control', () => {
     const html = renderInShell(<Header />);
-    expect(html).toMatch(/<input[^>]*checked[^>]*value="overview"/);
-    expect(html).not.toMatch(/<input[^>]*checked[^>]*value="deepDive"/);
+    expect(html).not.toContain('view-mode');
+    expect(html).not.toContain('Deep dive');
   });
 });

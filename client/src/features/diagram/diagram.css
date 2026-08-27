@@ -68,14 +68,9 @@
   color: var(--color-neutral-700);
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-/* Clamp so the card stays near the placeholder height ELK laid out with (cardSize.ts). */
-.diagram-card__body.is-overview {
+  /* Clamp so the card stays near the placeholder height ELK laid out with (cardSize.ts). */
   -webkit-line-clamp: 3;
-}
-.diagram-card__body.is-deepDive {
-  -webkit-line-clamp: 10;
+  overflow: hidden;
 }
 .diagram-card__tags {
   display: flex;
@@ -85,6 +80,7 @@
 .diagram-card__tags .tag {
   font-size: 10px;
   padding: 2px 9px;
+  white-space: nowrap;
 }
 
 /* --- Parent (group) frame --- */
@@ -139,13 +135,6 @@
 .diagram-edge.is-dimmed {
   opacity: var(--dim-opacity);
 }
-.diagram-edge__label {
-  font-family: var(--font-body);
-  font-size: 10px;
-  fill: var(--color-neutral-600);
-  pointer-events: none;
-}
-
 /* Arrowheads live in a zero-size svg; colour follows the edge state via the marker id. */
 .diagram-markers {
   position: absolute;

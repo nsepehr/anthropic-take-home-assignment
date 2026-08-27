@@ -2,7 +2,8 @@
      TEMPLATE MARKUP ONLY. The original file's <script> held mock data + logic; our data comes from
      @app/shared via useProject()/useSelection(). {{ }} placeholders show which value goes where.
      Human decisions that override this design: right panel is ALWAYS visible (project overview when
-     nothing selected); overview/deep-dive toggle is GLOBAL in the header, not per item. -->
+     nothing selected); deep dive is PER ITEM — a "Deep dive" button in the detail card, no global
+     toggle (design revision 2, 2026-08-27). -->
 
 <div
   style="
@@ -39,7 +40,6 @@
         <span class="tag tag-outline" style="font-size: 10px; padding: 2px 9px">AI</span
         ><span>inferred</span>
       </div>
-      <!-- (ours) global Overview | Deep dive .seg control goes here -->
     </div>
   </div>
 

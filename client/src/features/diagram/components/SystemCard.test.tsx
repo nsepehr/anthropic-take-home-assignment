@@ -6,48 +6,38 @@ import { SystemCard } from './SystemCard';
 const system = seedProject.systems.find((s) => s.id === 'sys-client-app')!;
 
 describe('SystemCard', () => {
-  it('renders name, counts, provenance tag and the summary in overview', () => {
+  it('renders name, counts, provenance tag and the one-line summary', () => {
     const html = renderToString(
-      <SystemCard
-        system={system}
-        requirementCount={3}
-        intentCount={2}
-        mode="overview"
-        state="idle"
-      />,
+      <SystemCard system={system} requirementCount={3} intentCount={2} state="idle" />,
     );
     expect(html).toContain(system.name);
     expect(html).toContain('3 req');
     expect(html).toContain('2 why');
     expect(html).toContain(system.provenance.source === 'human-verified' ? 'Verified' : 'AI');
     expect(html).toContain(system.summary);
+    expect(html).not.toContain(system.detail.slice(0, 20));
     expect(html).toContain(`--kind-${system.kind}`);
   });
 
-  it('shows detail in deep dive and reflects the selection state as a class', () => {
+  it('zero counts render no tag', () => {
     const html = renderToString(
-      <SystemCard
-        system={system}
-        requirementCount={0}
-        intentCount={0}
-        mode="deepDive"
-        state="selected"
-      />,
+      <SystemCard system={system} requirementCount={0} intentCount={0} state="idle" />,
     );
-    expect(html).toContain('is-selected');
-    expect(html).toContain(system.detail.slice(0, 20));
+    expect(html).not.toContain('0 req');
+    expect(html).not.toContain('0 why');
+    expect(html).toContain(system.kind);
   });
 
-  it('marks dimmed cards with the dimmed class', () => {
-    const html = renderToString(
-      <SystemCard
-        system={system}
-        requirementCount={0}
-        intentCount={0}
-        mode="overview"
-        state="dimmed"
-      />,
-    );
-    expect(html).toContain('is-dimmed');
+  it('reflects the selection state as a class', () => {
+    expect(
+      renderToString(
+        <SystemCard system={system} requirementCount={0} intentCount={0} state="selected" />,
+      ),
+    ).toContain('is-selected');
+    expect(
+      renderToString(
+        <SystemCard system={system} requirementCount={0} intentCount={0} state="dimmed" />,
+      ),
+    ).toContain('is-dimmed');
   });
 });
