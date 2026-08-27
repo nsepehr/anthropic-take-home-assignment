@@ -308,6 +308,7 @@
       "id": "int-intent-first-class",
       "statement": "Intent is a first-class entity, not a field on System.",
       "rationale": "One decision typically explains several systems and edges at once. Modelling it as its own entity with `appliesTo` lets the UI put intent front and center and cross-link it, instead of burying it in a tooltip on one node. Alternatives rejected: A `rationale` string field on each System; Free-text notes attached to edges. Trade-off: More ids to keep consistent by hand; the validator and gaps report exist partly to make that manageable.",
+      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model"],
         "requirementIds": ["req-one-view-understanding"],
@@ -325,6 +326,7 @@
       "id": "int-summary-and-detail",
       "statement": "Every entity carries both a one-sentence summary and a deep-dive detail.",
       "rationale": "Different readers need different depth: a newcomer wants plain language, a maintainer wants the full story. Baking both into the schema means the UI can toggle overview/deep dive globally without any entity being left out. Alternatives rejected: A single description field, truncated for overview mode; Generating the summary at render time. Trade-off: Authors must write two texts per entity; the seed is longer to maintain.",
+      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model"],
         "requirementIds": ["req-overview-deep-dive"],
@@ -342,6 +344,7 @@
       "id": "int-project-is-own-demo",
       "statement": "The project is its own demo; the seed data is captured from the build process, not mocked.",
       "rationale": "A mocked example codebase would prove nothing about whether the model captures real intent. Recording this repo's own decisions as they are made tests the model for real and gives the demo honest content. Alternatives rejected: A fictional sample project; Analysing a well-known open-source repo. Trade-off: The demo content is small and about a tooling project, which is less flashy than a big product codebase.",
+      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-seed-data"],
         "requirementIds": [
@@ -363,6 +366,7 @@
       "id": "int-react-flow-elk",
       "statement": "Use React Flow (@xyflow/react) with elkjs layout, rather than LikeC4, Cytoscape or Mermaid.",
       "rationale": "Nodes must be rich React components showing requirements and intent as content, so the rendering layer has to be React-native. React Flow gives full control over nodes and edges; elkjs supplies a proper layered layout for nested systems. Alternatives rejected: LikeC4 — too opinionated for an intent-first UI; Cytoscape — canvas-only, no React nodes; Mermaid — static output, no interaction. Trade-off: More layout and interaction code to write ourselves; elkjs adds bundle weight.",
+      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-client-app"],
         "requirementIds": ["req-one-view-understanding"],
@@ -380,6 +384,7 @@
       "id": "int-isolated-worktrees",
       "statement": "Each parallel agent works in its own git worktree with its own allocated ports.",
       "rationale": "Agents run concurrently and each starts dev servers. Worktrees give file-level isolation and a private branch; the ports allocator prevents `EADDRINUSE` collisions and hardcoded 5173/3001. Alternatives rejected: All agents on one checkout with feature branches; Fixed port offsets per task. Trade-off: A full `npm install` per worktree and some disk use; the human does all merges by hand, fast-forward only.",
+      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-agent-workflow", "sys-worktree-scripts", "sys-ports-allocator"],
         "requirementIds": ["req-parallel-agents-safe"],
@@ -397,6 +402,7 @@
       "id": "int-trust-provenance-gaps",
       "statement": "Trust is explicit: provenance on every claim, and the tool reports gaps instead of hiding them.",
       "rationale": "A map that mixes verified facts with AI guesses without saying which is which is worse than no map. Showing provenance and an honest 'unexplained' list lets the reader calibrate. Alternatives rejected: Treating all generated content as equally trustworthy; Omitting entities the model cannot explain so the diagram looks complete. Trade-off: The demo will visibly show gaps and `ai-inferred` badges, which looks less polished but is the point.",
+      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model", "sys-seed-data"],
         "requirementIds": ["req-provenance-on-claims"],
@@ -414,6 +420,7 @@
       "id": "int-chat-last",
       "statement": "Chat and AI generation features come deliberately last.",
       "rationale": "The core question is whether a human can understand a system from the map, not whether an AI can generate text about it. Building understanding first keeps the prototype focused and keeps the demo self-contained with no API keys. Alternatives rejected: Leading with an LLM chat over the codebase; Generating the architecture model from the repo with an LLM in task 01. Trade-off: The first demo has no generative feature, which some reviewers may expect.",
+      "status": "active",
       "appliesTo": {
         "systemIds": [],
         "requirementIds": ["req-self-contained-demo"],
@@ -431,6 +438,7 @@
       "id": "int-backend-first",
       "statement": "Build the model and backend first; design the UI look-and-feel separately with Claude Design.",
       "rationale": "The data model is the contract everything depends on and is where the product thesis lives. Locking it first lets server and client tasks run in parallel, while visual design happens in a dedicated tool rather than by iterating CSS in code. Alternatives rejected: UI-first prototyping with hardcoded data; Designing look-and-feel inline in React components. Trade-off: The client is a bare hello page for longer than a UI-first approach would leave it.",
+      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model", "sys-server-api", "sys-client-app"],
         "requirementIds": ["req-single-focused-interaction"],
@@ -448,6 +456,7 @@
       "id": "int-zod-single-definition",
       "statement": "Zod defines the schema once; TypeScript types are inferred from it.",
       "rationale": "Runtime validation at the API boundary and compile-time types must never drift. `z.infer` gives both from one definition. It is the one runtime dependency `shared/` is allowed. Alternatives rejected: Hand-written interfaces plus a separate JSON Schema; TypeScript types only, trusting the JSON. Trade-off: One dependency in the otherwise dependency-free contract package.",
+      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model"],
         "requirementIds": [],
@@ -465,6 +474,7 @@
       "id": "int-edges-lightweight",
       "statement": "Edges have optional summary/detail and no provenance of their own; their explanation lives in the Intent they point to.",
       "rationale": "An edge is a fact about two systems that already carry provenance. Requiring two paragraphs and a provenance block per arrow would make the seed tedious and push authors to omit edges. Keeping edges thin and hanging the 'why' on `intentId` keeps intent as the single place decisions are explained. Alternatives rejected: Edges as full entities with required summary, detail and provenance; Edges with no explanatory fields at all. Trade-off: An edge without an `intentId` is unexplained, which the gaps report surfaces as `edgesWithoutIntent`.",
+      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model"],
         "requirementIds": [],
@@ -482,6 +492,7 @@
       "id": "int-tests-pin-intent",
       "statement": "Every module ships with a small test that pins its intent, not its implementation.",
       "rationale": "With several agents editing in parallel, the danger is a silent behaviour change in something another task relies on. A test stating what the module must do fails loudly at `finish-worktree.sh` time. Coverage is not the goal. Alternatives rejected: Coverage thresholds; No tests during the prototype phase. Trade-off: Some duplication between tests and briefs; tests stay deliberately shallow.",
+      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-check-suite"],
         "requirementIds": ["req-parallel-agents-safe"],
@@ -499,13 +510,14 @@
       "id": "int-minimal-phase1-schema",
       "statement": "Schema kept minimal for phase 1; links stored once and derived; everything cut is re-addable as optional fields.",
       "rationale": "With several agents appending to the seed in parallel, bidirectional links (System.intentIds mirroring Intent.appliesTo, Requirement.intentIds mirroring the same) drift: one side gets updated and the other does not, and the validator cannot tell which side is right. Storing each link once — Requirement.systemIds, Intent.appliesTo, Edge endpoints/intentId, System.parentId — and deriving the reverse in relatedTo removes that failure mode. Intent.alternativesRejected and tradeoffs were folded into rationale prose for now. Every removed field can return later as an optional field or enum value without breaking existing data; the backlog in docs/TASKS.md lists them.",
+      "status": "active",
       "appliesTo": {
         "systemIds": ["sys-shared-model", "sys-seed-data"],
         "requirementIds": ["req-parallel-agents-safe"],
         "edgeIds": []
       },
       "summary": "Store each link once and derive the other direction, so parallel agents cannot leave the two sides disagreeing.",
-      "detail": "Removed in this revision: System.requirementIds, System.intentIds, Requirement.intentIds, Intent.alternativesRejected, Intent.tradeoffs. Kept: the common base (id, summary, detail, provenance), Edge shape, Project shape. `relatedTo` derives system → requirements/intents and requirement → intents; `computeGaps` treats a system as explained when any intent's appliesTo names it.",
+      "detail": "Removed in this revision: System.requirementIds, System.intentIds, Requirement.intentIds, Intent.alternativesRejected, Intent.tradeoffs. Added: Intent.status ('active' | 'superseded') + supersededBy?, validated to agree. Kept: the common base (id, summary, detail, provenance), Edge shape, Project shape. `relatedTo` derives system → requirements/intents and requirement → intents; `computeGaps` treats a system as explained when any intent's appliesTo names it.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T16:00:00+08:00",

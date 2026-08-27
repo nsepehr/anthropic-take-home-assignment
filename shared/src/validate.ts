@@ -24,7 +24,12 @@ export function validateProject(input: unknown): ValidateResult {
   }
   const project = parsed.data;
   const { ids, errors: duplicates } = indexIds(project);
-  const errors = [...duplicates, ...checkReferences(project, ids), ...checkParentCycles(project)];
+  const errors = [
+    ...duplicates,
+    ...checkReferences(project, ids),
+    ...checkParentCycles(project),
+    ...checkSupersession(project),
+  ];
   return errors.length > 0
     ? { ok: false, errors }
     : { ok: true, project, gaps: computeGaps(project) };
@@ -80,6 +85,7 @@ function checkReferences(project: Project, ids: IdIndex): ValidationError[] {
     refs(`${p}.systemIds`, it.appliesTo.systemIds, 'systems');
     refs(`${p}.requirementIds`, it.appliesTo.requirementIds, 'requirements');
     refs(`${p}.edgeIds`, it.appliesTo.edgeIds, 'edges');
+    if (it.supersededBy) ref(`intents.${i}.supersededBy`, it.supersededBy, 'intents');
   });
   project.edges.forEach((e, i) => {
     const p = `edges.${i}`;
@@ -107,6 +113,22 @@ function checkParentCycles(project: Project): ValidationError[] {
       if (trail.includes(current)) return; // cycle elsewhere; reported on its own member
       trail.push(current);
       current = parentOf.get(current);
+    }
+  });
+  return errors;
+}
+
+/** `supersededBy` is set exactly when `status` is 'superseded', and never points at itself. */
+function checkSupersession(project: Project): ValidationError[] {
+  const errors: ValidationError[] = [];
+  project.intents.forEach((it, i) => {
+    const path = `intents.${i}.supersededBy`;
+    if (it.status === 'superseded' && !it.supersededBy) {
+      errors.push({ path, message: 'required when status is "superseded"' });
+    } else if (it.status === 'active' && it.supersededBy) {
+      errors.push({ path, message: 'only allowed when status is "superseded"' });
+    } else if (it.supersededBy === it.id) {
+      errors.push({ path, message: 'an intent cannot supersede itself' });
     }
   });
   return errors;

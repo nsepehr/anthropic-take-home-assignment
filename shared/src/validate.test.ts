@@ -44,6 +44,21 @@ describe('validateProject', () => {
     ]);
   });
 
+  it('supersededBy must resolve to an intent and agree with status', () => {
+    const project = fullyLinkedProject();
+    project.intents[0]!.supersededBy = 'int-b'; // status still 'active'
+    expect(errorsOf(project)).toEqual([
+      { path: 'intents.0.supersededBy', message: 'only allowed when status is "superseded"' },
+    ]);
+    project.intents[0]!.status = 'superseded';
+    expect(validateProject(project).ok).toBe(true);
+    project.intents[0]!.supersededBy = 'sys-parent';
+    expect(errorsOf(project)[0]?.path).toBe('intents.0.supersededBy');
+    project.intents[1]!.status = 'superseded';
+    project.intents[1]!.supersededBy = undefined;
+    expect(errorsOf(project).map((e) => e.path)).toContain('intents.1.supersededBy');
+  });
+
   it('duplicate id across entity types → error', () => {
     const project = fullyLinkedProject();
     project.intents[1]!.id = 'sys-parent';

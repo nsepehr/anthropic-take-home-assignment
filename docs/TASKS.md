@@ -47,7 +47,6 @@ Cut from the phase-1 model on 2026-08-27 to keep it minimal. Each is re-addable 
 field or enum value without a breaking change.
 
 - Feature entity (or a `feature` requirement kind) — to be discussed next
-- Intent `status: active | superseded` + `supersededBy`
 - `alternativesRejected` / `tradeoffs` on Intent (currently folded into `rationale` prose)
 - Explicit Requirement → Intent links (currently only Intent.appliesTo.requirementIds)
 - Edge provenance

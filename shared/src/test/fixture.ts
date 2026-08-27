@@ -66,6 +66,7 @@ export function fullyLinkedProject(): Project {
         id: 'int-a',
         statement: 'A',
         rationale: 'r',
+        status: 'active',
         appliesTo: {
           systemIds: ['sys-parent', 'sys-child'],
           requirementIds: ['req-a'],
@@ -79,6 +80,7 @@ export function fullyLinkedProject(): Project {
         id: 'int-b',
         statement: 'B',
         rationale: 'r',
+        status: 'active',
         appliesTo: { systemIds: ['sys-other'], requirementIds: [], edgeIds: [] },
         summary: 's',
         detail: 'd',
