@@ -12,7 +12,7 @@ describe('SidePanel', () => {
   });
 
   it('shows the detail slot when something is selected', () => {
-    const html = renderInShell(panel, { selectedId: 'sys-client-app' });
+    const html = renderInShell(panel, { selectedId: 'sys-client-api' });
     expect(html).toContain('DETAIL-SLOT');
     expect(html).not.toContain('OVERVIEW-SLOT');
   });

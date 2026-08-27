@@ -5,7 +5,7 @@ import { categoryOf, laneBounds, laneIndex, laneOrder, LANE_PADDING } from './la
 
 describe('categoryOf', () => {
   it('returns a top-level system’s own category', () => {
-    expect(categoryOf(seedProject, 'sys-client-app')).toBe('Client');
+    expect(categoryOf(seedProject, 'sys-client-api')).toBe('Client');
   });
 
   it('gives a nested system its ancestor’s category', () => {

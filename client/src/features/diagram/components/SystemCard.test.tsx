@@ -3,7 +3,7 @@ import { renderToString } from 'react-dom/server';
 import { seedProject } from '../../../test/seed';
 import { SystemCard } from './SystemCard';
 
-const system = seedProject.systems.find((s) => s.id === 'sys-client-app')!;
+const system = seedProject.systems.find((s) => s.id === 'sys-client-api')!;
 
 describe('SystemCard', () => {
   it('renders name, counts, provenance tag and the one-line summary', () => {

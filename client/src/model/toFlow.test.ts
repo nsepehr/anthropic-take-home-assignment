@@ -36,7 +36,7 @@ describe('toFlowElements', () => {
   it('maps every model edge to a flow edge carrying the model edge', () => {
     expect(edges).toHaveLength(project.edges.length);
     const e = edges.find((x) => x.id === 'edge-client-calls-server')!;
-    expect(e.source).toBe('sys-client-app');
+    expect(e.source).toBe('sys-client-api');
     expect(e.target).toBe('sys-server-api');
     expect(e.data?.edge.kind).toBe('calls');
   });

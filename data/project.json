@@ -43,24 +43,17 @@
       }
     },
     {
-      "id": "sys-client-app",
-      "name": "Client app",
-      "kind": "ui",
+      "id": "sys-client-api",
+      "name": "Client API",
+      "kind": "module",
       "category": "Client",
-      "paths": [
-        "client/src/App.tsx",
-        "client/src/main.tsx",
-        "client/src/api/project.ts",
-        "client/src/model/toFlow.ts",
-        "client/src/features/debug/",
-        "client/vite.config.ts"
-      ],
-      "summary": "React app that turns the project model into an interactive architecture diagram.",
-      "detail": "Vite + React 18. `App.tsx` is a composition root wiring providers and the current top-level feature; `api/` is the only place `fetch` is called (responses parsed with `validateProject`); `model/toFlow.ts` maps Systems/Edges to React Flow elements; `features/debug/` is a throwaway page proving the pipeline until the designed UI replaces it.",
+      "paths": ["client/src/api/project.ts", "client/vite.config.ts"],
+      "summary": "The only network edge of the client: fetches `/api/project` once and validates the payload with the shared schema before anything renders.",
+      "detail": "`fetchProject(url)` is the single `fetch` call in `client/src` (`api/project.ts:21`). It returns a typed `ApiResult` — `ok` with a `Project` that passed `validateProject` from `@app/shared`, or a readable error for network failures, non-2xx responses and payloads that fail the schema — so the rest of the client trusts the types. `vite.config.ts` proxies `/api` to the Fastify port from `.env.local` in dev; in production the same path is served by the Vercel function.",
       "provenance": {
         "source": "ai-inferred",
-        "capturedAt": "2026-08-27T15:00:00Z",
-        "sessionRef": "agent: client-foundation (task 03)"
+        "capturedAt": "2026-08-27T22:00:00+08:00",
+        "sessionRef": "agent: seed-client (task 12), derived from client/src imports"
       }
     },
     {
@@ -151,7 +144,7 @@
       "id": "sys-client-state",
       "name": "Client state",
       "kind": "module",
-      "parentId": "sys-client-app",
+      "category": "Client",
       "paths": [
         "client/src/state/projectStore.tsx",
         "client/src/state/selection.tsx",
@@ -159,7 +152,7 @@
         "client/src/state/viewMode.tsx"
       ],
       "summary": "Project, selection, and view-mode state exposed as React hooks.",
-      "detail": "`ProjectProvider`/`useProject` load the project once via the API. `SelectionProvider`/`useSelection` hold one selected id and derive `related`, `isHighlighted`, `isDimmed` with `relatedTo` from the shared model — no network round-trip. `useViewMode` is the global overview/deep-dive switch persisted in localStorage.",
+      "detail": "`ProjectProvider`/`useProject` load the project once through `api/project.ts` (the client's only fetch call site). `SelectionProvider`/`useSelection` hold one selected id and derive `related`, `isHighlighted`, `isDimmed` with `relatedTo` from the shared model — no network round-trip. `useViewMode` is the global overview/deep-dive switch persisted in localStorage.",
       "provenance": {
         "source": "ai-inferred",
         "capturedAt": "2026-08-27T15:00:00Z",
@@ -170,10 +163,16 @@
       "id": "sys-client-layout",
       "name": "Client layout",
       "kind": "module",
-      "parentId": "sys-client-app",
-      "paths": ["client/src/layout/elk.ts", "client/src/layout/useLayout.ts"],
+      "category": "Client",
+      "paths": [
+        "client/src/layout/elk.ts",
+        "client/src/layout/useLayout.ts",
+        "client/src/layout/useLanes.ts",
+        "client/src/model/toFlow.ts",
+        "client/src/model/lanes.ts"
+      ],
       "summary": "Pure ELK layout pipeline: flow elements in, positioned nodes out.",
-      "detail": "`layoutWithElk` builds a compound ELK graph (children nested by `parentId`, `INCLUDE_CHILDREN` so cross-group edges route) and returns nodes with parent-relative positions and ELK-computed parent sizes. `useLayout` wraps the async call and reports `idle | layouting | ready | error`.",
+      "detail": "`model/toFlow.ts` maps Systems/Edges to React Flow elements. `layoutWithElk` builds a compound ELK graph (children nested by `parentId`, `INCLUDE_CHILDREN` so cross-group edges route, one partition per category) and returns nodes with parent-relative positions and ELK-computed parent sizes. `useLayout` wraps the async call and reports `idle | layouting | ready | error`. `model/lanes.ts` is pure: `categoryOf` walks `parentId` to the top-level ancestor, `laneOrder` orders categories by first appearance, `laneBounds` pads the positioned top-level nodes of each category; `useLanes` turns that into the `partitionOf` callback for ELK and the lane rectangles the diagram draws.",
       "provenance": {
         "source": "ai-inferred",
         "capturedAt": "2026-08-27T15:00:00Z",
@@ -184,10 +183,10 @@
       "id": "sys-client-styles",
       "name": "Client styles",
       "kind": "module",
-      "parentId": "sys-client-app",
+      "category": "Client",
       "paths": ["client/src/styles/", "client/src/components/"],
       "summary": "The Organic design tokens and base classes, plus the shared presentational components that consume them.",
-      "detail": "`styles/tokens.css` holds the `:root` variables ported verbatim from `docs/design/organic.css` plus app semantic tokens (`--kind-*`, `--status-*`, `--prov-*`, `--dim-opacity`, `--canvas-*`) derived from the ramps. `styles/base.css` carries the base rules and `.btn/.tag/.card/.seg` classes; `styles/index.css` is the single stylesheet entry. `components/` has `Tag`, `Button`, `KindDot`, `StatusDot`, `ProvenanceDot` — presentational only, typed from `@app/shared`.",
+      "detail": "`styles/tokens.css` holds the `:root` variables ported verbatim from `docs/design/organic.css` plus app semantic tokens (`--kind-*`, `--status-*`, `--prov-*`, `--dim-opacity`, `--canvas-*`) derived from the ramps. `styles/base.css` carries the base rules and `.btn/.tag/.card/.seg` classes; `styles/index.css` is the single stylesheet entry. `components/` has `Tag`, `Button`, `KindDot`, `StatusDot`, `ProvenanceDot` — presentational only, typed from `@app/shared`. Every feature (shell, diagram, panel) imports from `components/` and relies on the tokens; on the diagram only the shell→styles edge is drawn to keep the Client lane readable.",
       "provenance": {
         "source": "ai-inferred",
         "capturedAt": "2026-08-27T20:00:00+08:00",
@@ -195,31 +194,13 @@
       }
     },
     {
-      "id": "sys-client-lanes",
-      "name": "Category lanes",
-      "kind": "ui",
-      "parentId": "sys-client-app",
-      "paths": [
-        "client/src/features/diagram/components/LaneLayer.tsx",
-        "client/src/model/lanes.ts",
-        "client/src/layout/useLanes.ts"
-      ],
-      "summary": "Draws a translucent lane with an uppercase label behind each category of systems.",
-      "detail": "`model/lanes.ts` is pure: `categoryOf` walks `parentId` to the top-level ancestor, `laneOrder` orders categories by first appearance, `laneBounds` pads the positioned top-level nodes of each category. `useLanes` turns that into the `partitionOf` callback `useLayout` passes to ELK and the lane rectangles; `LaneLayer` renders them inside React Flow's `ViewportPortal` (z-index below nodes) so they pan and zoom with the graph. Built by task 08-category-lanes.",
-      "provenance": {
-        "source": "ai-inferred",
-        "capturedAt": "2026-08-27T16:00:00+08:00",
-        "sessionRef": "agent: category-lanes (task 08)"
-      }
-    },
-    {
       "id": "sys-client-shell",
       "name": "App shell",
       "kind": "ui",
-      "parentId": "sys-client-app",
-      "paths": ["client/src/features/shell/", "client/src/App.tsx"],
+      "category": "Client",
+      "paths": ["client/src/features/shell/", "client/src/App.tsx", "client/src/main.tsx"],
       "summary": "The single-screen frame: header, canvas region and the always-visible 400px right panel with overview/detail slots.",
-      "detail": "`AppShell` is a 100vh flex column (no page scroll): `Header` shows the project name, mission, the provenance legend and the global Overview / Deep dive `.seg` control bound to `useViewMode()`; `CanvasFrame` is the rounded dotted-grid region that renders the `canvas` slot and a hint while nothing is selected; `SidePanel` scrolls on its own and switches on `useSelection().selectedId` between the `overview` and `detail` slots. Slots are props so the shell never imports other features; the canvas slot is a render prop that receives the loaded project. Layout-only CSS lives in `shell.css`; every color, font and radius is a token from `client/src/styles`.",
+      "detail": "`AppShell` is a 100vh flex column (no page scroll): `Header` shows the project name, mission, the provenance legend and the global Overview / Deep dive `.seg` control bound to `useViewMode()`; `CanvasFrame` is the rounded dotted-grid region that renders the `canvas` slot and a hint while nothing is selected; `SidePanel` scrolls on its own and switches on `useSelection().selectedId` between the `overview` and `detail` slots. Slots are props so the shell folder never imports other features — `App.tsx` (the composition root, owned here) is where the diagram and panel are plugged into the slots and the state providers are stacked; the canvas slot is a render prop that receives the loaded project. Layout-only CSS lives in `shell.css`; every color, font and radius is a token from `client/src/styles`.",
       "provenance": {
         "source": "ai-inferred",
         "capturedAt": "2026-08-27T16:00:00+08:00",
@@ -230,7 +211,7 @@
       "id": "sys-client-panel",
       "name": "Detail panel",
       "kind": "ui",
-      "parentId": "sys-client-app",
+      "category": "Client",
       "paths": ["client/src/features/panel/", "client/src/model/entities.ts"],
       "summary": "The right panel: the selected entity's what / must-do / why, or the whole project when nothing is selected.",
       "detail": "`EntityDetail` dispatches on the selected id: a headline `DetailCard` (kicker, title, summary, and in deep dive the system's how-it-works, the requirement's evidence, or the intent's rationale), then the entity's requirements and intents as clickable cards, then `ConnectedChips` for every linked entity. `ProjectOverview` shows mission, counts and every requirement and intent. The pure lookups (`findEntity`, `requirementsFor`, `intentsFor`, `connectionsFor`) live in `client/src/model/entities.ts` and derive everything from `relatedTo`.",
@@ -242,12 +223,15 @@
     },
     {
       "id": "sys-client-diagram",
-      "name": "Diagram",
+      "name": "Diagram canvas",
       "kind": "ui",
-      "parentId": "sys-client-app",
-      "paths": ["client/src/features/diagram/"],
+      "category": "Client",
+      "paths": [
+        "client/src/features/diagram/",
+        "client/src/features/diagram/components/LaneLayer.tsx"
+      ],
       "summary": "The architecture canvas: designed system cards and arrowed edges, laid out by ELK, lit by the selection.",
-      "detail": "`DiagramCanvas` wraps React Flow with `nodeTypes={{ system: SystemNode }}` and `edgeTypes={{ system: SystemEdge }}`, sizes leaf nodes per view mode (`cardSize.ts`) before `useLayout`, and maps clicks to `useSelection().select/clear`. `SystemNode` renders a `SystemCard` (kind dot, name, summary or detail, `kind · N req · N why · Verified/AI` tags) or a `GroupCard` frame for parents. `SystemEdge` is a bezier with an arrowhead marker, accent when related and neutral otherwise; labels only in deep dive. All colours come from tokens via `diagram.css`; `elementState` (selected | related | dimmed | idle) is the one pure function both cards and edges use.",
+      "detail": "`DiagramCanvas` wraps React Flow with `nodeTypes={{ system: SystemNode }}` and `edgeTypes={{ system: SystemEdge }}`, sizes leaf nodes per view mode (`cardSize.ts`) before `useLayout`, and maps clicks to `useSelection().select/clear`. `SystemNode` renders a `SystemCard` (kind dot, name, summary or detail, `kind · N req · N why · Verified/AI` tags) or a `GroupCard` frame for parents. `SystemEdge` is a bezier with an arrowhead marker, accent when related and neutral otherwise; labels only in deep dive. All colours come from tokens via `diagram.css`; `elementState` (selected | related | dimmed | idle) is the one pure function both cards and edges use. `LaneLayer` (from task 08-category-lanes) draws a translucent lane with an uppercase label behind each category inside React Flow's `ViewportPortal` (z-index below nodes) so lanes pan and zoom with the graph; the lane geometry itself comes from the layout module.",
       "provenance": {
         "source": "ai-inferred",
         "capturedAt": "2026-08-27T16:00:00+08:00",
@@ -293,7 +277,7 @@
       "title": "Deployed prototype",
       "kind": "constraint",
       "status": "partial",
-      "systemIds": ["sys-server-api", "sys-client-app"],
+      "systemIds": ["sys-server-api", "sys-client-shell"],
       "evidence": ["CLAUDE.md (Stack: 'Deploy target later: Fly.io (not set up yet)')"],
       "summary": "The prototype is reachable at a public URL, not only on a laptop.",
       "detail": "From the assignment. The chosen target is Fly.io, but nothing is configured: there is no Dockerfile or `fly.toml`, and the server binds `127.0.0.1` in dev. Deployment is a later task.",
@@ -308,7 +292,7 @@
       "title": "One single, focused hero interaction",
       "kind": "functional",
       "status": "partial",
-      "systemIds": ["sys-client-app", "sys-shared-model", "sys-client-state"],
+      "systemIds": ["sys-client-diagram", "sys-shared-model", "sys-client-state"],
       "evidence": [
         "shared/src/related.ts",
         "shared/src/related.test.ts",
@@ -358,7 +342,7 @@
       "title": "Understand architecture, features and intent from one view",
       "kind": "functional",
       "status": "planned",
-      "systemIds": ["sys-client-app"],
+      "systemIds": ["sys-client-diagram"],
       "evidence": [],
       "summary": "A user opens the app and sees systems, the requirements they serve and the intent behind them together, without reading code.",
       "detail": "The product's core requirement. Systems render as boxes and edges as arrows; requirements and intents are front-and-center content on and around the nodes, not tooltips. The client currently renders a hello page, so this is entirely ahead of us; the model that makes it possible is in place.",
@@ -457,7 +441,7 @@
       "title": "The diagram reads left-to-right by system role",
       "kind": "functional",
       "status": "implemented",
-      "systemIds": ["sys-shared-model", "sys-client-layout", "sys-client-lanes"],
+      "systemIds": ["sys-shared-model", "sys-client-layout", "sys-client-diagram"],
       "evidence": [
         "shared/src/schema/system.ts (category)",
         "client/src/layout/elk.ts (partitionOf)",
@@ -538,7 +522,7 @@
       "rationale": "Nodes must be rich React components showing requirements and intent as content, so the rendering layer has to be React-native. React Flow gives full control over nodes and edges; elkjs supplies a proper layered layout for nested systems. Alternatives rejected: LikeC4 — too opinionated for an intent-first UI; Cytoscape — canvas-only, no React nodes; Mermaid — static output, no interaction. Trade-off: More layout and interaction code to write ourselves; elkjs adds bundle weight.",
       "status": "active",
       "appliesTo": {
-        "systemIds": ["sys-client-app"],
+        "systemIds": ["sys-client-diagram", "sys-client-layout"],
         "requirementIds": ["req-one-view-understanding"],
         "edgeIds": []
       },
@@ -610,7 +594,7 @@
       "rationale": "The data model is the contract everything depends on and is where the product thesis lives. Locking it first lets server and client tasks run in parallel, while visual design happens in a dedicated tool rather than by iterating CSS in code. Alternatives rejected: UI-first prototyping with hardcoded data; Designing look-and-feel inline in React components. Trade-off: The client is a bare hello page for longer than a UI-first approach would leave it.",
       "status": "active",
       "appliesTo": {
-        "systemIds": ["sys-shared-model", "sys-server-api", "sys-client-app"],
+        "systemIds": ["sys-shared-model", "sys-server-api", "sys-client-api"],
         "requirementIds": ["req-single-focused-interaction"],
         "edgeIds": ["edge-client-depends-shared", "edge-server-depends-shared"]
       },
@@ -720,7 +704,11 @@
       "appliesTo": {
         "systemIds": ["sys-client-state", "sys-shared-model"],
         "requirementIds": ["req-single-focused-interaction"],
-        "edgeIds": ["edge-client-depends-shared"]
+        "edgeIds": [
+          "edge-diagram-reads-state",
+          "edge-panel-reads-state",
+          "edge-state-depends-shared"
+        ]
       },
       "summary": "Selection highlight is computed in the browser with relatedTo.",
       "detail": "Client state holds only the selected id; everything derived (related ids, highlighted/dimmed) is a pure function of project + id so it is trivially testable and never stale.",
@@ -736,9 +724,9 @@
       "rationale": "The design pass restyles nodes without touching logic: `toFlowElements` and `layoutWithElk` take model data and return plain data, so custom node components and tokens can be swapped in on top. React Flow 12 needs parents before children and parent-relative child positions; the pipeline guarantees both.",
       "status": "active",
       "appliesTo": {
-        "systemIds": ["sys-client-layout", "sys-client-app"],
+        "systemIds": ["sys-client-layout"],
         "requirementIds": ["req-one-view-understanding"],
-        "edgeIds": []
+        "edgeIds": ["edge-diagram-calls-layout", "edge-layout-depends-shared"]
       },
       "summary": "Model to positioned nodes is pure data transformation.",
       "detail": "No component computes layout; `useLayout` is the only effectful wrapper and merely resolves the async ELK call and reports status.",
@@ -754,9 +742,9 @@
       "rationale": "The model is small and the product's point is seeing it all at once, so there is nothing to gain from paging or per-entity fetches. Holding one immutable object on the client means one source of truth: selection closures (`relatedTo`) and gaps (`computeGaps`) are derived from it with the same `@app/shared` functions the validator uses, so the UI can never disagree with the data. The API response is byte-identical in shape to `data/project.json`, which is a trust property: what you see in the diagram is what is in the file. The original task 02 added `GET /api/project/related/:id`, `/entities/:id` and `/gaps`; human review found they duplicated client logic for a hypothetical curl user, and they were removed.",
       "status": "active",
       "appliesTo": {
-        "systemIds": ["sys-server-api", "sys-client-app"],
+        "systemIds": ["sys-server-api", "sys-client-api"],
         "requirementIds": [],
-        "edgeIds": ["edge-client-calls-server"]
+        "edgeIds": ["edge-client-calls-server", "edge-state-calls-api"]
       },
       "summary": "One GET, the whole model; everything else is computed on the client.",
       "detail": "Remaining routes: `GET /api/project`, `GET /api/health`, dev-only `POST /api/project/reload`. Removed in 02b-api-trim: `services/entities.ts`, `lib/slug.ts` and the three per-entity routes.",
@@ -774,7 +762,7 @@
       "appliesTo": {
         "systemIds": ["sys-client-styles"],
         "requirementIds": [],
-        "edgeIds": []
+        "edgeIds": ["edge-shell-depends-styles"]
       },
       "summary": "One token sheet is the visual source of truth; no hex, font or radius in component code.",
       "detail": "Semantic tokens: `--kind-ui/service/module/store/external/workflow`, `--status-implemented/partial/planned`, `--prov-human/ai`, `--dim-opacity`, `--canvas-bg/dot/dot-size`. Dark theme tokens are backlog.",
@@ -790,7 +778,7 @@
       "rationale": "Two different questions get two different fields. `parentId` says what a system is inside of; `category` says what role it plays (Model, Server, Client, Workflow) and therefore which column it belongs in. Folding category into the tree (e.g. a synthetic parent per category) was rejected because it would force every top-level system into an artificial box and break real containment. Only top-level systems carry a category; nested systems inherit their ancestor's, so they always land inside their parent's lane. ELK's `partitioning` option turns each category into a vertical column ordered by first appearance in `project.systems`, which makes the reading order a property of the data, not of the layout engine.",
       "status": "active",
       "appliesTo": {
-        "systemIds": ["sys-shared-model", "sys-client-layout", "sys-client-lanes"],
+        "systemIds": ["sys-shared-model", "sys-client-layout", "sys-client-diagram"],
         "requirementIds": ["req-category-lanes"],
         "edgeIds": []
       },
@@ -812,7 +800,7 @@
       "appliesTo": {
         "systemIds": ["sys-client-shell"],
         "requirementIds": [],
-        "edgeIds": []
+        "edgeIds": ["edge-shell-renders-panel"]
       },
       "provenance": {
         "source": "human-verified",
@@ -831,7 +819,7 @@
       "appliesTo": {
         "systemIds": ["sys-client-shell", "sys-client-state"],
         "requirementIds": [],
-        "edgeIds": []
+        "edgeIds": ["edge-shell-reads-state"]
       },
       "provenance": {
         "source": "human-verified",
@@ -895,7 +883,7 @@
     },
     {
       "id": "int-selection-closure-includes-neighbors",
-      "statement": "Selecting a thing lights up everything one hop away \u2014 connected systems, not just the arrows",
+      "statement": "Selecting a thing lights up everything one hop away — connected systems, not just the arrows",
       "rationale": "The question a selection answers is \"how does this fit together?\"; a lit arrow into a dimmed box answers half of it. Matches the design's related() rule. Fixed at the shared model (relatedTo) so canvas and panel agree.",
       "status": "active",
       "appliesTo": {
@@ -904,7 +892,7 @@
         "edgeIds": []
       },
       "summary": "relatedTo returns the one-hop closure: neighbour systems via edges, and for requirements/intents the edges between their systems.",
-      "detail": "system \u2192 its edges + both endpoints, requirements listing it, intents applying to it; requirement \u2192 its systems, intents, edges between those systems; intent \u2192 appliesTo + systems of its requirements + edges between; edge \u2192 endpoints + intent. Never the selected id itself.",
+      "detail": "system → its edges + both endpoints, requirements listing it, intents applying to it; requirement → its systems, intents, edges between those systems; intent → appliesTo + systems of its requirements + edges between; edge → endpoints + intent. Never the selected id itself.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T16:00:00+08:00",
@@ -928,25 +916,52 @@
         "capturedAt": "2026-08-27T18:00:00+08:00",
         "sessionRef": "planning chat 2026-08-27, design revision 2"
       }
+    },
+    {
+      "id": "int-client-is-a-graph",
+      "statement": "The client is modeled as its real modules with the edges between them, not one container",
+      "rationale": "A stack of boxes answers nothing; the interesting question is how shell, diagram, panel, state, api and layout depend on each other. Edges are derived from imports in `client/src` so the picture is evidence, not decoration. The first build nested every client module under one `Client app` container with no edges, and ELK stacked them into a column — the human review called it 'not interesting'. The container was removed rather than kept as an empty parent; the styles module gets a single edge from the shell (every feature uses it, drawing all three would add noise without information).",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": [
+          "sys-client-shell",
+          "sys-client-diagram",
+          "sys-client-panel",
+          "sys-client-state",
+          "sys-client-api",
+          "sys-client-layout",
+          "sys-client-styles"
+        ],
+        "requirementIds": ["req-one-view-understanding"],
+        "edgeIds": ["edge-shell-renders-diagram"]
+      },
+      "summary": "Seven client systems, import-evidenced edges, no container.",
+      "detail": "Flat is a data decision, not a schema change: `parentId` still works and the Workflow lane still uses it. If the client grows past what one lane can hold, a container can come back — but only with edges between its children.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T22:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, review of first build"
+      }
     }
   ],
   "edges": [
     {
       "id": "edge-client-calls-server",
-      "from": "sys-client-app",
+      "from": "sys-client-api",
       "to": "sys-server-api",
       "kind": "calls",
       "label": "GET /api/project",
-      "summary": "The client fetches `/api/project` once at startup and parses it with `validateProject`; Vite proxies `/api` to the Fastify port.",
+      "summary": "`fetchProject` in `client/src/api/project.ts` fetches `/api/project` once at startup (called from `ProjectProvider`) and parses it with `validateProject`; Vite proxies `/api` to the Fastify port.",
       "intentId": "int-api-single-payload"
     },
     {
       "id": "edge-client-depends-shared",
-      "from": "sys-client-app",
+      "from": "sys-client-api",
       "to": "sys-shared-model",
       "kind": "depends",
       "intentId": "int-backend-first",
-      "summary": "The client imports types (today `HealthStatus`) from `@app/shared` via a Vite alias to `shared/src`."
+      "summary": "`api/project.ts` imports `validateProject` and the `Project` type from `@app/shared` (Vite alias to `shared/src`) so the payload is checked against the one schema before it is trusted.",
+      "label": "validateProject"
     },
     {
       "id": "edge-server-depends-shared",
@@ -981,6 +996,96 @@
       "label": "PROJECT_FILE",
       "intentId": "int-server-thin-validate-once",
       "summary": "The server reads `data/project.json` at boot (path overridable with `PROJECT_FILE`) and on `POST /api/project/reload` in dev."
+    },
+    {
+      "id": "edge-shell-renders-diagram",
+      "from": "sys-client-shell",
+      "to": "sys-client-diagram",
+      "kind": "calls",
+      "label": "renders in canvas slot",
+      "intentId": "int-client-is-a-graph",
+      "summary": "`App.tsx:1` imports `DiagramCanvas` from `features/diagram` and passes it to the shell's canvas render prop."
+    },
+    {
+      "id": "edge-shell-renders-panel",
+      "from": "sys-client-shell",
+      "to": "sys-client-panel",
+      "kind": "calls",
+      "label": "renders in panel slots",
+      "intentId": "int-panel-always-visible",
+      "summary": "`App.tsx:2` imports `EntityDetail` and `ProjectOverview` from `features/panel` and plugs them into the side panel's two slots."
+    },
+    {
+      "id": "edge-shell-reads-state",
+      "from": "sys-client-shell",
+      "to": "sys-client-state",
+      "kind": "reads",
+      "label": "selection, view mode",
+      "intentId": "int-global-view-mode",
+      "summary": "`Header.tsx:2-3` reads `useProject` and `useViewMode`; `SidePanel.tsx:2`, `CanvasFrame.tsx:2` and `Placeholder.tsx:1` read `useSelection` to switch between overview and detail."
+    },
+    {
+      "id": "edge-diagram-reads-state",
+      "from": "sys-client-diagram",
+      "to": "sys-client-state",
+      "kind": "reads",
+      "label": "selection",
+      "intentId": "int-selection-client-side",
+      "summary": "`DiagramCanvas.tsx:8-9`, `SystemNode.tsx:4-5` and `SystemEdge.tsx:4-5` import `useSelection` and `useViewMode`; clicks call `select`/`clear`, cards and edges derive their highlight from the selection."
+    },
+    {
+      "id": "edge-panel-reads-state",
+      "from": "sys-client-panel",
+      "to": "sys-client-state",
+      "kind": "reads",
+      "label": "selection",
+      "intentId": "int-selection-client-side",
+      "summary": "`EntityDetail.tsx:2-3`, `DetailCard.tsx:3-4`, `ConnectedChips.tsx:3`, `ProjectOverview.tsx:1` and `components/useCardState.ts:1` import `useProject`, `useSelection` and `useViewMode`."
+    },
+    {
+      "id": "edge-diagram-calls-layout",
+      "from": "sys-client-diagram",
+      "to": "sys-client-layout",
+      "kind": "calls",
+      "label": "toFlow → ELK",
+      "intentId": "int-layout-pure-pipeline",
+      "summary": "`DiagramCanvas.tsx:4-7` imports `useLayout`, `PartitionOf`, `laneBounds`/`laneIndex` and `toFlowElements`; `SystemNode.tsx:3`, `SystemEdge.tsx:3` and `LaneLayer.tsx:2` import the flow and lane types."
+    },
+    {
+      "id": "edge-state-calls-api",
+      "from": "sys-client-state",
+      "to": "sys-client-api",
+      "kind": "calls",
+      "label": "fetchProject",
+      "intentId": "int-api-single-payload",
+      "summary": "`state/projectStore.tsx:3` imports `fetchProject`; `ProjectProvider` calls it once on mount and holds the result."
+    },
+    {
+      "id": "edge-state-depends-shared",
+      "from": "sys-client-state",
+      "to": "sys-shared-model",
+      "kind": "depends",
+      "label": "relatedTo",
+      "intentId": "int-selection-client-side",
+      "summary": "`model/selection.ts:1` imports `relatedTo` from `@app/shared`; `deriveSelection` computes the highlighted closure locally."
+    },
+    {
+      "id": "edge-layout-depends-shared",
+      "from": "sys-client-layout",
+      "to": "sys-shared-model",
+      "kind": "depends",
+      "label": "Project, System, Edge",
+      "intentId": "int-layout-pure-pipeline",
+      "summary": "`model/toFlow.ts:1`, `model/lanes.ts:1` and `layout/useLanes.ts:2` import the model types; layout is model in, positioned nodes out."
+    },
+    {
+      "id": "edge-shell-depends-styles",
+      "from": "sys-client-shell",
+      "to": "sys-client-styles",
+      "kind": "depends",
+      "label": "tokens + components",
+      "intentId": "int-design-tokens-single-source",
+      "summary": "`main.tsx:3` imports `styles/index.css`; `Header.tsx:1` imports `ProvenanceDot` from `components/`. Diagram (`SystemCard.tsx:2`, `CardTags.tsx:2`) and panel (`DetailCard.tsx:6`, `IntentCard.tsx:3`, `RequirementCard.tsx:3`) import from `components/` too; only this one edge is drawn to keep the lane readable."
     }
   ]
 }

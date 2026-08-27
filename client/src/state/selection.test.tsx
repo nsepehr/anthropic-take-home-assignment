@@ -18,6 +18,6 @@ describe('SelectionProvider', () => {
         </SelectionProvider>
       </ProjectProvider>,
     );
-    expect(html).toContain('edge-client-calls-server:sys-client-app,sys-server-api');
+    expect(html).toContain('edge-client-calls-server:sys-client-api,sys-server-api');
   });
 });

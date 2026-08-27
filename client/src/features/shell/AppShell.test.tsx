@@ -20,7 +20,7 @@ describe('AppShell', () => {
   });
 
   it('hides the hint once something is selected', () => {
-    expect(renderInShell(shell, { selectedId: 'sys-client-app' })).not.toContain(HINT);
+    expect(renderInShell(shell, { selectedId: 'sys-client-api' })).not.toContain(HINT);
   });
 
   it('shows a loading state before the project arrives', () => {

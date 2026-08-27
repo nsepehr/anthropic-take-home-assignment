@@ -16,8 +16,8 @@ describe('deriveSelection', () => {
     const view = deriveSelection(project, id);
     expect(view.related).toEqual(relatedTo(project, id));
     expect(view.isHighlighted(id)).toBe(true);
-    expect(view.isHighlighted('sys-client-app')).toBe(true);
-    expect(view.isDimmed('sys-client-app')).toBe(false);
+    expect(view.isHighlighted('sys-client-api')).toBe(true);
+    expect(view.isDimmed('sys-client-api')).toBe(false);
     expect(view.isDimmed('sys-dev-runner')).toBe(true);
   });
 
