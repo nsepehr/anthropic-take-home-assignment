@@ -1,6 +1,6 @@
 import Fastify from 'fastify';
 import { loadConfig, type Config } from './config.js';
-import { createProjectStore, type ProjectStore } from './projectStore.js';
+import { createProjectStore, type ProjectStore } from './stores/projectStore.js';
 import { healthRoutes } from './routes/health.js';
 import { projectRoutes } from './routes/project.js';
 

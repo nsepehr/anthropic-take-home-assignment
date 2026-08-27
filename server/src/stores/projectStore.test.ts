@@ -2,10 +2,10 @@ import { mkdtempSync, copyFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { buildApp } from './app.js';
-import { loadConfig } from './config.js';
+import { buildApp } from '../app.js';
+import { loadConfig } from '../config.js';
 import { createProjectStore } from './projectStore.js';
-import { fixturePath } from '../test/fixtures/load.js';
+import { fixturePath } from '../../test/fixtures/load.js';
 
 const testConfig = (projectFile: string) =>
   loadConfig({ NODE_ENV: 'test', PROJECT_FILE: projectFile });

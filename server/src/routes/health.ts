@@ -1,6 +1,6 @@
 import type { FastifyPluginAsync } from 'fastify';
 import type { HealthStatus } from '@app/shared';
-import type { ProjectStore } from '../projectStore.js';
+import type { ProjectStore } from '../stores/projectStore.js';
 
 export const healthRoutes: FastifyPluginAsync<{ store: ProjectStore }> = async (app, { store }) => {
   app.get('/api/health', async (): Promise<HealthStatus> => {

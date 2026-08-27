@@ -29,17 +29,15 @@
         "server/src/app.ts",
         "server/src/index.ts",
         "server/src/config.ts",
-        "server/src/projectStore.ts",
-        "server/src/routes/",
-        "server/src/services/entities.ts",
-        "server/src/lib/slug.ts"
+        "server/src/stores/projectStore.ts",
+        "server/src/routes/"
       ],
-      "summary": "A thin Fastify server that loads `data/project.json` once, validates it with `@app/shared`, and serves the project, its gaps report and per-entity lookups as JSON.",
-      "detail": "`projectStore.ts` reads the file named by `PROJECT_FILE` (default `data/project.json`) at startup, runs `validateProject()` and caches the result; if validation fails the server still boots and reports the errors. Routes in `server/src/routes/`: `GET /api/project` (the validated Project, or 500 with readable errors), `GET /api/project/gaps` (Gaps), `GET /api/project/related/:id` (the `relatedTo` closure; 400 for a non-slug id, 404 for an unknown one), `GET /api/project/entities/:id` (the entity plus its `type`), `GET /api/health` (adds `project: { loaded, name }`), and dev-only `POST /api/project/reload` (absent when `NODE_ENV=production`). `app.ts` is the composition root; `config.ts` is the only reader of `process.env`. Built by task 02-api.",
+      "summary": "A thin Fastify server that loads `data/project.json` once, validates it with `@app/shared`, and serves the whole project as one JSON payload.",
+      "detail": "`stores/projectStore.ts` reads the file named by `PROJECT_FILE` (default `data/project.json`) at startup, runs `validateProject()` and caches the result; if validation fails the server still boots and reports the errors. Routes in `server/src/routes/`: `GET /api/project` (the validated Project — the same shape as `data/project.json` — or 500 with readable errors), `GET /api/health` (adds `project: { loaded, name }`), and dev-only `POST /api/project/reload` (absent when `NODE_ENV=production`). `app.ts` is the composition root; `config.ts` is the only reader of `process.env`. Built by task 02-api; per-entity routes (`/gaps`, `/related/:id`, `/entities/:id`) were removed by 02b-api-trim after human review.",
       "provenance": {
         "source": "human-verified",
-        "capturedAt": "2026-08-27T15:10:00+08:00",
-        "sessionRef": "docs/tasks/02-api.md"
+        "capturedAt": "2026-08-27T18:00:00+08:00",
+        "sessionRef": "docs/tasks/02-api.md (incl. Revision)"
       }
     },
     {
@@ -188,10 +186,10 @@
       "evidence": [
         "data/project.json",
         "server/src/projectStore.ts",
-        "server/src/routes/project.ts (GET /api/project, /gaps, /related/:id, /entities/:id)"
+        "server/src/routes/project.ts (GET /api/project)"
       ],
       "summary": "A reviewer can run and evaluate the prototype without external services or credentials.",
-      "detail": "From the assignment. The app must work from a clone with no API keys: the server serves the checked-in `data/project.json` rather than analysing a repo live or calling an LLM. The server now serves the validated seed, its gaps and related-entity closures; the client does not render them yet and nothing is deployed, so this is partial.",
+      "detail": "From the assignment. The app must work from a clone with no API keys: the server serves the checked-in `data/project.json` rather than analysing a repo live or calling an LLM. The server now serves the validated seed as one payload; the client does not render them yet and nothing is deployed, so this is partial.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T15:10:00+08:00",
@@ -586,7 +584,7 @@
     {
       "id": "int-server-thin-validate-once",
       "statement": "The server validates the project once at boot and stays thin; a broken seed is surfaced, not hidden.",
-      "rationale": "The server's whole job is load, validate, serve. Validating once and caching keeps every route a pure lookup over the model, and keeps analysis or AI out of the server so it can be added as a separate task later. If the seed fails validation the server must still boot: `/api/project` returns 500 with the readable path+message errors and `/api/health` reports `loaded: false`, so an author sees exactly what is wrong instead of a crash loop or a silently empty diagram. Alternatives rejected: crashing at startup on an invalid file; validating on every request; serving whatever parses even if references dangle. Trade-off: editing the seed needs `POST /api/project/reload` (dev only) or a restart.",
+      "rationale": "The server's whole job is load, validate, serve. Validating once and caching keeps the one project route a pure read of the cached model, and keeps analysis or AI out of the server so it can be added as a separate task later. If the seed fails validation the server must still boot: `/api/project` returns 500 with the readable path+message errors and `/api/health` reports `loaded: false`, so an author sees exactly what is wrong instead of a crash loop or a silently empty diagram. Alternatives rejected: crashing at startup on an invalid file; validating on every request; serving whatever parses even if references dangle. Trade-off: editing the seed needs `POST /api/project/reload` (dev only) or a restart.",
       "status": "active",
       "appliesTo": {
         "systemIds": ["sys-server-api"],
@@ -594,7 +592,7 @@
         "edgeIds": ["edge-server-depends-shared", "edge-server-reads-seed"]
       },
       "summary": "Load once, validate once, serve; if the data is broken, say so loudly.",
-      "detail": "`server/src/projectStore.ts` holds the `ValidateResult` for the process; routes read it through `store.current()`. `projectStore.test.ts` pins that an invalid fixture still boots the app with a 500 on `/api/project`.",
+      "detail": "`server/src/stores/projectStore.ts` holds the `ValidateResult` for the process; routes read it through `store.current()`. `projectStore.test.ts` pins that an invalid fixture still boots the app with a 500 on `/api/project`.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T15:10:00+08:00",
@@ -604,7 +602,7 @@
     {
       "id": "int-selection-client-side",
       "statement": "The selection closure is computed client-side from the shared model, not via the API.",
-      "rationale": "Highlighting must be instant and there should be one source of truth: `relatedTo` in `@app/shared` runs in the browser over the already-loaded project. `GET /api/project/related/:id` exists for curl/reviewers, but the UI never waits on it for a click.",
+      "rationale": "Highlighting must be instant and there should be one source of truth: `relatedTo` in `@app/shared` runs in the browser over the already-loaded project. The per-entity API routes were removed (see int-api-single-payload); the UI only ever had the whole model.",
       "status": "active",
       "appliesTo": {
         "systemIds": ["sys-client-state", "sys-shared-model"],
@@ -636,6 +634,24 @@
         "capturedAt": "2026-08-27T15:00:00Z",
         "sessionRef": "task 03-client-foundation brief"
       }
+    },
+    {
+      "id": "int-api-single-payload",
+      "statement": "The API is one payload: the whole model in one call; the client derives selection, highlighting and gaps locally",
+      "rationale": "The model is small and the product's point is seeing it all at once, so there is nothing to gain from paging or per-entity fetches. Holding one immutable object on the client means one source of truth: selection closures (`relatedTo`) and gaps (`computeGaps`) are derived from it with the same `@app/shared` functions the validator uses, so the UI can never disagree with the data. The API response is byte-identical in shape to `data/project.json`, which is a trust property: what you see in the diagram is what is in the file. The original task 02 added `GET /api/project/related/:id`, `/entities/:id` and `/gaps`; human review found they duplicated client logic for a hypothetical curl user, and they were removed.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-server-api", "sys-client-app"],
+        "requirementIds": [],
+        "edgeIds": ["edge-client-calls-server"]
+      },
+      "summary": "One GET, the whole model; everything else is computed on the client.",
+      "detail": "Remaining routes: `GET /api/project`, `GET /api/health`, dev-only `POST /api/project/reload`. Removed in 02b-api-trim: `services/entities.ts`, `lib/slug.ts` and the three per-entity routes.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T18:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat (API review)"
+      }
     }
   ],
   "edges": [
@@ -645,7 +661,8 @@
       "to": "sys-server-api",
       "kind": "calls",
       "label": "GET /api/project",
-      "summary": "The client fetches `/api/project` once at startup and parses it with `validateProject`; Vite proxies `/api` to the Fastify port."
+      "summary": "The client fetches `/api/project` once at startup and parses it with `validateProject`; Vite proxies `/api` to the Fastify port.",
+      "intentId": "int-api-single-payload"
     },
     {
       "id": "edge-client-depends-shared",
@@ -661,7 +678,7 @@
       "to": "sys-shared-model",
       "kind": "depends",
       "intentId": "int-backend-first",
-      "summary": "The server validates the seed with `validateProject`, answers `/related/:id` with `relatedTo`, and types its responses with `@app/shared`."
+      "summary": "The server validates the seed with `validateProject` and types its responses with `@app/shared`."
     },
     {
       "id": "edge-seed-conforms-shared",

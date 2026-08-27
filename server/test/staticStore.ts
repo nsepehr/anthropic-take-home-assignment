@@ -1,5 +1,5 @@
 import type { ValidateResult } from '@app/shared';
-import type { ProjectStore } from '../src/projectStore.js';
+import type { ProjectStore } from '../src/stores/projectStore.js';
 
 /** In-memory fake of `ProjectStore` for route tests. */
 export function createStaticStore(result: ValidateResult): ProjectStore {

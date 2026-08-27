@@ -15,7 +15,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 
 1. **Foundation** — repo, agent workflow, task tracking
 2. **Model** — schema, seed data, validation (the contract)
-3. **API** — server serves validated project + gaps + related-entities
+3. **API** — server serves the validated project as one payload
 4. **Diagram core** — React Flow + ELK rendering from the model (look-and-feel from human's Claude Design work)
 5. **Hero interaction** — select any entity → connected entities highlight; detail panel; overview/deep-dive toggle
 6. **Trust layer** — provenance badges, evidence links, gaps/"unexplained" view
@@ -30,7 +30,8 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 0   | `repo-setup`             | 1     | P0       | done   | agent: repo-setup        | —          | Bootstrap monorepo + worktree/ports scripts + CLAUDE.md                           |
 | 0   | `task-tracker`           | 1     | P0       | done   | agent: task-tracker      | —          | This file                                                                         |
 | 1   | `01-schema-and-seed`     | 2     | P0       | done   | agent: schema-and-seed   | —          | Zod model in shared/, validateProject, relatedTo, data/project.json; brief exists |
-| 2   | `02-api`                 | 3     | P0       | done   | agent: api               | 01         | GET /api/project (validated), /api/project/gaps, /api/project/related/:id         |
+| 2   | `02-api`                 | 3     | P0       | done   | agent: api               | 01         | GET /api/project (validated), /api/health, dev-only reload                        |
+| 2b  | `02b-api-trim`           | 3     | P0       | review | agent: api-trim          | 02         | Trim API to single payload; move store to stores/; record intent                  |
 | 3   | `03-client-foundation`   | 4     | P0       | done   | agent: client-foundation | 01, 02     | React Flow + ELK renders systems/edges/nesting                                    |
 | 4   | `04-selection-linking`   | 5     | P0       | todo   | —                        | 03         | Hero interaction: select entity → connected entities highlight                    |
 | 11  | `11-video-and-rationale` | 9     | P0       | todo   | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                   |
@@ -67,3 +68,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 02-api → done (human)
 - 2026-08-27 — 03-client-foundation → review (agent: client-foundation)
 - 2026-08-27 — 03-client-foundation → done (human)
+- 2026-08-27 — 02b-api-trim → review (agent: api-trim)
