@@ -74,6 +74,18 @@
   --status-partial: var(--color-accent-500);
   --status-planned: var(--color-neutral-400);
 
+  /* Requirement / intent pills (design rev 3): solid status, neutral kind, provenance */
+  --pill-status-implemented-bg: var(--color-accent-2-600);
+  --pill-status-partial-bg: var(--color-accent-600);
+  --pill-status-planned-bg: var(--color-neutral-600);
+  --pill-status-fg: var(--color-bg);
+  --pill-kind-bg: var(--color-neutral-300);
+  --pill-kind-fg: var(--color-neutral-900);
+  --pill-prov-human-bg: var(--color-accent-2-700);
+  --pill-prov-human-fg: var(--color-bg);
+  --pill-prov-ai-bg: var(--color-neutral-200);
+  --pill-prov-ai-fg: var(--color-neutral-800);
+
   /* Provenance */
   --prov-human: var(--color-accent-2-600);
   --prov-ai: var(--color-accent-500);

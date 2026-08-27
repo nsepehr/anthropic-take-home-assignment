@@ -1,14 +1,15 @@
 import type { Requirement } from '@app/shared';
-import { ProvenanceDot, StatusDot, Tag, type TagVariant } from '../../components';
+import { StatusDot, Tag } from '../../components';
 import { useCardState } from './components/useCardState';
 
-const STATUS_TAG: Record<Requirement['status'], TagVariant> = {
-  implemented: 'accent-2',
-  partial: 'accent',
-  planned: 'neutral',
-};
+function ProvenancePill({ source }: { source: Requirement['provenance']['source'] }) {
+  const human = source === 'human-verified';
+  return (
+    <Tag className={human ? 'tag-prov-human' : 'tag-prov-ai'}>{human ? 'Verified' : 'AI'}</Tag>
+  );
+}
 
-/** One requirement in a list: status, title, provenance, one-line summary, tags. */
+/** One requirement in a list: status, title, one-line summary, status/kind/provenance pills. */
 export function RequirementCard({ requirement }: { requirement: Requirement }) {
   const card = useCardState(requirement.id);
   return (
@@ -16,12 +17,12 @@ export function RequirementCard({ requirement }: { requirement: Requirement }) {
       <div className="panel-card-row">
         <StatusDot status={requirement.status} className="panel-status" />
         <span className="panel-card-title">{requirement.title}</span>
-        <ProvenanceDot source={requirement.provenance.source} className="panel-dot" />
       </div>
       <div className="panel-card-body">{requirement.summary}</div>
       <div className="panel-card-tags">
-        <Tag variant={STATUS_TAG[requirement.status]}>{requirement.status}</Tag>
-        <Tag>{requirement.kind}</Tag>
+        <Tag className={`tag-status-${requirement.status}`}>{requirement.status}</Tag>
+        <Tag className="tag-kind">{requirement.kind}</Tag>
+        <ProvenancePill source={requirement.provenance.source} />
       </div>
     </button>
   );

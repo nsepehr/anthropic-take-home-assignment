@@ -169,6 +169,9 @@
   margin-top: 7px;
   padding-left: 16px;
 }
+.panel-card-intent .panel-card-tags {
+  padding-left: 0;
+}
 .panel-card-intent {
   background: var(--color-accent-100);
   border-color: var(--color-accent-200);

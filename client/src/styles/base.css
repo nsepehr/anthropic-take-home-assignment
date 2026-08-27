@@ -208,6 +208,33 @@ a {
   border: 1px solid var(--color-accent);
   color: var(--color-accent);
 }
+/* requirement / intent pills — solid so they read on neutral surfaces (design rev 3) */
+.tag-status-implemented,
+.tag-status-partial,
+.tag-status-planned {
+  color: var(--pill-status-fg);
+}
+.tag-status-implemented {
+  background: var(--pill-status-implemented-bg);
+}
+.tag-status-partial {
+  background: var(--pill-status-partial-bg);
+}
+.tag-status-planned {
+  background: var(--pill-status-planned-bg);
+}
+.tag-kind {
+  background: var(--pill-kind-bg);
+  color: var(--pill-kind-fg);
+}
+.tag-prov-human {
+  background: var(--pill-prov-human-bg);
+  color: var(--pill-prov-human-fg);
+}
+.tag-prov-ai {
+  background: var(--pill-prov-ai-bg);
+  color: var(--pill-prov-ai-fg);
+}
 
 /* — rounded frame: everything softens, small controls go pill — */
 .card {
