@@ -28,7 +28,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | #   | Slug / Title             | Phase | Priority | Status      | Owner                  | Depends on | Notes                                                                             |
 | --- | ------------------------ | ----- | -------- | ----------- | ---------------------- | ---------- | --------------------------------------------------------------------------------- |
 | 0   | `repo-setup`             | 1     | P0       | done        | agent: repo-setup      | —          | Bootstrap monorepo + worktree/ports scripts + CLAUDE.md                           |
-| 0   | `task-tracker`           | 1     | P0       | in-progress | agent: task-tracker    | —          | This file                                                                         |
+| 0   | `task-tracker`           | 1     | P0       | done        | agent: task-tracker    | —          | This file                                                                         |
 | 1   | `01-schema-and-seed`     | 2     | P0       | in-progress | agent: schema-and-seed | —          | Zod model in shared/, validateProject, relatedTo, data/project.json; brief exists |
 | 2   | `02-api`                 | 3     | P0       | todo        | —                      | 01         | GET /api/project (validated), /api/project/gaps, /api/project/related/:id         |
 | 3   | `03-diagram-core`        | 4     | P0       | todo        | —                      | 01, 02     | React Flow + ELK renders systems/edges/nesting                                    |
@@ -48,3 +48,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — repo-setup → done (agent: repo-setup)
 - 2026-08-27 — 01-schema-and-seed → in-progress (agent: schema-and-seed)
 - 2026-08-27 — task-tracker → in-progress (agent: task-tracker)
+- 2026-08-27 — task-tracker → done (human)
