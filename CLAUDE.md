@@ -72,7 +72,8 @@ Ports: `CLIENT_PORT` (default 5173) and `SERVER_PORT` (default 3001) come from `
    `data/project.json`: the System(s) you built or changed, the Requirement(s) they serve (update
    `status`), and the Intent(s) behind non-obvious choices — with honest `provenance` (your brief's
    stated decisions are `human-verified`; your own inferences are `ai-inferred`). Run
-   `npm run validate:data`. Until task 01 lands this file doesn't exist; then it's mandatory.
+   `npm run validate:data`. **Append new entries at the END of each array and never reorder or reformat
+   existing entries** — several tasks edit this file in parallel and that keeps git auto-merging.
 
 **Tracker:** `docs/TASKS.md`. Set your row to `in-progress` when you start and `review` when you
 finish, and append a changelog line. The human marks `done` after merge.
