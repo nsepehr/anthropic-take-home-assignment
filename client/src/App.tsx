@@ -1,4 +1,5 @@
-import { DebugCanvas } from './features/debug/components/DebugCanvas';
+import { DiagramCanvas } from './features/diagram';
+import { LaneLayer } from './features/lanes';
 import { EntityDetail, ProjectOverview } from './features/panel';
 import { AppShell } from './features/shell';
 import { ProjectProvider } from './state/projectStore';
@@ -12,7 +13,9 @@ export function App() {
       <ProjectProvider>
         <SelectionProvider>
           <AppShell
-            canvas={(project) => <DebugCanvas project={project} />}
+            canvas={(project) => (
+              <DiagramCanvas project={project} overlay={(lanes) => <LaneLayer lanes={lanes} />} />
+            )}
             overview={<ProjectOverview />}
             detail={<EntityDetail />}
           />
