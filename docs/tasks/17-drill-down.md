@@ -106,3 +106,15 @@ navigation model over category levels:
 - Rationale: the ego graph scales by edges-per-system, not total edges, and walking neighbour to
   neighbour answers "how is this connected?" directly. Category levels solved the atlas's scale,
   which is not the problem at 16 systems.
+
+### Interaction model (final, confirmed 2026-08-27)
+
+- Panel stays visible on the atlas (overview / selected entity), as in revision 1.
+- Hover → neighbours light. **Single click → select** (panel). **Double-click or "Open ›"** →
+  enter the system's focus view. Same rule inside the focus view (click = select neighbour,
+  double-click/Open = walk; Back pops the trail). Esc = Back.
+- **First-time helper**: a dismissible coach-mark explains click vs. double-click until the user
+  has stepped inside once (persisted in localStorage), then the hint shortens.
+- Rationale: top-level systems carry requirements and intents too, so selection must not be
+  sacrificed for navigation; double-click alone is undiscoverable, hence the explicit button
+  and the helper.
