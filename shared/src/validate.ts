@@ -12,7 +12,8 @@ export type ValidateResult =
 
 /**
  * Shape-checks with Zod, then checks referential integrity: unique ids, references resolving to
- * the right entity type, edge endpoints existing, and no `parentId` cycles.
+ * the right entity type, edge endpoints existing, no `parentId` cycles, and — when the project
+ * lists `categories` — every `System.category` naming one of them.
  */
 export function validateProject(input: unknown): ValidateResult {
   const parsed = ProjectSchema.safeParse(input);
@@ -29,6 +30,7 @@ export function validateProject(input: unknown): ValidateResult {
     ...checkReferences(project, ids),
     ...checkParentCycles(project),
     ...checkSupersession(project),
+    ...checkCategories(project),
   ];
   return errors.length > 0
     ? { ok: false, errors }
@@ -129,6 +131,27 @@ function checkSupersession(project: Project): ValidationError[] {
       errors.push({ path, message: 'only allowed when status is "superseded"' });
     } else if (it.supersededBy === it.id) {
       errors.push({ path, message: 'an intent cannot supersede itself' });
+    }
+  });
+  return errors;
+}
+
+/** With a `categories` list, category ids are unique and every `System.category` is one of them. */
+function checkCategories(project: Project): ValidationError[] {
+  if (!project.categories) return [];
+  const errors: ValidationError[] = [];
+  const known = new Set<string>();
+  project.categories.forEach((c, i) => {
+    if (known.has(c.id))
+      errors.push({ path: `categories.${i}.id`, message: `duplicate id "${c.id}"` });
+    known.add(c.id);
+  });
+  project.systems.forEach((s, i) => {
+    if (s.category && !known.has(s.category)) {
+      errors.push({
+        path: `systems.${i}.category`,
+        message: `references unknown category "${s.category}" (not in project.categories)`,
+      });
     }
   });
   return errors;

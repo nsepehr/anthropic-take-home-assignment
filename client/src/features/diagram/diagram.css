@@ -83,6 +83,23 @@
   white-space: nowrap;
 }
 
+/* Focus view centre card (design revision 3): larger, accent surface, always lit. */
+.diagram-card--focus {
+  width: 260px;
+  min-height: 176px;
+  padding: 16px 18px;
+  background: var(--color-accent-200);
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+}
+.diagram-card--focus .diagram-card__name {
+  font-size: 19px;
+}
+.diagram-card--focus .diagram-card__body {
+  font-size: 12.5px;
+  color: var(--color-accent-900);
+}
+
 /* --- Parent (group) frame --- */
 .diagram-group {
   position: relative;
@@ -139,6 +156,15 @@
 .diagram-edge.is-dimmed {
   opacity: var(--dim-opacity);
 }
+.diagram-edge__label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  fill: var(--color-accent-800);
+  paint-order: stroke;
+  stroke: var(--canvas-bg);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
 /* Arrowheads live in a zero-size svg; colour follows the edge state via the marker id. */
 .diagram-markers {
   position: absolute;
@@ -150,6 +176,21 @@
 }
 #diagram-arrow-lit .diagram-marker__head {
   fill: var(--color-accent);
+}
+
+/* Each level mounts fresh; a short fade is the only transition between them. */
+.diagram-level {
+  width: 100%;
+  height: 100%;
+  animation: diagram-fade-in 0.22s ease-out;
+}
+@keyframes diagram-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .diagram-error {

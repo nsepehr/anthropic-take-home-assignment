@@ -1,15 +1,19 @@
 import type { ReactNode } from 'react';
-import { useSelection } from '../../state/selection';
+import { useNavigation } from '../../state/navigation';
 
-const HINT = 'Click a system to read what it does, what it must do, and why it was built this way.';
+const HINT = {
+  atlas:
+    'Click a system to open it — you get its neighbours, what it must do, and why it is built this way.',
+  system: 'Click a neighbour to walk the graph. Esc goes back.',
+} as const;
 
-/** The rounded dotted-grid region the diagram lives in; shows a hint while nothing is selected. */
+/** The rounded dotted-grid region the diagram lives in, with a hint for the current level. */
 export function CanvasFrame({ children }: { children: ReactNode }) {
-  const { selectedId } = useSelection();
+  const { scope } = useNavigation();
   return (
     <section className="canvas-frame" aria-label="Architecture canvas">
       {children}
-      {selectedId === null && <div className="canvas-hint">{HINT}</div>}
+      <div className="canvas-hint">{HINT[scope.level]}</div>
     </section>
   );
 }

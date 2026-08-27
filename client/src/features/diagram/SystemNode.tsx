@@ -24,6 +24,7 @@ export const SystemNode = memo(function SystemNode({ id, data }: NodeProps<Syste
           requirementCount={data.requirementCount}
           intentCount={data.intentCount}
           state={state}
+          focus={data.focus}
         />
       )}
       <SideHandles type="source" />

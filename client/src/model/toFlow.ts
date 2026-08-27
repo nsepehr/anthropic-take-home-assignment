@@ -7,10 +7,13 @@ export type SystemNodeData = {
   system: System;
   requirementCount: number;
   intentCount: number;
+  /** The system the focus view is centered on: drawn as the large accent card. */
+  focus?: boolean;
 };
 
 export type SystemNode = FlowNode<SystemNodeData, 'system'>;
-export type SystemEdge = Edge<{ edge: ModelEdge }>;
+/** `showLabel`: the focus view names each edge by its kind; the atlas keeps edges silent. */
+export type SystemEdge = Edge<{ edge: ModelEdge; showLabel?: boolean }>;
 
 export interface FlowElements {
   nodes: SystemNode[];

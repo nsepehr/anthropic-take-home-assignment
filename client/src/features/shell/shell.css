@@ -13,9 +13,9 @@
 
 .shell-header {
   display: flex;
-  align-items: flex-end;
-  gap: 24px;
-  padding: 26px 34px 20px;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 30px 10px;
   flex: none;
 }
 .shell-header-name {
@@ -24,10 +24,38 @@
   font-size: 29px;
   line-height: 1.1;
 }
-.shell-header-mission {
+/* Trail crumbs: Architecture / hop / current (design revision 3). */
+.shell-trail {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.shell-trail-sep {
+  color: var(--color-neutral-400);
+  font-size: 13px;
+}
+.crumb {
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  background: none;
+  border: 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: var(--color-neutral-700);
+}
+.crumb:hover {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent-800);
+}
+.crumb.is-current {
+  color: var(--color-accent-800);
+}
+.shell-subline {
+  flex: none;
+  padding: 0 30px 14px;
   font-size: 14px;
   color: var(--color-neutral-700);
-  margin-top: 4px;
 }
 .shell-header-tools {
   margin-left: auto;
@@ -72,7 +100,7 @@
 }
 
 .side-panel {
-  width: 360px;
+  width: 380px;
   flex: none;
   margin-left: 16px;
   overflow-y: auto;

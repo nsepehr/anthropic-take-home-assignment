@@ -79,4 +79,26 @@ describe('validateProject', () => {
       { path: 'systems.1.parentId', message: 'parent cycle: sys-child -> sys-parent -> sys-child' },
     ]);
   });
+
+  it('System.category must name a listed category when the list is present', () => {
+    const project = fullyLinkedProject();
+    project.systems[0]!.category = 'Client';
+    expect(validateProject(project).ok).toBe(true); // no list: any string is fine
+    const provenance = project.systems[0]!.provenance;
+    project.categories = [{ id: 'Server', name: 'Server', summary: 's', detail: 'd', provenance }];
+    expect(errorsOf(project)).toEqual([
+      {
+        path: 'systems.0.category',
+        message: 'references unknown category "Client" (not in project.categories)',
+      },
+    ]);
+    project.categories.push({
+      id: 'Client',
+      name: 'Client',
+      summary: 's',
+      detail: 'd',
+      provenance,
+    });
+    expect(validateProject(project).ok).toBe(true);
+  });
 });

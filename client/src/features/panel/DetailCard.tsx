@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { FoundEntity } from '../../model/entities';
 import { entityLabel } from '../../model/entities';
-import { useSelection } from '../../state/selection';
+import { useNavigation } from '../../state/navigation';
 import { DeepSection } from './components/DeepSection';
 import { Button, ProvenanceDot } from '../../components';
 
@@ -25,9 +25,10 @@ interface Props {
 /**
  * The headline card of the selected entity: what it is, who vouches for it, and a per-item
  * "Deep dive" toggle. Expanded state is local, so it resets when SidePanel remounts on selection.
+ * "Back" walks the trail one hop (to the previous system, or the atlas).
  */
 export function DetailCard({ found, defaultExpanded = false }: Props) {
-  const { clear } = useSelection();
+  const { back } = useNavigation();
   const [expanded, setExpanded] = useState(defaultExpanded);
   const { provenance } = found.entity;
   const human = provenance.source === 'human-verified';
@@ -35,8 +36,8 @@ export function DetailCard({ found, defaultExpanded = false }: Props) {
     <article className="panel-detail">
       <div className="panel-detail-head">
         <span className="card-kicker">{kicker(found)}</span>
-        <Button variant="ghost" onClick={clear}>
-          Close
+        <Button variant="ghost" onClick={back}>
+          Back
         </Button>
       </div>
       <h2 className="panel-detail-title">{entityLabel(found)}</h2>
