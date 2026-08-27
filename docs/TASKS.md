@@ -42,6 +42,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 3d  | `07-detail-panel`        | 4     | P0       | in-progress | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                          |
 | 3e  | `08-category-lanes`      | 4     | P0       | done        | agent: category-lanes    | 03, 04, 05 | System.category in schema; ELK partitions; lane overlay                                 |
 | 3f  | `10-per-item-deep-dive`  | 4     | P0       | in-progress | agent: deep-dive         | 05, 06, 07 | Remove global toggle; per-selection Deep dive button; panel 360px; hide zero-count tags |
+| 3g  | `11-highlight-neighbors` | 4     | P0       | in-progress | agent: highlight         | 06, 07     | relatedTo includes edge-neighbor systems; connected cards tinted, not dimmed            |
 | 4   | `04-selection-linking`   | 5     | P0       | todo        | —                        | 03         | Hero interaction: select entity → connected entities highlight                          |
 | 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                         |
 | 5   | `05-detail-panels`       | 5     | P1       | todo        | —                        | 03         | Requirement list, intent panel, overview/deep-dive toggle                               |
@@ -100,3 +101,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 06-system-node → review (agent: system-node)
 - 2026-08-27 — 06-system-node → done (human); phase-1 UI complete
 - 2026-08-27 — 10-per-item-deep-dive → in-progress (agent: deep-dive); design revision 2
+- 2026-08-27 — 11-highlight-neighbors → in-progress (agent: highlight)
