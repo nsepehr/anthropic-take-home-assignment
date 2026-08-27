@@ -71,24 +71,30 @@
       }
     },
     {
-      "id": "sys-agent-workflow",
-      "name": "Agent workflow",
+      "id": "sys-agent-rules",
+      "name": "Agent rules",
       "kind": "workflow",
       "category": "Workflow",
-      "paths": ["CLAUDE.md", "docs/AGENT_WORKFLOW.md", "docs/tasks/", "scripts/"],
-      "summary": "The rules and scripts that let several AI coding agents work on this repo in parallel without colliding.",
-      "detail": "Each task is a brief in `docs/tasks/<slug>.md` that names the files the agent owns. The agent runs in its own git worktree and branch (`agent/<slug>`) with its own allocated ports, must keep `npm run check` green, and finishes with `scripts/finish-worktree.sh`, which rebases on `main` and re-runs the checks. Merges are fast-forward only and done by the human. `CLAUDE.md` holds the short rules; `docs/AGENT_WORKFLOW.md` the long form.",
+      "paths": [
+        "CLAUDE.md",
+        "docs/MODULARITY.md",
+        "docs/AGENT_WORKFLOW.md",
+        "docs/tasks/",
+        "docs/TASKS.md"
+      ],
+      "summary": "The briefs, rules and tracker that direct the AI agents building this repo: what to build, where to work, and how to leave the seed data behind.",
+      "detail": "`CLAUDE.md` holds the non-negotiable rules: every task in its own worktree via the scripts (rule 1), ports from `.env.local` (rule 2), scope is the brief (rule 3), modularity per `docs/MODULARITY.md` (rule 5), `npm run check` green before finishing (rule 7) and rule 9 — every task appends the systems, requirements and intents it produced to `data/project.json`, which is the dogfooding loop that makes this diagram describe its own construction. `docs/tasks/<slug>.md` briefs name the files each agent owns; `docs/TASKS.md` is the hand-edited tracker (todo → in-progress → review → done); `docs/AGENT_WORKFLOW.md` is the long-form lifecycle.",
       "provenance": {
-        "source": "human-verified",
-        "capturedAt": "2026-08-27T14:35:46+08:00",
-        "sessionRef": "commit 47b4a68 (bootstrap); CLAUDE.md"
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T23:00:00+08:00",
+        "sessionRef": "agent: seed-client (task 12, workflow extension)"
       }
     },
     {
       "id": "sys-worktree-scripts",
       "name": "Worktree scripts",
       "kind": "module",
-      "parentId": "sys-agent-workflow",
+      "category": "Workflow",
       "paths": ["scripts/new-worktree.sh", "scripts/finish-worktree.sh"],
       "summary": "Shell scripts that open a task worktree and close it out with a rebase and full check run.",
       "detail": "`new-worktree.sh <slug>` creates branch `agent/<slug>` from `main`, adds a worktree at `../worktrees/<slug>`, installs dependencies and allocates ports. `finish-worktree.sh` refuses uncommitted changes, rebases onto `main`, runs `npm run check` and prints the fast-forward merge commands. Neither script merges or pushes.",
@@ -102,7 +108,7 @@
       "id": "sys-ports-allocator",
       "name": "Ports allocator",
       "kind": "module",
-      "parentId": "sys-agent-workflow",
+      "category": "Workflow",
       "paths": ["scripts/ports.mjs", "scripts/env.mjs"],
       "summary": "Gives each worktree its own free CLIENT_PORT and SERVER_PORT, written to a gitignored `.env.local`.",
       "detail": "`scripts/ports.mjs` reads the `.env.local` of every sibling worktree (via `git worktree list`) so it never hands out a port another agent has claimed, then probes the OS on IPv4, IPv6 and unspecified hosts before accepting a port. It is idempotent: re-running keeps existing ports unless `--force` is passed. `env.mjs` is the tiny dependency-free `.env.local` parser shared with the dev runner.",
@@ -116,7 +122,7 @@
       "id": "sys-dev-runner",
       "name": "Dev runner",
       "kind": "module",
-      "parentId": "sys-agent-workflow",
+      "category": "Workflow",
       "paths": ["scripts/dev.mjs"],
       "summary": "`npm run dev`: allocates ports, then starts the server and client dev servers with those ports in the environment.",
       "detail": "`scripts/dev.mjs` first runs the ports allocator synchronously, loads `.env.local`, prints the two URLs, and spawns `npm run dev` in the `server` and `client` workspaces. It forwards SIGINT/SIGTERM to both children and exits if either child fails. The Vite dev server proxies `/api` to the Fastify port.",
@@ -130,10 +136,10 @@
       "id": "sys-check-suite",
       "name": "Check suite",
       "kind": "workflow",
-      "parentId": "sys-agent-workflow",
+      "category": "Workflow",
       "paths": ["package.json", "eslint.config.js", "vitest.workspace.ts", "tsconfig.base.json"],
       "summary": "`npm run check` — typecheck, lint, format check and Vitest across all three workspaces; the definition of green.",
-      "detail": "Root scripts run `tsc --noEmit` per workspace, ESLint (flat config, with a lint rule banning `dangerouslySetInnerHTML`), Prettier in check mode and `vitest run` over the `client`, `server` and `shared` workspaces. Every module ships with a small test that pins its intent so a parallel agent cannot silently break it. `finish-worktree.sh` runs this suite after rebasing.",
+      "detail": "Root scripts run `tsc --noEmit` per workspace, ESLint (flat config, with a lint rule banning `dangerouslySetInnerHTML`), Prettier in check mode and `vitest run` over the `client`, `server` and `shared` workspaces. Every module ships with a small test that pins its intent so a parallel agent cannot silently break it. `finish-worktree.sh` runs this suite after rebasing. It runs the tests of the shared, server and client workspaces; on the diagram only the edge to the shared model is drawn, as the representative of the three.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T14:35:46+08:00",
@@ -395,7 +401,7 @@
       "kind": "non-functional",
       "status": "implemented",
       "systemIds": [
-        "sys-agent-workflow",
+        "sys-agent-rules",
         "sys-worktree-scripts",
         "sys-ports-allocator",
         "sys-check-suite",
@@ -500,13 +506,13 @@
       "rationale": "A mocked example codebase would prove nothing about whether the model captures real intent. Recording this repo's own decisions as they are made tests the model for real and gives the demo honest content. Alternatives rejected: A fictional sample project; Analysing a well-known open-source repo. Trade-off: The demo content is small and about a tooling project, which is less flashy than a big product codebase.",
       "status": "active",
       "appliesTo": {
-        "systemIds": ["sys-seed-data"],
+        "systemIds": ["sys-seed-data", "sys-agent-rules"],
         "requirementIds": [
           "req-self-contained-demo",
           "req-dogfood-seed",
           "req-written-video-rationale"
         ],
-        "edgeIds": ["edge-seed-conforms-shared"]
+        "edgeIds": ["edge-seed-conforms-shared", "edge-rules-write-seed"]
       },
       "summary": "The demo data is this repo's real history, so the tool is tested on itself.",
       "detail": "CLAUDE.md rule 9 makes appending to `data/project.json` part of every task's definition of done. Provenance distinguishes what the human decided in the planning chat from what an agent inferred while building.",
@@ -540,9 +546,20 @@
       "rationale": "Agents run concurrently and each starts dev servers. Worktrees give file-level isolation and a private branch; the ports allocator prevents `EADDRINUSE` collisions and hardcoded 5173/3001. Alternatives rejected: All agents on one checkout with feature branches; Fixed port offsets per task. Trade-off: A full `npm install` per worktree and some disk use; the human does all merges by hand, fast-forward only.",
       "status": "active",
       "appliesTo": {
-        "systemIds": ["sys-agent-workflow", "sys-worktree-scripts", "sys-ports-allocator"],
+        "systemIds": [
+          "sys-agent-rules",
+          "sys-worktree-scripts",
+          "sys-ports-allocator",
+          "sys-dev-runner"
+        ],
         "requirementIds": ["req-parallel-agents-safe"],
-        "edgeIds": ["edge-dev-runner-calls-ports"]
+        "edgeIds": [
+          "edge-dev-runner-calls-ports",
+          "edge-worktree-calls-ports",
+          "edge-dev-runner-calls-server",
+          "edge-dev-runner-calls-client",
+          "edge-rules-depend-worktree"
+        ]
       },
       "summary": "Isolation by worktree and port so agents never step on each other.",
       "detail": "See `scripts/new-worktree.sh`, `scripts/ports.mjs` and CLAUDE.md rules 1–2. The allocator reads sibling worktrees' `.env.local` files so ports are unique across the whole checkout, not just free on the OS at that instant.",
@@ -650,7 +667,7 @@
       "appliesTo": {
         "systemIds": ["sys-check-suite"],
         "requirementIds": ["req-parallel-agents-safe"],
-        "edgeIds": []
+        "edgeIds": ["edge-worktree-calls-check", "edge-check-depends-shared"]
       },
       "summary": "Tests exist to stop other agents breaking you, not to hit a number.",
       "detail": "CLAUDE.md rule 6 states this. Marked AI-inferred because the rule was found in the repo, not confirmed in the planning conversation enumerated for this task.",
@@ -936,11 +953,35 @@
         "edgeIds": ["edge-shell-renders-diagram"]
       },
       "summary": "Seven client systems, import-evidenced edges, no container.",
-      "detail": "Flat is a data decision, not a schema change: `parentId` still works and the Workflow lane still uses it. If the client grows past what one lane can hold, a container can come back — but only with edges between its children.",
+      "detail": "Flat is a data decision, not a schema change: `parentId` still works even though no seed system uses it today. If the client grows past what one lane can hold, a container can come back — but only with edges between its children.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T22:00:00+08:00",
         "sessionRef": "planning chat 2026-08-27, review of first build"
+      }
+    },
+    {
+      "id": "int-workflow-is-a-graph",
+      "statement": "The agent workflow is modeled as its real modules with the edges between them, not one container",
+      "rationale": "The workflow that built this repo is itself a system worth understanding. As one `Agent workflow` box with four stacked children it said nothing; as rules → worktree scripts → ports / check suite, dev runner → both servers, and rules → seed data it shows how agents are kept from colliding and, most importantly, makes the dogfooding loop visible: rule 9 is the edge by which every task writes itself into the diagram. Edges are cited from the scripts and CLAUDE.md so the picture is evidence, not decoration.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": [
+          "sys-agent-rules",
+          "sys-worktree-scripts",
+          "sys-ports-allocator",
+          "sys-dev-runner",
+          "sys-check-suite"
+        ],
+        "requirementIds": ["req-parallel-agents-safe"],
+        "edgeIds": []
+      },
+      "summary": "Five workflow systems, script-evidenced edges, the rule-9 dogfood edge drawn explicitly.",
+      "detail": "Mirrors `int-client-is-a-graph`. `sys-agent-rules` replaces the old `sys-agent-workflow` container in the same array slot so the lane order is unchanged; the check suite gets one representative edge (to the shared model) rather than three.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T23:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, review of first build (workflow extension)"
       }
     }
   ],
@@ -986,7 +1027,8 @@
       "to": "sys-ports-allocator",
       "kind": "calls",
       "intentId": "int-isolated-worktrees",
-      "summary": "`dev.mjs` runs `ports.mjs` before starting servers so ports are always allocated."
+      "summary": "`dev.mjs:11` runs `ports.mjs` synchronously before starting servers, then `dev.mjs:12` reads the allocated `CLIENT_PORT`/`SERVER_PORT` back from `.env.local` via `env.mjs`.",
+      "label": "ports.mjs, .env.local"
     },
     {
       "id": "edge-server-reads-seed",
@@ -1086,6 +1128,69 @@
       "label": "tokens + components",
       "intentId": "int-design-tokens-single-source",
       "summary": "`main.tsx:3` imports `styles/index.css`; `Header.tsx:1` imports `ProvenanceDot` from `components/`. Diagram (`SystemCard.tsx:2`, `CardTags.tsx:2`) and panel (`DetailCard.tsx:6`, `IntentCard.tsx:3`, `RequirementCard.tsx:3`) import from `components/` too; only this one edge is drawn to keep the lane readable."
+    },
+    {
+      "id": "edge-worktree-calls-ports",
+      "from": "sys-worktree-scripts",
+      "to": "sys-ports-allocator",
+      "kind": "calls",
+      "label": "node scripts/ports.mjs",
+      "intentId": "int-isolated-worktrees",
+      "summary": "`new-worktree.sh:27` runs `node scripts/ports.mjs` in the fresh worktree right after `npm install`, so every worktree starts with its own ports."
+    },
+    {
+      "id": "edge-worktree-calls-check",
+      "from": "sys-worktree-scripts",
+      "to": "sys-check-suite",
+      "kind": "calls",
+      "label": "npm run check",
+      "intentId": "int-tests-pin-intent",
+      "summary": "`finish-worktree.sh:26` runs `npm run check` after rebasing on `main`; the merge instructions are only printed if it passes."
+    },
+    {
+      "id": "edge-dev-runner-calls-server",
+      "from": "sys-dev-runner",
+      "to": "sys-server-api",
+      "kind": "calls",
+      "label": "npm run dev -w server",
+      "intentId": "int-isolated-worktrees",
+      "summary": "`dev.mjs:19` spawns `npm run dev -w server` with `SERVER_PORT` in the environment; the Fastify server listens on 127.0.0.1 at that port."
+    },
+    {
+      "id": "edge-dev-runner-calls-client",
+      "from": "sys-dev-runner",
+      "to": "sys-client-shell",
+      "kind": "calls",
+      "label": "npm run dev -w client",
+      "intentId": "int-isolated-worktrees",
+      "summary": "`dev.mjs:19` spawns `npm run dev -w client` with `CLIENT_PORT` in the environment; Vite serves the app shell and proxies `/api` to `SERVER_PORT`."
+    },
+    {
+      "id": "edge-rules-depend-worktree",
+      "from": "sys-agent-rules",
+      "to": "sys-worktree-scripts",
+      "kind": "depends",
+      "label": "rule 1: own worktree",
+      "intentId": "int-isolated-worktrees",
+      "summary": "CLAUDE.md rule 1 mandates that every task runs in a worktree created by `scripts/new-worktree.sh` and ends with `scripts/finish-worktree.sh`; the rules have no teeth without the scripts."
+    },
+    {
+      "id": "edge-rules-write-seed",
+      "from": "sys-agent-rules",
+      "to": "sys-seed-data",
+      "kind": "writes",
+      "label": "rule 9: dogfood",
+      "intentId": "int-project-is-own-demo",
+      "summary": "CLAUDE.md rule 9 requires every task to append the systems, requirements and intents it produced to `data/project.json` with honest provenance, and to keep `npm run validate:data` green. This is the loop by which the diagram describes its own construction."
+    },
+    {
+      "id": "edge-check-depends-shared",
+      "from": "sys-check-suite",
+      "to": "sys-shared-model",
+      "kind": "depends",
+      "label": "tests shared (+ server, client)",
+      "intentId": "int-tests-pin-intent",
+      "summary": "`npm run check` (`package.json:24`) runs `typecheck --workspaces`, ESLint, Prettier and `vitest run` over the shared, server and client workspaces; shared is drawn as the representative of the three."
     }
   ]
 }
