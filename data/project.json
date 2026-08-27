@@ -225,6 +225,20 @@
         "capturedAt": "2026-08-27T16:00:00+08:00",
         "sessionRef": "agent: app-shell (task 05)"
       }
+    },
+    {
+      "id": "sys-client-panel",
+      "name": "Detail panel",
+      "kind": "ui",
+      "parentId": "sys-client-app",
+      "paths": ["client/src/features/panel/", "client/src/model/entities.ts"],
+      "summary": "The right panel: the selected entity's what / must-do / why, or the whole project when nothing is selected.",
+      "detail": "`EntityDetail` dispatches on the selected id: a headline `DetailCard` (kicker, title, summary, and in deep dive the system's how-it-works, the requirement's evidence, or the intent's rationale), then the entity's requirements and intents as clickable cards, then `ConnectedChips` for every linked entity. `ProjectOverview` shows mission, counts and every requirement and intent. The pure lookups (`findEntity`, `requirementsFor`, `intentsFor`, `connectionsFor`) live in `client/src/model/entities.ts` and derive everything from `relatedTo`.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T16:00:00+08:00",
+        "sessionRef": "agent: detail-panel (task 07)"
+      }
     }
   ],
   "requirements": [
@@ -790,6 +804,24 @@
         "requirementIds": [],
         "edgeIds": []
       },
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T16:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, design review"
+      }
+    },
+    {
+      "id": "int-panel-answers-three-questions",
+      "statement": "Selecting a system answers, in one panel: what it is, what it must do (requirements + evidence), and why it is built this way (intents + rationale)",
+      "rationale": "The product thesis is that intent and requirements are content, not tooltips. One panel with a fixed order — what, must-do, why — means a newcomer reads a system the same way every time, and the evidence and rationale sit right next to the claim they support instead of behind a click. Requirements and intents re-center the same panel so the reading flow never changes shape.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-client-panel"],
+        "requirementIds": ["req-single-focused-interaction", "req-overview-deep-dive"],
+        "edgeIds": []
+      },
+      "summary": "One panel, three questions, always in the same order: what, what it must do, why.",
+      "detail": "Headings are fixed per entity type: a system shows \"Requirements\" and \"Why it is built this way\"; an intent shows \"Requirements it serves\"; a requirement shows \"Intents\". The global overview / deep-dive switch decides whether cards show summary or detail and rationale; there is no per-item deep-dive button.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T16:00:00+08:00",

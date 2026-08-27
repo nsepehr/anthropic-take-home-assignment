@@ -36,7 +36,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 3a  | `04-design-tokens`       | 4     | P0       | done        | agent: design-tokens     | 03         | Organic tokens/classes → client/src/styles; base components; brief exists         |
 | 3b  | `05-app-shell`           | 4     | P0       | done        | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots     |
 | 3c  | `06-system-node`         | 4     | P0       | in-progress | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                 |
-| 3d  | `07-detail-panel`        | 4     | P0       | in-progress | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                    |
+| 3d  | `07-detail-panel`        | 4     | P0       | review      | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                    |
 | 3e  | `08-category-lanes`      | 4     | P0       | done        | agent: category-lanes    | 03, 04, 05 | System.category in schema; ELK partitions; lane overlay                           |
 | 4   | `04-selection-linking`   | 5     | P0       | todo        | —                        | 03         | Hero interaction: select entity → connected entities highlight                    |
 | 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                   |
@@ -91,3 +91,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 08-category-lanes → done (human); overlay wiring into DiagramCanvas deferred to 06
 - 2026-08-27 — 05-app-shell → review (agent: app-shell)
 - 2026-08-27 — 05-app-shell → done (human)
+- 2026-08-27 — 07-detail-panel → review (agent: detail-panel)

@@ -1,5 +1,6 @@
 import { DebugCanvas } from './features/debug/components/DebugCanvas';
-import { AppShell, DetailPlaceholder, OverviewPlaceholder } from './features/shell';
+import { EntityDetail, ProjectOverview } from './features/panel';
+import { AppShell } from './features/shell';
 import { ProjectProvider } from './state/projectStore';
 import { SelectionProvider } from './state/selection';
 import { ViewModeProvider } from './state/viewMode';
@@ -12,8 +13,8 @@ export function App() {
         <SelectionProvider>
           <AppShell
             canvas={(project) => <DebugCanvas project={project} />}
-            overview={<OverviewPlaceholder />}
-            detail={<DetailPlaceholder />}
+            overview={<ProjectOverview />}
+            detail={<EntityDetail />}
           />
         </SelectionProvider>
       </ProjectProvider>
