@@ -247,6 +247,7 @@
       "id": "sys-deploy-vercel",
       "name": "Vercel deploy",
       "kind": "workflow",
+      "category": "Workflow",
       "paths": ["api/", "vercel.json", "docs/DEPLOY.md"],
       "summary": "Ships the prototype to Vercel: static client on the CDN plus the Fastify app as one serverless function under /api/*.",
       "detail": "`api/[...path].ts` imports `buildApp` from `server/src/app.ts` (source, not dist), builds the app once per lambda instance, awaits `ready()` and emits the request on `app.server`. `PROJECT_FILE` is resolved relative to the function file so the bundled `data/project.json` (declared via `includeFiles` in `vercel.json`) is found without relying on cwd. `NODE_ENV=production` on Vercel disables the reload route through `config.ts`. `api/handler.test.ts` drives the handler through a real `node:http` server so the wrapper is verified without Vercel.",
