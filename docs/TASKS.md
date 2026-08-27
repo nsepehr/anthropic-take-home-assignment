@@ -26,41 +26,41 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 
 ## Tasks
 
-| #   | Slug / Title             | Phase | Priority | Status      | Owner                    | Depends on | Notes                                                                                            |
-| --- | ------------------------ | ----- | -------- | ----------- | ------------------------ | ---------- | ------------------------------------------------------------------------------------------------ |
-| 0   | `repo-setup`             | 1     | P0       | done        | agent: repo-setup        | —          | Bootstrap monorepo + worktree/ports scripts + CLAUDE.md                                          |
-| 0   | `task-tracker`           | 1     | P0       | done        | agent: task-tracker      | —          | This file                                                                                        |
-| 1   | `01-schema-and-seed`     | 2     | P0       | done        | agent: schema-and-seed   | —          | Zod model in shared/, validateProject, relatedTo, data/project.json; brief exists                |
-| 2   | `02-api`                 | 3     | P0       | done        | agent: api               | 01         | GET /api/project (validated), /api/health, dev-only reload                                       |
-| 2b  | `02b-api-trim`           | 3     | P0       | done        | agent: api-trim          | 02         | Trim API to single payload; move store to stores/; record intent                                 |
-| 3   | `03-client-foundation`   | 4     | P0       | done        | agent: client-foundation | 01, 02     | React Flow + ELK renders systems/edges/nesting                                                   |
-| 3a  | `04-design-tokens`       | 4     | P0       | done        | agent: design-tokens     | 03         | Organic tokens/classes → client/src/styles; base components; brief exists                        |
-| 3b  | `05-app-shell`           | 4     | P0       | done        | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots                    |
-| 3c  | `06-system-node`         | 4     | P0       | done        | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                                |
-| 3d  | `07-detail-panel`        | 4     | P0       | done        | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                                   |
-| 3b  | `05-app-shell`           | 4     | P0       | in-progress | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots                    |
-| 3c  | `06-system-node`         | 4     | P0       | done        | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                                |
-| 3d  | `07-detail-panel`        | 4     | P0       | in-progress | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                                   |
-| 3e  | `08-category-lanes`      | 4     | P0       | done        | agent: category-lanes    | 03, 04, 05 | System.category in schema; ELK partitions; lane overlay                                          |
-| 3f  | `10-per-item-deep-dive`  | 4     | P0       | done        | agent: deep-dive         | 05, 06, 07 | Remove global toggle; per-selection Deep dive button; panel 360px; hide zero-count tags          |
-| 3g  | `11-highlight-neighbors` | 4     | P0       | done        | agent: highlight         | 06, 07     | relatedTo includes edge-neighbor systems; connected cards tinted, not dimmed                     |
-| 3h  | `12-seed-client-graph`   | 7     | P0       | done        | agent: seed-client       | 08         | Flatten client + workflow into real modules with evidenced edges                                 |
-| 3i  | `13-edge-routing`        | 4     | P1       | done        | agent: edges             | 06         | Edges attach to the nearest side; human inspects before merge                                    |
-| 3j  | `14-layout-lanes`        | 4     | P0       | done        | agent: layout            | 08, 13     | Lane order from edges; top-aligned compact lanes; fit; human inspects before merge               |
-| 4a  | `15-polish`              | 4     | P1       | done        | agent: polish            | 14         | Dead CSS/hooks, engines pin, click threshold                                                     |
-| 5a  | `16-modeling-rules`      | 5     | P0       | done        | agent: modeling          | 01         | docs/MODELING.md + computeAdvisories in shared; applied to seed                                  |
-| 5b  | `17-drill-down`          | 5     | P0       | in-progress | agent: drilldown         | 14         | L0 categories → L1 systems → L2 children; breadcrumb; categories in schema; inspect before merge |
-| 5c  | `18-column-layout`       | 5     | P0       | todo        | —                        | 17         | Stage columns, stable vertical order, side arcs; drop ELK; inspect before merge                  |
-| 5d  | `19-locks`               | 5     | P1       | todo        | —                        | 17         | Lock a box / a layer; persisted; header counter; feeds 18                                        |
-| 5e  | `20-lifecycle`           | 5     | P0       | in-progress | agent: lifecycle         | 16         | lifecycle {current,superseded,retired} on every entity; current-only views; per-entity history   |
-| 4   | `04-selection-linking`   | 5     | P0       | todo        | —                        | 03         | Hero interaction: select entity → connected entities highlight                                   |
-| 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                                  |
-| 5   | `05-detail-panels`       | 5     | P1       | todo        | —                        | 03         | Requirement list, intent panel, overview/deep-dive toggle                                        |
-| 6   | `06-trust-layer`         | 6     | P1       | todo        | —                        | 04         | Provenance badges, evidence links, gaps view                                                     |
-| 7   | `09-deploy-vercel`       | 7     | P1       | done        | agent: deploy-vercel     | 02, 03     | Live: https://anthropic-take-home-assignment.vercel.app (vercel.json, api/, DEPLOY.md)           |
-| 8   | `08-seed-complete`       | 7     | P1       | todo        | —                        | 01         | Seed describes the finished project, honest provenance                                           |
-| 9   | `09-readme`              | 7     | P1       | todo        | —                        | —          | How to run, architecture, links                                                                  |
-| 10  | `10-chat`                | 8     | P2       | todo        | —                        | 04         | Stretch: AI chat that @-tags systems/requirements/intents                                        |
+| #   | Slug / Title             | Phase | Priority | Status      | Owner                    | Depends on | Notes                                                                                          |
+| --- | ------------------------ | ----- | -------- | ----------- | ------------------------ | ---------- | ---------------------------------------------------------------------------------------------- |
+| 0   | `repo-setup`             | 1     | P0       | done        | agent: repo-setup        | —          | Bootstrap monorepo + worktree/ports scripts + CLAUDE.md                                        |
+| 0   | `task-tracker`           | 1     | P0       | done        | agent: task-tracker      | —          | This file                                                                                      |
+| 1   | `01-schema-and-seed`     | 2     | P0       | done        | agent: schema-and-seed   | —          | Zod model in shared/, validateProject, relatedTo, data/project.json; brief exists              |
+| 2   | `02-api`                 | 3     | P0       | done        | agent: api               | 01         | GET /api/project (validated), /api/health, dev-only reload                                     |
+| 2b  | `02b-api-trim`           | 3     | P0       | done        | agent: api-trim          | 02         | Trim API to single payload; move store to stores/; record intent                               |
+| 3   | `03-client-foundation`   | 4     | P0       | done        | agent: client-foundation | 01, 02     | React Flow + ELK renders systems/edges/nesting                                                 |
+| 3a  | `04-design-tokens`       | 4     | P0       | done        | agent: design-tokens     | 03         | Organic tokens/classes → client/src/styles; base components; brief exists                      |
+| 3b  | `05-app-shell`           | 4     | P0       | done        | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots                  |
+| 3c  | `06-system-node`         | 4     | P0       | done        | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                              |
+| 3d  | `07-detail-panel`        | 4     | P0       | done        | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                                 |
+| 3b  | `05-app-shell`           | 4     | P0       | in-progress | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots                  |
+| 3c  | `06-system-node`         | 4     | P0       | done        | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                              |
+| 3d  | `07-detail-panel`        | 4     | P0       | in-progress | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                                 |
+| 3e  | `08-category-lanes`      | 4     | P0       | done        | agent: category-lanes    | 03, 04, 05 | System.category in schema; ELK partitions; lane overlay                                        |
+| 3f  | `10-per-item-deep-dive`  | 4     | P0       | done        | agent: deep-dive         | 05, 06, 07 | Remove global toggle; per-selection Deep dive button; panel 360px; hide zero-count tags        |
+| 3g  | `11-highlight-neighbors` | 4     | P0       | done        | agent: highlight         | 06, 07     | relatedTo includes edge-neighbor systems; connected cards tinted, not dimmed                   |
+| 3h  | `12-seed-client-graph`   | 7     | P0       | done        | agent: seed-client       | 08         | Flatten client + workflow into real modules with evidenced edges                               |
+| 3i  | `13-edge-routing`        | 4     | P1       | done        | agent: edges             | 06         | Edges attach to the nearest side; human inspects before merge                                  |
+| 3j  | `14-layout-lanes`        | 4     | P0       | done        | agent: layout            | 08, 13     | Lane order from edges; top-aligned compact lanes; fit; human inspects before merge             |
+| 4a  | `15-polish`              | 4     | P1       | done        | agent: polish            | 14         | Dead CSS/hooks, engines pin, click threshold                                                   |
+| 5a  | `16-modeling-rules`      | 5     | P0       | done        | agent: modeling          | 01         | docs/MODELING.md + computeAdvisories in shared; applied to seed                                |
+| 5b  | `17-drill-down`          | 5     | P0       | review      | agent: drilldown         | 14         | Atlas → system focus (ego graph) with header trail; categories in schema; inspect before merge |
+| 5c  | `18-column-layout`       | 5     | P0       | todo        | —                        | 17         | Stage columns, stable vertical order, side arcs; drop ELK; inspect before merge                |
+| 5d  | `19-locks`               | 5     | P1       | todo        | —                        | 17         | Lock a box / a layer; persisted; header counter; feeds 18                                      |
+| 5e  | `20-lifecycle`           | 5     | P0       | in-progress | agent: lifecycle         | 16         | lifecycle {current,superseded,retired} on every entity; current-only views; per-entity history |
+| 4   | `04-selection-linking`   | 5     | P0       | todo        | —                        | 03         | Hero interaction: select entity → connected entities highlight                                 |
+| 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                                |
+| 5   | `05-detail-panels`       | 5     | P1       | todo        | —                        | 03         | Requirement list, intent panel, overview/deep-dive toggle                                      |
+| 6   | `06-trust-layer`         | 6     | P1       | todo        | —                        | 04         | Provenance badges, evidence links, gaps view                                                   |
+| 7   | `09-deploy-vercel`       | 7     | P1       | done        | agent: deploy-vercel     | 02, 03     | Live: https://anthropic-take-home-assignment.vercel.app (vercel.json, api/, DEPLOY.md)         |
+| 8   | `08-seed-complete`       | 7     | P1       | todo        | —                        | 01         | Seed describes the finished project, honest provenance                                         |
+| 9   | `09-readme`              | 7     | P1       | todo        | —                        | —          | How to run, architecture, links                                                                |
+| 10  | `10-chat`                | 8     | P2       | todo        | —                        | 04         | Stretch: AI chat that @-tags systems/requirements/intents                                      |
 
 ## Backlog (client)
 
@@ -149,3 +149,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 16-modeling-rules → done (human); seed advisories: Client should split into stages
 - 2026-08-27 — design revision 4 recorded; briefs 18-column-layout and 19-locks queued behind 17
 - 2026-08-27 — 20-lifecycle → in-progress (agent: lifecycle, Opus)
+- 2026-08-27 — 17-drill-down → review (agent: drilldown): atlas (hover previews neighbours, click selects, double-click / Open › enters focus) → system focus (pure `egoLayout` ego graph, labelled accent edges, 380px panel with Close/Clear/Back) → walk neighbours; header trail `Architecture / hop / current`, Esc = Back; first-time coach-mark; rev-4 tag/legend pills; `Project.categories` schema + validation + seed kept; `int-drill-down-by-category` superseded by `int-focus-ego-graph`; worktree left running for inspection
