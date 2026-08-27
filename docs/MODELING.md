@@ -103,6 +103,6 @@ algorithm into `detail` and leaving a one-sentence summary.
 overview / deep-dive switch after task 10 removed it. A superseded decision must be reflected
 wherever it is described, not only in the new Intent.
 
-**Bad: isolated system** — `sys-deploy-vercel` has no edges although its `detail` says it imports
-`buildApp` from `server/src/app.ts`. The evidence exists; the edge is missing — that is what
-`system-isolated` points at.
+**Bad: isolated system** — before `edge-vercel-calls-server` was added, `sys-deploy-vercel` had no
+edges although its `detail` said it imports `buildApp` from `server/src/app.ts`. The evidence
+existed; the edge was missing — that is what `system-isolated` points at.

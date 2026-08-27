@@ -1275,6 +1275,15 @@
       "intentId": "int-tests-pin-intent",
       "summary": "`npm run check` (`package.json:24`) runs typecheck, ESLint, Prettier and Vitest over all workspaces; shared represents the three.",
       "detail": "`npm run check` (`package.json:24`) runs `typecheck --workspaces`, ESLint, Prettier and `vitest run` over the shared, server and client workspaces; shared is drawn as the representative of the three."
+    },
+    {
+      "id": "edge-vercel-calls-server",
+      "from": "sys-deploy-vercel",
+      "to": "sys-server-api",
+      "kind": "calls",
+      "label": "wraps buildApp()",
+      "intentId": "int-one-function-same-app",
+      "summary": "`api/[...path].ts:4-5` imports `buildApp` and `loadConfig` from `server/src` and serves every `/api/*` request through them."
     }
   ]
 }
