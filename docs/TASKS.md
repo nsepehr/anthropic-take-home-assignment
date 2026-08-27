@@ -50,6 +50,8 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 4a  | `15-polish`              | 4     | P1       | done        | agent: polish            | 14         | Dead CSS/hooks, engines pin, click threshold                                                     |
 | 5a  | `16-modeling-rules`      | 5     | P0       | done        | agent: modeling          | 01         | docs/MODELING.md + computeAdvisories in shared; applied to seed                                  |
 | 5b  | `17-drill-down`          | 5     | P0       | in-progress | agent: drilldown         | 14         | L0 categories → L1 systems → L2 children; breadcrumb; categories in schema; inspect before merge |
+| 5c  | `18-column-layout`       | 5     | P0       | todo        | —                        | 17         | Stage columns, stable vertical order, side arcs; drop ELK; inspect before merge                  |
+| 5d  | `19-locks`               | 5     | P1       | todo        | —                        | 17         | Lock a box / a layer; persisted; header counter; feeds 18                                        |
 | 4   | `04-selection-linking`   | 5     | P0       | todo        | —                        | 03         | Hero interaction: select entity → connected entities highlight                                   |
 | 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                                  |
 | 5   | `05-detail-panels`       | 5     | P1       | todo        | —                        | 03         | Requirement list, intent panel, overview/deep-dive toggle                                        |
@@ -144,3 +146,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 15-polish → done (human): cleanup, show-more lists, rev-3 pills
 - 2026-08-27 — 16-modeling-rules → review (agent: modeling): docs/MODELING.md, computeAdvisories (10 rules) printed by validate:data, seed trimmed to one honest advisory (sys-deploy-vercel isolated)
 - 2026-08-27 — 16-modeling-rules → done (human); seed advisories: Client should split into stages
+- 2026-08-27 — design revision 4 recorded; briefs 18-column-layout and 19-locks queued behind 17

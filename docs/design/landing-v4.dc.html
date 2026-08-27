@@ -1,0 +1,39 @@
+<!-- Source: Claude Design project "Project Atlas — Landing Directions", revision 4 (2026-08-27).
+     DELTAS over revision 3 (see landing-v3.dc.html for the atlas / focus / trail structure):
+
+     1. CARD TAGS (system cards on atlas, focus card, neighbour cards) — inline colours, no .tag-* class:
+          kind      → bg neutral-300, fg neutral-800, border transparent
+          "N req"   → bg neutral-200, fg neutral-800, border neutral-400
+          "N why"   → bg accent-300,  fg accent-800,  border transparent
+          Verified  → bg accent-2-300, fg accent-2-800, border transparent
+          AI        → bg transparent, fg neutral-700, border neutral-400
+        HEADER LEGEND: Verified pill = bg accent-2-600 / fg --color-bg; AI pill = bg neutral-200 / fg neutral-800 /
+        1px DASHED neutral-500 border. Then a divider and a lock summary: "<n> locked · <m> layers" or "nothing locked",
+        accent-2-800, with a 12px lock icon (Lucide lock, stroke 2.75).
+
+     2. LOCKS
+        - Every system card: lock button top-right of the title row (14px Lucide lock; open shackle when unlocked).
+          opacity 0.18 idle, 0.55 on card hover, 1 when locked; colour neutral-600 → accent-2-700 when locked;
+          locked card border = accent-2-600. title: "Lock this box in place" / "Locked in place — click to unlock".
+          Click stops propagation (does not select/open).
+        - Every LAYER (lane): lock button beside the uppercase lane label (12px icon, opacity 0.4 → 1 when locked).
+          Locked lane: 1.5px DASHED accent-2-600 border on the lane background, label colour accent-2-800.
+          Locking a layer locks all its member systems; unlocking it unlocks them.
+        - Detail panel (system): next to "Deep dive", a secondary button with the lock icon:
+          "Lock position" (transparent, divider border) ↔ "Locked in place" (bg accent-2-600, fg --color-bg).
+          Note under the buttons (11.5px neutral-600): "Lock it if you do not want a re-layout to move or re-parent it."
+          / "Re-layouts keep this box where it is, under its current parent."
+        - Persisted in localStorage (key like "<project>-atlas-locks": { locks: string[], groupLocks: string[] }).
+        - Layout contract: a locked system keeps its column (category/parent) and vertical position across re-layouts.
+
+     3. INTERACTION / COPY
+        - Cards: onClick = select (panel), onDoubleClick = open (focus view). Hover OR selection drives highlight
+          (focusId = sel || hover): ring + accent-200 on the focused id, accent-100 on neighbours, others dim 0.22.
+        - Atlas hint: "Click a system to inspect it — double-click to open its own view."
+          Focus hint:  "Click a neighbour to inspect it — double-click to walk into it."
+        - Panel action button label: atlas → "Close"; focus view with a selected neighbour → "Clear"
+          (clears selection, panel returns to the focused system); focus view, nothing selected → "Back".
+        - Focus view edge labels are pills: bg neutral-100, fg accent-800, 11px, letter-spacing .04em,
+          radius 999px, centred at the curve midpoint (lx = ax + (bx-ax)*0.5, ly = ay + (by-ay)*0.3).
+        - Focus-view neighbour cards: selected → bg accent-100, border accent.
+-->
