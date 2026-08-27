@@ -42,7 +42,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                   |
 | 5   | `05-detail-panels`       | 5     | P1       | todo        | —                        | 03         | Requirement list, intent panel, overview/deep-dive toggle                         |
 | 6   | `06-trust-layer`         | 6     | P1       | todo        | —                        | 04         | Provenance badges, evidence links, gaps view                                      |
-| 7   | `07-deploy-fly`          | 7     | P1       | todo        | —                        | 02, 03     | Dockerfile + fly.toml + deploy                                                    |
+| 7   | `09-deploy-vercel`       | 7     | P1       | in-progress | —                        | 02, 03     | vercel.json + api/[...path].ts Fastify wrapper + DEPLOY.md                        |
 | 8   | `08-seed-complete`       | 7     | P1       | todo        | —                        | 01         | Seed describes the finished project, honest provenance                            |
 | 9   | `09-readme`              | 7     | P1       | todo        | —                        | —          | How to run, architecture, links                                                   |
 | 10  | `10-chat`                | 8     | P2       | todo        | —                        | 04         | Stretch: AI chat that @-tags systems/requirements/intents                         |
@@ -86,3 +86,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 08-category-lanes → in-progress (agent: category-lanes)
 - 2026-08-27 — 04-design-tokens → review (agent: design-tokens)
 - 2026-08-27 — 04-design-tokens → done (human)
+- 2026-08-27 — 09-deploy-vercel → in-progress (agent: deploy-vercel); Fly.io dropped for Vercel (human)
