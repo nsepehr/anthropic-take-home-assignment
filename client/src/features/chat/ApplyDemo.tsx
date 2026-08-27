@@ -1,31 +1,28 @@
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { Button, Modal } from '../../components';
 
-const STEPS: { title: string; detail: ReactNode }[] = [
+const STEPS: { title: string; details: string[] }[] = [
   {
-    title: 'Claude drafts a change to the map',
-    detail: 'Add, reword or retire a requirement, record an intent, set a status.',
+    title: 'This tool is an extension to Claude — think of it as the Claude Code UI',
+    details: [
+      'Normal chat messages, with the addition of pointing at a specific part of the code.',
+      'You can tag features, requirements, intents and systems that you want to change.',
+    ],
   },
   {
-    title: 'You see it as a proposal card — nothing is written yet',
-    detail: 'Apply changes or Discard; the map is untouched until you pick one.',
+    title: "The AI gets more context on what you're trying to change and goes and attacks the work",
+    details: [],
   },
   {
-    title: 'Apply writes it to data/project.json tagged AI-inferred',
-    detail: 'The same provenance every other inferred entry carries — never human-verified.',
+    title:
+      'Before applying the final change, it checks the changes against your intent for verification',
+    details: ['The AI chat transcripts become a short summary of intent, verified by the user.'],
   },
   {
-    title: "The card shows 'Chat edit · review' until a human verifies it",
-    detail: (
-      <>
-        <span className="apply-demo-pill">Chat edit · review</span> sits on the edited card, so the
-        map never hides where a change came from.
-      </>
-    ),
-  },
-  {
-    title: 'validate:data and the advisories gate every write',
-    detail: 'A draft that breaks the schema or trips an advisory never reaches the file.',
+    title: 'Human intent, product requirements and features all live side by side',
+    details: [
+      'Now we have a forever capture of the overall system architecture, intent, features and product requirements.',
+    ],
   },
 ];
 
@@ -36,7 +33,7 @@ const FOOTNOTE =
 export function ApplyDemoDialog({ onClose }: { onClose: () => void }) {
   return (
     <Modal
-      title="What happens when you apply"
+      title="What happens during the chat experience"
       onClose={onClose}
       footer={
         <>
@@ -55,7 +52,11 @@ export function ApplyDemoDialog({ onClose }: { onClose: () => void }) {
             </span>
             <div>
               <p className="apply-demo-title">{step.title}</p>
-              <p className="apply-demo-detail">{step.detail}</p>
+              {step.details.map((detail) => (
+                <p key={detail} className="apply-demo-detail">
+                  {detail}
+                </p>
+              ))}
             </div>
           </li>
         ))}
@@ -64,13 +65,13 @@ export function ApplyDemoDialog({ onClose }: { onClose: () => void }) {
   );
 }
 
-/** The ghost link under a reply that shows the write side the prototype stops short of. */
+/** The ghost link under a reply that shows what the chat experience is for. */
 export function ApplyDemo() {
   const [open, setOpen] = useState(false);
   return (
     <>
       <Button variant="ghost" className="apply-demo-open" onClick={() => setOpen(true)}>
-        See what Apply would do ›
+        See how the chat experience works ›
       </Button>
       {open && <ApplyDemoDialog onClose={() => setOpen(false)} />}
     </>

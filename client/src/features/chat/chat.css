@@ -296,7 +296,7 @@ div.diagram-card.is-out-of-scope {
   opacity: var(--dim-opacity);
 }
 
-/* — "See what Apply would do": the write side, shown rather than built — */
+/* — "See how the chat experience works": the write side, shown rather than built — */
 .apply-demo-open {
   align-self: flex-start;
   padding-inline: 0;
@@ -337,15 +337,6 @@ div.diagram-card.is-out-of-scope {
   margin: 2px 0 0;
   font-size: 12.5px;
   color: var(--color-neutral-700);
-}
-.apply-demo-pill {
-  display: inline-block;
-  padding: 1px 9px;
-  border: 1px dashed var(--legend-ai-border);
-  border-radius: 999px;
-  background: var(--legend-ai-bg);
-  color: var(--legend-ai-fg);
-  font-size: 11px;
 }
 .apply-demo-note {
   margin: 0;
