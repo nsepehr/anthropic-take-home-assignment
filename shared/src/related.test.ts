@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fullyLinkedProject } from './fixture.js';
+import { fullyLinkedProject } from './test/fixture.js';
 import { getSystem, relatedTo } from './related.js';
 
 const sorted = (r: ReturnType<typeof relatedTo>) => ({

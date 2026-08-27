@@ -1,4 +1,4 @@
-import type { Project, System } from './schema.js';
+import type { Project, System } from './schema/index.js';
 
 export interface Related {
   systemIds: string[];

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { fullyLinkedProject } from './fixture.js';
+import { fullyLinkedProject } from './test/fixture.js';
 import { validateProject } from './validate.js';
 
 const seedPath = new URL('../../data/project.json', import.meta.url);

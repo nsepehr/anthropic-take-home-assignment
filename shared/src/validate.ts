@@ -1,5 +1,11 @@
-import { computeGaps } from './gaps.js';
-import { ProjectSchema, type Gaps, type Project, type ValidationError } from './schema.js';
+import { computeGaps, type Gaps } from './gaps.js';
+import { ProjectSchema, type Project } from './schema/index.js';
+
+/** A readable validation error: where it is and what is wrong. */
+export interface ValidationError {
+  path: string;
+  message: string;
+}
 
 export type ValidateResult =
   { ok: true; project: Project; gaps: Gaps } | { ok: false; errors: ValidationError[] };

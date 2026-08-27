@@ -7,7 +7,7 @@
       "name": "Shared data model",
       "kind": "module",
       "paths": [
-        "shared/src/schema.ts",
+        "shared/src/schema/",
         "shared/src/validate.ts",
         "shared/src/gaps.ts",
         "shared/src/related.ts",
@@ -263,7 +263,7 @@
       "status": "partial",
       "systemIds": ["sys-shared-model"],
       "intentIds": ["int-summary-and-detail"],
-      "evidence": ["shared/src/schema.ts (EntityBase: summary + detail required)"],
+      "evidence": ["shared/src/schema/entity.ts (EntityBase: summary + detail required)"],
       "summary": "Every system, requirement and intent can be read as a one-sentence overview or a deep dive, toggled globally.",
       "detail": "The schema requires `summary` and `detail` on every first-class entity, and the seed fills both. The global overview/deep-dive toggle in the UI is not built. Partial.",
       "provenance": {
@@ -280,7 +280,7 @@
       "systemIds": ["sys-shared-model", "sys-seed-data"],
       "intentIds": ["int-trust-provenance-gaps"],
       "evidence": [
-        "shared/src/schema.ts (ProvenanceSchema)",
+        "shared/src/schema/provenance.ts (ProvenanceSchema)",
         "shared/src/gaps.ts",
         "data/project.json"
       ],
@@ -380,7 +380,7 @@
         "edgeIds": []
       },
       "summary": "Simple and deep language are both required fields, not an afterthought.",
-      "detail": "`EntityBase` in `shared/src/schema.ts` requires non-empty `summary` and `detail` on System, Requirement and Intent. Edges make both optional to stay lightweight (see int-edges-lightweight).",
+      "detail": "`EntityBase` in `shared/src/schema/entity.ts` requires non-empty `summary` and `detail` on System, Requirement and Intent. Edges make both optional to stay lightweight (see int-edges-lightweight).",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T15:00:00+08:00",
@@ -535,7 +535,7 @@
       "tradeoffs": "One dependency in the otherwise dependency-free contract package.",
       "appliesTo": { "systemIds": ["sys-shared-model"], "requirementIds": [], "edgeIds": [] },
       "summary": "One schema definition serves both validation and types.",
-      "detail": "See `shared/src/schema.ts`. `shared/package.json` depends on `zod@^3`; nothing else.",
+      "detail": "See `shared/src/schema/`. `shared/package.json` depends on `zod@^3`; nothing else.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T15:00:00+08:00",
@@ -553,7 +553,7 @@
       "tradeoffs": "An edge without an `intentId` is unexplained, which the gaps report surfaces as `edgesWithoutIntent`.",
       "appliesTo": { "systemIds": ["sys-shared-model"], "requirementIds": [], "edgeIds": [] },
       "summary": "Arrows stay thin; the reason for an arrow is its intent.",
-      "detail": "`EdgeSchema` in `shared/src/schema.ts`: `id, from, to, kind, label?, intentId?, summary?, detail?`. The brief left this to the implementing agent, so it is marked as AI-inferred.",
+      "detail": "`EdgeSchema` in `shared/src/schema/edge.ts`: `id, from, to, kind, label?, intentId?, summary?, detail?`. The brief left this to the implementing agent, so it is marked as AI-inferred.",
       "provenance": {
         "source": "ai-inferred",
         "capturedAt": "2026-08-27T15:00:00+08:00",

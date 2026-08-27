@@ -3,9 +3,9 @@
  * Changes here affect every parallel agent: keep them minimal and call them out in your report.
  */
 
-export * from './schema.js';
-export { validateProject, type ValidateResult } from './validate.js';
-export { computeGaps } from './gaps.js';
+export * from './schema/index.js';
+export { validateProject, type ValidateResult, type ValidationError } from './validate.js';
+export { computeGaps, type Gaps } from './gaps.js';
 export { getSystem, relatedTo, type Related } from './related.js';
 
 /** Response shape of `GET /api/health`. */

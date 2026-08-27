@@ -1,4 +1,12 @@
-import type { Gaps, Project } from './schema.js';
+import type { Project } from './schema/index.js';
+
+/** Computed, never stored: what the model cannot explain. */
+export interface Gaps {
+  systemsWithoutIntent: string[];
+  requirementsWithoutSystem: string[];
+  edgesWithoutIntent: string[];
+  intentsWithoutTarget: string[];
+}
 
 /** Reports what the model leaves unexplained. Honest by design: gaps are surfaced, not hidden. */
 export function computeGaps(project: Project): Gaps {

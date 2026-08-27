@@ -1,4 +1,4 @@
-import type { Project } from './schema.js';
+import type { Project } from '../schema/index.js';
 
 /** Test fixture: a small, fully linked project (no gaps) that tests mutate. */
 const provenance = { source: 'human-verified', capturedAt: '2026-08-27T00:00:00Z' } as const;
