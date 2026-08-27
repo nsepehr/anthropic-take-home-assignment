@@ -1,0 +1,366 @@
+<!-- Source: Claude Design project "Project Atlas — Landing Directions" (2026-08-27).
+     TEMPLATE MARKUP ONLY. The original file's <script> held mock data + logic; our data comes from
+     @app/shared via useProject()/useSelection(). {{ }} placeholders show which value goes where.
+     Human decisions that override this design: right panel is ALWAYS visible (project overview when
+     nothing selected); overview/deep-dive toggle is GLOBAL in the header, not per item. -->
+
+<div
+  style="
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg);
+    overflow: hidden;
+  "
+>
+  <!-- HEADER: name + mission left; provenance legend right -->
+  <div style="display: flex; align-items: flex-end; gap: 24px; padding: 26px 34px 20px; flex: none">
+    <div>
+      <div style="font-family: var(--font-heading); font-size: 29px; line-height: 1.1">
+        {{ project.name }}
+      </div>
+      <div style="font-size: 14px; color: var(--color-neutral-700); margin-top: 4px">
+        {{ project.mission }}
+      </div>
+    </div>
+    <div style="margin-left: auto; display: flex; align-items: center; gap: 20px">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 11px;
+          color: var(--color-neutral-600);
+          white-space: nowrap;
+        "
+      >
+        <span class="tag tag-accent-2" style="font-size: 10px; padding: 2px 9px">Verified</span
+        ><span>human-checked</span>
+        <span class="tag tag-outline" style="font-size: 10px; padding: 2px 9px">AI</span
+        ><span>inferred</span>
+      </div>
+      <!-- (ours) global Overview | Deep dive .seg control goes here -->
+    </div>
+  </div>
+
+  <div style="flex: 1; min-height: 0; display: flex; gap: 0; padding: 0 22px 22px">
+    <!-- CANVAS: rounded, dotted grid, takes remaining width -->
+    <div
+      style="
+        flex: 1;
+        min-width: 0;
+        position: relative;
+        border-radius: 28px;
+        background-color: var(--color-neutral-100);
+        background-image: radial-gradient(var(--color-neutral-300) 1px, transparent 1px);
+        background-size: 22px 22px;
+        overflow: hidden;
+      "
+    >
+      <!-- CATEGORY LANES: translucent surface panels with an uppercase label (design used 4 columns:
+           Clients / Edge / Core services / Data & external) -->
+      <div
+        style="
+          position: absolute;
+          left: 0;
+          top: 26px;
+          width: 250px;
+          height: 306px;
+          border-radius: 26px;
+          background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+        "
+      ></div>
+      <div
+        style="
+          position: absolute;
+          left: 20px;
+          top: 34px;
+          font-size: 10px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--color-neutral-600);
+        "
+      >
+        {{ lane.label }}
+      </div>
+
+      <!-- EDGES: curved SVG paths with arrowheads; label centered; lit when related to selection -->
+      <svg style="position: absolute; inset: 0; overflow: visible; pointer-events: none">
+        <defs>
+          <marker
+            id="ah"
+            viewBox="0 0 8 8"
+            refX="6"
+            refY="4"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto"
+          >
+            <path d="M0,1 L7,4 L0,7 z" fill="context-stroke"></path>
+          </marker>
+        </defs>
+        <g opacity="{{ related ? 1 : (nothingSelected ? 0.75 : dim*0.7) }}">
+          <path
+            d="{{ path }}"
+            fill="none"
+            stroke="{{ lit ? var(--color-accent) : var(--color-neutral-500) }}"
+            stroke-width="{{ lit ? 2.2 : 1.4 }}"
+            stroke-linecap="round"
+            marker-end="url(#ah)"
+          ></path>
+          <text
+            text-anchor="middle"
+            style="font-family: var(--font-body); font-size: 10px; fill: var(--color-neutral-600)"
+          >
+            {{ edge.label (deep dive only) }}
+          </text>
+        </g>
+      </svg>
+
+      <!-- SYSTEM CARD (node): 210px wide -->
+      <div
+        style="position: absolute; width: 210px; min-height: 112px;
+                  opacity: {{ dimmed ? 0.22 : 1 }};
+                  box-shadow: {{ selected ? '0 0 0 2.5px var(--color-accent)' : var(--shadow-sm) }};
+                  border: 1.5px solid {{ selected ? var(--color-accent) : var(--color-neutral-300) }};
+                  background: {{ selected ? var(--color-accent-200) : related ? var(--color-accent-100) : var(--color-bg) }};
+                  border-radius: 22px; padding: 12px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; overflow: hidden; transition: opacity .18s, box-shadow .18s, background .18s"
+      >
+        <div style="display: flex; align-items: center; gap: 7px">
+          <span
+            style="width: 9px; height: 9px; border-radius: 50%; flex: none; background: {{ var(--kind-<kind>) }}"
+          ></span>
+          <span style="font-family: var(--font-heading); font-size: 15px; line-height: 1.15"
+            >{{ system.name }}</span
+          >
+        </div>
+        <div style="font-size: 12px; line-height: 1.4; color: var(--color-neutral-700); flex: 1">
+          {{ overview ? system.summary : system.detail }}
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px">
+          <span class="tag tag-neutral" style="font-size: 10px; padding: 2px 9px"
+            >{{ system.kind }}</span
+          >
+          <span class="tag tag-neutral" style="font-size: 10px; padding: 2px 9px"
+            >{{ requirementCount }} req</span
+          >
+          <span class="tag tag-accent" style="font-size: 10px; padding: 2px 9px"
+            >{{ intentCount }} why</span
+          >
+          <span
+            class="tag {{ human ? 'tag-accent-2' : 'tag-outline' }}"
+            style="font-size: 10px; padding: 2px 9px"
+            >{{ human ? 'Verified' : 'AI' }}</span
+          >
+        </div>
+      </div>
+
+      <!-- HINT when nothing selected -->
+      <div
+        style="
+          position: absolute;
+          left: 28px;
+          bottom: 22px;
+          font-size: 13px;
+          color: var(--color-neutral-600);
+        "
+      >
+        Click a system to read what it does, what it must do, and why it was built this way.
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: 400px, scrolls -->
+    <div
+      class="sb"
+      style="width: 400px; flex: none; margin-left: 18px; overflow-y: auto; padding-right: 4px"
+    >
+      <div style="display: flex; flex-direction: column; gap: 16px">
+        <!-- ENTITY DETAIL card -->
+        <div style="background: var(--color-surface); border-radius: 28px; padding: 20px 22px">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span class="card-kicker"
+              >{{ 'System · kind' | 'Requirement · kind · status' | 'Intent · decision' }}</span
+            >
+            <button class="btn btn-ghost" style="margin-left: auto; font-size: 12px">Close</button>
+          </div>
+          <div
+            style="
+              font-family: var(--font-heading);
+              font-size: 22px;
+              line-height: 1.15;
+              margin: 2px 0 8px;
+            "
+          >
+            {{ name | title | statement }}
+          </div>
+          <div style="font-size: 13.5px; line-height: 1.5; color: var(--color-neutral-800)">
+            {{ summary }}
+          </div>
+          <!-- deep section: for systems "How it works" = detail; requirements "Evidence" = detail; intents "Rationale" -->
+          <div
+            style="
+              margin-top: 12px;
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+              border-top: 1px solid var(--color-divider);
+              padding-top: 12px;
+            "
+          >
+            <div>
+              <div
+                style="
+                  font-size: 10px;
+                  letter-spacing: 0.1em;
+                  text-transform: uppercase;
+                  color: var(--color-neutral-600);
+                  margin-bottom: 3px;
+                "
+              >
+                {{ label }}
+              </div>
+              <div style="font-size: 13px; line-height: 1.5; color: var(--color-neutral-800)">
+                {{ text }}
+              </div>
+            </div>
+          </div>
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 7px;
+              margin-top: 14px;
+              font-size: 11px;
+              color: var(--color-neutral-600);
+            "
+          >
+            <span
+              style="width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid {{ provColor }}; background: {{ human ? provColor : transparent }}"
+            ></span
+            >{{ 'Human-verified' | 'AI-inferred' }} · {{ capturedAt date }}
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px">
+            <span
+              style="
+                font-family: ui-monospace, monospace;
+                font-size: 11px;
+                background: var(--color-neutral-200);
+                border-radius: 999px;
+                padding: 3px 11px;
+                color: var(--color-neutral-800);
+              "
+              >{{ path }}</span
+            >
+          </div>
+        </div>
+
+        <!-- REQUIREMENTS list (heading: "Requirements" | for intents "Requirements it serves") -->
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 8px; padding: 0 4px 9px">
+            <span style="font-family: var(--font-heading); font-size: 16px">{{ heading }}</span>
+            <span class="text-muted" style="font-size: 12px">{{ count }}</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 7px">
+            <div
+              style="opacity: {{ dimmed ? 0.22 : 1 }}; box-shadow: {{ selected ? ring : shadow-sm }}; background: var(--color-neutral-100); border: 1px solid {{ selected ? var(--color-accent) : var(--color-divider) }}; border-radius: 18px; padding: 10px 13px; cursor: pointer; transition: opacity .18s"
+            >
+              <div style="display: flex; align-items: flex-start; gap: 8px">
+                <span
+                  style="width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; flex: none; background: {{ var(--status-<status>) }}"
+                ></span>
+                <span style="font-size: 13px; line-height: 1.35; flex: 1"
+                  >{{ requirement.title }}</span
+                >
+                <span
+                  style="width: 9px; height: 9px; margin-top: 4px; border-radius: 50%; flex: none; border: 1.5px solid {{ provColor }}; background: {{ human ? provColor : transparent }}"
+                ></span>
+              </div>
+              <div
+                style="
+                  padding-left: 16px;
+                  font-size: 11.5px;
+                  line-height: 1.4;
+                  color: var(--color-neutral-700);
+                  margin-top: 4px;
+                "
+              >
+                {{ overview ? summary : detail }}
+              </div>
+              <div style="display: flex; gap: 6px; margin-top: 7px; padding-left: 16px">
+                <span
+                  class="tag {{ implemented ? 'tag-accent-2' : partial ? 'tag-accent' : 'tag-neutral' }}"
+                  >{{ status }}</span
+                >
+                <span class="tag tag-neutral">{{ kind }}</span>
+              </div>
+            </div>
+            <div style="font-size: 12.5px; color: var(--color-neutral-600); padding: 2px 4px">
+              Nothing recorded yet.
+            </div>
+          </div>
+        </div>
+
+        <!-- INTENTS list (heading: for systems "Why it is built this way" | else "Intents") -->
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 8px; padding: 0 4px 9px">
+            <span style="font-family: var(--font-heading); font-size: 16px">{{ heading }}</span>
+            <span class="text-muted" style="font-size: 12px">{{ count }}</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 7px">
+            <div
+              style="opacity: {{ dimmed ? 0.22 : 1 }}; box-shadow: {{ selected ? ring : shadow-sm }}; background: var(--color-accent-100); border: 1px solid {{ selected ? var(--color-accent) : var(--color-accent-200) }}; border-radius: 20px; padding: 13px 15px; cursor: pointer; transition: opacity .18s"
+            >
+              <div style="display: flex; align-items: flex-start; gap: 8px">
+                <span
+                  style="
+                    font-family: var(--font-heading);
+                    font-size: 14.5px;
+                    line-height: 1.25;
+                    flex: 1;
+                    color: var(--color-accent-900);
+                  "
+                  >{{ intent.statement }}</span
+                >
+                <span
+                  style="width: 9px; height: 9px; margin-top: 5px; border-radius: 50%; flex: none; border: 1.5px solid {{ provColor }}; background: {{ human ? provColor : transparent }}"
+                ></span>
+              </div>
+              <div
+                style="
+                  font-size: 12.5px;
+                  line-height: 1.45;
+                  color: var(--color-accent-800);
+                  margin-top: 6px;
+                "
+              >
+                {{ overview ? summary : rationale }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONNECTED chips: navigate to linked entities -->
+        <div>
+          <div
+            style="
+              font-size: 10px;
+              letter-spacing: 0.1em;
+              text-transform: uppercase;
+              color: var(--color-neutral-600);
+              padding: 0 4px 8px;
+            "
+          >
+            Connected
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; padding: 0 4px 8px">
+            <button
+              style="cursor: pointer; font: inherit; font-size: 12px; text-align: left; background: {{ intent ? var(--color-accent-200) : requirement ? var(--color-neutral-200) : var(--color-accent-2-200) }}; color: {{ intent ? var(--color-accent-900) : var(--color-neutral-900) }}; border: 0; border-radius: 999px; padding: 5px 13px"
+            >
+              {{ label }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

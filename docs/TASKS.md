@@ -25,22 +25,24 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 
 ## Tasks
 
-| #   | Slug / Title             | Phase | Priority | Status | Owner                    | Depends on | Notes                                                                             |
-| --- | ------------------------ | ----- | -------- | ------ | ------------------------ | ---------- | --------------------------------------------------------------------------------- |
-| 0   | `repo-setup`             | 1     | P0       | done   | agent: repo-setup        | —          | Bootstrap monorepo + worktree/ports scripts + CLAUDE.md                           |
-| 0   | `task-tracker`           | 1     | P0       | done   | agent: task-tracker      | —          | This file                                                                         |
-| 1   | `01-schema-and-seed`     | 2     | P0       | done   | agent: schema-and-seed   | —          | Zod model in shared/, validateProject, relatedTo, data/project.json; brief exists |
-| 2   | `02-api`                 | 3     | P0       | done   | agent: api               | 01         | GET /api/project (validated), /api/health, dev-only reload                        |
-| 2b  | `02b-api-trim`           | 3     | P0       | done   | agent: api-trim          | 02         | Trim API to single payload; move store to stores/; record intent                  |
-| 3   | `03-client-foundation`   | 4     | P0       | done   | agent: client-foundation | 01, 02     | React Flow + ELK renders systems/edges/nesting                                    |
-| 4   | `04-selection-linking`   | 5     | P0       | todo   | —                        | 03         | Hero interaction: select entity → connected entities highlight                    |
-| 11  | `11-video-and-rationale` | 9     | P0       | todo   | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                   |
-| 5   | `05-detail-panels`       | 5     | P1       | todo   | —                        | 03         | Requirement list, intent panel, overview/deep-dive toggle                         |
-| 6   | `06-trust-layer`         | 6     | P1       | todo   | —                        | 04         | Provenance badges, evidence links, gaps view                                      |
-| 7   | `07-deploy-fly`          | 7     | P1       | todo   | —                        | 02, 03     | Dockerfile + fly.toml + deploy                                                    |
-| 8   | `08-seed-complete`       | 7     | P1       | todo   | —                        | 01         | Seed describes the finished project, honest provenance                            |
-| 9   | `09-readme`              | 7     | P1       | todo   | —                        | —          | How to run, architecture, links                                                   |
-| 10  | `10-chat`                | 8     | P2       | todo   | —                        | 04         | Stretch: AI chat that @-tags systems/requirements/intents                         |
+| #   | Slug / Title             | Phase | Priority | Status      | Owner                    | Depends on | Notes                                                                             |
+| --- | ------------------------ | ----- | -------- | ----------- | ------------------------ | ---------- | --------------------------------------------------------------------------------- |
+| 0   | `repo-setup`             | 1     | P0       | done        | agent: repo-setup        | —          | Bootstrap monorepo + worktree/ports scripts + CLAUDE.md                           |
+| 0   | `task-tracker`           | 1     | P0       | done        | agent: task-tracker      | —          | This file                                                                         |
+| 1   | `01-schema-and-seed`     | 2     | P0       | done        | agent: schema-and-seed   | —          | Zod model in shared/, validateProject, relatedTo, data/project.json; brief exists |
+| 2   | `02-api`                 | 3     | P0       | done        | agent: api               | 01         | GET /api/project (validated), /api/health, dev-only reload                        |
+| 2b  | `02b-api-trim`           | 3     | P0       | done        | agent: api-trim          | 02         | Trim API to single payload; move store to stores/; record intent                  |
+| 3   | `03-client-foundation`   | 4     | P0       | done        | agent: client-foundation | 01, 02     | React Flow + ELK renders systems/edges/nesting                                    |
+| 3a  | `04-design-tokens`       | 4     | P0       | in-progress | agent: design-tokens     | 03         | Organic tokens/classes → client/src/styles; base components; brief exists         |
+| 3b  | `05-app-shell`           | 4     | P0       | in-progress | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots     |
+| 4   | `04-selection-linking`   | 5     | P0       | todo        | —                        | 03         | Hero interaction: select entity → connected entities highlight                    |
+| 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                   |
+| 5   | `05-detail-panels`       | 5     | P1       | todo        | —                        | 03         | Requirement list, intent panel, overview/deep-dive toggle                         |
+| 6   | `06-trust-layer`         | 6     | P1       | todo        | —                        | 04         | Provenance badges, evidence links, gaps view                                      |
+| 7   | `07-deploy-fly`          | 7     | P1       | todo        | —                        | 02, 03     | Dockerfile + fly.toml + deploy                                                    |
+| 8   | `08-seed-complete`       | 7     | P1       | todo        | —                        | 01         | Seed describes the finished project, honest provenance                            |
+| 9   | `09-readme`              | 7     | P1       | todo        | —                        | —          | How to run, architecture, links                                                   |
+| 10  | `10-chat`                | 8     | P2       | todo        | —                        | 04         | Stretch: AI chat that @-tags systems/requirements/intents                         |
 
 ## Backlog (schema)
 
@@ -70,3 +72,5 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 03-client-foundation → done (human)
 - 2026-08-27 — 02b-api-trim → review (agent: api-trim)
 - 2026-08-27 — 02b-api-trim → done (human)
+- 2026-08-27 — 04-design-tokens → in-progress (agent: design-tokens)
+- 2026-08-27 — 05-app-shell → in-progress (agent: app-shell)
