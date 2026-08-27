@@ -1,15 +1,12 @@
 import type { ReactNode } from 'react';
-import { useSelection } from '../../state/selection';
+import { CanvasHint } from './CanvasHint';
 
-const HINT = 'Click a system to read what it does, what it must do, and why it was built this way.';
-
-/** The rounded dotted-grid region the diagram lives in; shows a hint while nothing is selected. */
+/** The rounded dotted-grid region the diagram lives in, with the hint or coach-mark for the level. */
 export function CanvasFrame({ children }: { children: ReactNode }) {
-  const { selectedId } = useSelection();
   return (
     <section className="canvas-frame" aria-label="Architecture canvas">
       {children}
-      {selectedId === null && <div className="canvas-hint">{HINT}</div>}
+      <CanvasHint />
     </section>
   );
 }

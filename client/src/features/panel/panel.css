@@ -17,8 +17,13 @@
   align-items: center;
   gap: 10px;
 }
-.panel-detail-head .btn {
+.panel-detail-actions {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.panel-detail-head .btn {
   font-size: 12px;
 }
 .panel-detail-title {

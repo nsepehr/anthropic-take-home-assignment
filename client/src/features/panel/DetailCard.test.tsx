@@ -37,4 +37,23 @@ describe('DetailCard', () => {
     expect(html).toContain('panel-evidence');
     expect(html).toContain(req.evidence[0]);
   });
+
+  it('action label follows the level: Close on the atlas, Clear for a selected neighbour, Back for the focus', () => {
+    const found = findEntity(seedProject, 'sys-server-api')!;
+    expect(renderPanel(<DetailCard found={found} />, 'sys-server-api')).toContain('>Close<');
+    expect(
+      renderPanel(<DetailCard found={found} />, 'sys-server-api', ['sys-client-api']),
+    ).toContain('>Clear<');
+    expect(renderPanel(<DetailCard found={found} />, undefined, ['sys-server-api'])).toContain(
+      '>Back<',
+    );
+  });
+
+  it('a system that is not the current focus offers "Open"', () => {
+    const found = findEntity(seedProject, 'sys-server-api')!;
+    expect(renderPanel(<DetailCard found={found} />, 'sys-server-api')).toContain('Open');
+    expect(renderPanel(<DetailCard found={found} />, undefined, ['sys-server-api'])).not.toContain(
+      'Open',
+    );
+  });
 });

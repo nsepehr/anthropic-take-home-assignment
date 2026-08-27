@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { FoundEntity } from '../../model/entities';
 import { entityLabel } from '../../model/entities';
+import { panelAction } from '../../model/panelAction';
+import { useNavigation } from '../../state/navigation';
 import { useSelection } from '../../state/selection';
 import { DeepSection } from './components/DeepSection';
 import { Button, ProvenanceDot } from '../../components';
@@ -25,9 +27,16 @@ interface Props {
 /**
  * The headline card of the selected entity: what it is, who vouches for it, and a per-item
  * "Deep dive" toggle. Expanded state is local, so it resets when SidePanel remounts on selection.
+ * The action button is Close / Clear / Back per `panelAction`; a system that is not the current
+ * focus also offers "Open" into its own view. The title row keeps a trailing slot for later
+ * controls (locks).
  */
 export function DetailCard({ found, defaultExpanded = false }: Props) {
-  const { clear } = useSelection();
+  const { scope, back, open } = useNavigation();
+  const { selectedId, clear } = useSelection();
+  const action = panelAction(scope, selectedId);
+  const openable =
+    found.type === 'system' && !(scope.level === 'system' && scope.id === found.entity.id);
   const [expanded, setExpanded] = useState(defaultExpanded);
   const { provenance } = found.entity;
   const human = provenance.source === 'human-verified';
@@ -35,9 +44,16 @@ export function DetailCard({ found, defaultExpanded = false }: Props) {
     <article className="panel-detail">
       <div className="panel-detail-head">
         <span className="card-kicker">{kicker(found)}</span>
-        <Button variant="ghost" onClick={clear}>
-          Close
-        </Button>
+        <div className="panel-detail-actions">
+          {openable && (
+            <Button variant="primary" onClick={() => open(found.entity.id)}>
+              Open ›
+            </Button>
+          )}
+          <Button variant="ghost" onClick={action.kind === 'back' ? back : clear}>
+            {action.label}
+          </Button>
+        </div>
       </div>
       <h2 className="panel-detail-title">{entityLabel(found)}</h2>
       <div className="panel-detail-summary">{found.entity.summary}</div>

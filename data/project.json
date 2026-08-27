@@ -258,6 +258,25 @@
         "capturedAt": "2026-08-27T15:45:00+08:00",
         "sessionRef": "agent: deploy-vercel (task 09)"
       }
+    },
+    {
+      "id": "sys-client-navigation",
+      "name": "Navigation state",
+      "kind": "module",
+      "category": "Client",
+      "paths": [
+        "client/src/state/navigation.tsx",
+        "client/src/model/scope.ts",
+        "client/src/model/focusView.ts",
+        "client/src/layout/egoLayout.ts"
+      ],
+      "summary": "Where you are in the graph: the atlas, or a trail of opened systems whose last hop is the focus.",
+      "detail": "`model/scope.ts` is pure: a `Scope` is the atlas or one system; `openIn` appends a hop or rewinds to it when it is already on the trail, so walking in a circle never grows the trail; `breadcrumbFor` names each hop. `model/focusView.ts` splits a system's neighbours into inbound (they point at it) and outbound. `layout/egoLayout.ts` places the focus card in the centre with inbound stacked left and outbound right — no ELK, the shape is fixed. `state/navigation.tsx` exposes `{ scope, trail, open, back, goTo, breadcrumb }`, selects the new focus on every hop, and maps Esc to `back()`.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T18:30:00+08:00",
+        "sessionRef": "agent: drilldown (task 17)"
+      }
     }
   ],
   "requirements": [
@@ -467,6 +486,31 @@
         "source": "ai-inferred",
         "capturedAt": "2026-08-27T16:00:00+08:00",
         "sessionRef": "agent: category-lanes (task 08)"
+      }
+    },
+    {
+      "id": "req-system-focus",
+      "title": "Open any system to see its neighbours and walk the graph",
+      "kind": "functional",
+      "status": "implemented",
+      "systemIds": [
+        "sys-client-navigation",
+        "sys-client-diagram",
+        "sys-client-shell",
+        "sys-client-panel"
+      ],
+      "evidence": [
+        "client/src/model/focusView.test.ts",
+        "client/src/layout/egoLayout.test.ts",
+        "client/src/state/navigation.test.tsx",
+        "client/src/features/shell/Header.test.tsx (trail crumbs)"
+      ],
+      "summary": "A user can open any system to see its inbound and outbound neighbours, walk to one, and go back.",
+      "detail": "Implemented by task 17-drill-down after design revision 3 replaced category levels with the ego graph. The atlas has no panel; the panel (380px) appears only in a focus view and its headline card says Back instead of Close.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T18:30:00+08:00",
+        "sessionRef": "agent: drilldown (task 17)"
       }
     }
   ],
@@ -1058,6 +1102,52 @@
         "capturedAt": "2026-08-27T17:00:00+08:00",
         "sessionRef": "planning chat 2026-08-27, phase-2 planning"
       }
+    },
+    {
+      "id": "int-drill-down-by-category",
+      "statement": "The canvas shows one level at a time: categories, then a category's systems, then a system's parts",
+      "rationale": "The flat view stopped being legible past ~25 edges. Hiding edges ad hoc would lie about the graph; disclosing it level by level through the same fields that already classify (`category`) and contain (`parentId`) systems keeps one model and one truth.",
+      "status": "superseded",
+      "supersededBy": "int-focus-ego-graph",
+      "appliesTo": {
+        "systemIds": ["sys-client-diagram", "sys-client-state", "sys-shared-model"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "summary": "Progressive disclosure over the existing hierarchy fields; superseded the same day by the ego-graph focus view.",
+      "detail": "Decided in the phase-2 planning chat and reversed after reviewing design revision 3: category levels solved the atlas's scale, which is not the problem at 16 systems. The optional `Project.categories` list it introduced stays in the schema and seed so the category collapse can return for large projects.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T18:30:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, phase-2 planning"
+      }
+    },
+    {
+      "id": "int-focus-ego-graph",
+      "statement": "Opening a system shows its ego graph — inbound left, the system centred, outbound right — and walking neighbour to neighbour replaces drilling through levels",
+      "rationale": "The ego graph scales by edges-per-system, not total edges, and walking neighbour to neighbour answers \"how is this connected?\" directly. Category levels solved the atlas's scale, which is not the problem at 16 systems. The atlas keeps hover-highlighting and drops the panel so it reads as a map; the panel belongs to the system you are inside.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": [
+          "sys-client-navigation",
+          "sys-client-diagram",
+          "sys-client-shell",
+          "sys-client-panel"
+        ],
+        "requirementIds": ["req-system-focus"],
+        "edgeIds": [
+          "edge-diagram-calls-navigation",
+          "edge-shell-reads-navigation",
+          "edge-panel-calls-navigation"
+        ]
+      },
+      "summary": "Atlas with hover-highlight and click-to-open; system focus shows the ego graph beside the panel; trail and Esc go back.",
+      "detail": "Chosen from Claude Design revision 3 (`docs/design/landing-v3.dc.html`). The trail rewinds when you reopen a system already on it, so circular walks stay short. The focus view reuses the atlas's card, edge and selection machinery through the same React Flow canvas; only the layout differs.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T18:30:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, design revision 3"
+      }
     }
   ],
   "edges": [
@@ -1284,6 +1374,76 @@
       "label": "wraps buildApp()",
       "intentId": "int-one-function-same-app",
       "summary": "`api/[...path].ts:4-5` imports `buildApp` and `loadConfig` from `server/src` and serves every `/api/*` request through them."
+    },
+    {
+      "id": "edge-diagram-calls-navigation",
+      "from": "sys-client-diagram",
+      "to": "sys-client-navigation",
+      "kind": "calls",
+      "label": "open / back",
+      "summary": "`AtlasCanvas` and `FocusCanvas` call `open(id)` on a card click; `DiagramCanvas` keys the canvas by `scope`."
+    },
+    {
+      "id": "edge-shell-reads-navigation",
+      "from": "sys-client-shell",
+      "to": "sys-client-navigation",
+      "kind": "reads",
+      "label": "trail",
+      "summary": "`Trail` renders `useNavigation().breadcrumb`; `AppShell` shows the panel only when `scope.level` is `system`."
+    },
+    {
+      "id": "edge-panel-calls-navigation",
+      "from": "sys-client-panel",
+      "to": "sys-client-navigation",
+      "kind": "calls",
+      "label": "back / open",
+      "summary": "`DetailCard` Back calls `back()`; a system chip in `ConnectedChips` calls `open(id)`."
+    }
+  ],
+  "categories": [
+    {
+      "id": "Workflow",
+      "name": "Workflow",
+      "summary": "How the project is built: agent rules, worktree and port scripts, the check suite and the deploy.",
+      "detail": "Everything a contributor (human or agent) touches before and after writing code: CLAUDE.md and the task briefs set the rules; new-worktree/finish-worktree and the ports allocator isolate each task; the check suite is the definition of green; the Vercel deploy ships the result. Ordered first because its edges point at every other category and nothing points back.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T18:30:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, phase-2 planning"
+      }
+    },
+    {
+      "id": "Client",
+      "name": "Client",
+      "summary": "The web app: an atlas of all systems, and an ego graph with a detail panel for each.",
+      "detail": "Vite + React 18. `state/` holds the loaded project, the selection and the navigation trail; `model/` derives everything from the shared types with pure functions; `layout/` adapts ELK for the atlas and lays out the focus view by hand; `features/` are the shell, diagram and panel. Features never import each other — they meet in state and model.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T18:30:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, phase-2 planning"
+      }
+    },
+    {
+      "id": "Server",
+      "name": "Server",
+      "summary": "A thin Fastify API that validates the project file with the shared model and serves it as one payload.",
+      "detail": "`buildApp()` registers routes and is testable via `inject`; the store reads `data/project.json` from disk; validation happens once at load with readable errors. In production the same app runs as a single Vercel serverless function.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T18:30:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, phase-2 planning"
+      }
+    },
+    {
+      "id": "Model",
+      "name": "Model",
+      "summary": "The contract: Zod schemas for systems, requirements, intents, edges and categories, plus the seed data that describes this project.",
+      "detail": "`@app/shared` has no runtime dependency except zod and is imported by both client and server, so there is exactly one definition of every entity. `data/project.json` is the model applied to this repo — the project is its own demo and every task appends to it.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T18:30:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, phase-2 planning"
+      }
     }
   ]
 }

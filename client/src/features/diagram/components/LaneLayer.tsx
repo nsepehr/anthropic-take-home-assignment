@@ -22,7 +22,7 @@ const LABEL_STYLE = {
 
 /**
  * Translucent lane behind each category with an uppercase label. Rendered inside the React Flow
- * viewport so it pans and zooms with the graph; pass as `overlay` to `DiagramCanvas`.
+ * viewport so it pans and zooms with the graph; rendered by `AtlasCanvas`.
  */
 export function LaneLayer({ lanes }: { lanes: LaneBounds[] }) {
   return (

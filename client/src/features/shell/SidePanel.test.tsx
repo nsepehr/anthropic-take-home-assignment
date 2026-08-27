@@ -5,14 +5,13 @@ import { SidePanel } from './SidePanel';
 const panel = <SidePanel overview={<p>OVERVIEW-SLOT</p>} detail={<p>DETAIL-SLOT</p>} />;
 
 describe('SidePanel', () => {
-  it('shows the overview slot when nothing is selected', () => {
-    const html = renderInShell(panel);
-    expect(html).toContain('OVERVIEW-SLOT');
-    expect(html).not.toContain('DETAIL-SLOT');
+  it('atlas: overview when nothing is selected, detail when something is', () => {
+    expect(renderInShell(panel)).toContain('OVERVIEW-SLOT');
+    expect(renderInShell(panel, { selectedId: 'sys-client-api' })).toContain('DETAIL-SLOT');
   });
 
-  it('shows the detail slot when something is selected', () => {
-    const html = renderInShell(panel, { selectedId: 'sys-client-api' });
+  it('focus view: detail even with nothing selected (the focused system)', () => {
+    const html = renderInShell(panel, { trail: ['sys-client-api'] });
     expect(html).toContain('DETAIL-SLOT');
     expect(html).not.toContain('OVERVIEW-SLOT');
   });

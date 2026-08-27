@@ -40,4 +40,13 @@ describe('SystemCard', () => {
       ),
     ).toContain('is-dimmed');
   });
+
+  it('offers "Open" only when given an onOpen handler (never on the focus card)', () => {
+    const base = { system, requirementCount: 0, intentCount: 0, state: 'idle' as const };
+    expect(renderToString(<SystemCard {...base} onOpen={() => {}} />)).toContain(
+      'diagram-card__open',
+    );
+    expect(renderToString(<SystemCard {...base} />)).not.toContain('diagram-card__open');
+    expect(renderToString(<SystemCard {...base} focus />)).toContain('diagram-card--focus');
+  });
 });

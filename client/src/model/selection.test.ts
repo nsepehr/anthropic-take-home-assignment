@@ -27,4 +27,16 @@ describe('deriveSelection', () => {
     expect(allIds.some((id) => view.isDimmed(id))).toBe(false);
     expect(allIds.some((id) => view.isHighlighted(id))).toBe(false);
   });
+
+  it('a hover drives the highlight only while nothing is selected', () => {
+    const hovered = deriveSelection(project, null, 'sys-shared-model');
+    expect(hovered.hoveredId).toBe('sys-shared-model');
+    expect(hovered.selectedId).toBeNull();
+    expect(hovered.isHighlighted('sys-shared-model')).toBe(true);
+    expect(hovered.isHighlighted('sys-server-api')).toBe(true); // a neighbour of the hovered one
+    expect(hovered.isDimmed('sys-ports-allocator')).toBe(true);
+    const both = deriveSelection(project, 'sys-client-api', 'sys-ports-allocator');
+    expect(both.related).toEqual(relatedTo(project, 'sys-client-api'));
+    expect(both.isDimmed('sys-ports-allocator')).toBe(true);
+  });
 });

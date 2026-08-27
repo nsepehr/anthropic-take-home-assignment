@@ -12,7 +12,8 @@ export type ValidateResult =
 
 /**
  * Shape-checks with Zod, then checks referential integrity: unique ids, references resolving to
- * the right entity type, edge endpoints existing, and no `parentId` cycles.
+ * the right entity type, edge endpoints existing, no `parentId` cycles, and — when the project
+ * lists `categories` — every `System.category` naming one of them.
  */
 export function validateProject(input: unknown): ValidateResult {
   const parsed = ProjectSchema.safeParse(input);
@@ -29,13 +30,14 @@ export function validateProject(input: unknown): ValidateResult {
     ...checkReferences(project, ids),
     ...checkParentCycles(project),
     ...checkSupersession(project),
+    ...checkCategories(project, ids),
   ];
   return errors.length > 0
     ? { ok: false, errors }
     : { ok: true, project, gaps: computeGaps(project) };
 }
 
-type Collection = 'systems' | 'requirements' | 'intents' | 'edges';
+type Collection = 'systems' | 'requirements' | 'intents' | 'edges' | 'categories';
 
 type IdIndex = Record<Collection, Set<string>>;
 
@@ -46,11 +48,12 @@ function indexIds(project: Project): { ids: IdIndex; errors: ValidationError[] }
     requirements: new Set(),
     intents: new Set(),
     edges: new Set(),
+    categories: new Set(),
   };
   const seen = new Map<string, string>();
   const errors: ValidationError[] = [];
   for (const collection of Object.keys(ids) as Collection[]) {
-    project[collection].forEach((entity, index) => {
+    (project[collection] ?? []).forEach((entity, index) => {
       const path = `${collection}.${index}.id`;
       const first = seen.get(entity.id);
       if (first)
@@ -129,6 +132,21 @@ function checkSupersession(project: Project): ValidationError[] {
       errors.push({ path, message: 'only allowed when status is "superseded"' });
     } else if (it.supersededBy === it.id) {
       errors.push({ path, message: 'an intent cannot supersede itself' });
+    }
+  });
+  return errors;
+}
+
+/** With a `categories` list present, every `System.category` must name one of them. */
+function checkCategories(project: Project, ids: IdIndex): ValidationError[] {
+  if (!project.categories) return [];
+  const errors: ValidationError[] = [];
+  project.systems.forEach((s, i) => {
+    if (s.category && !ids.categories.has(s.category)) {
+      errors.push({
+        path: `systems.${i}.category`,
+        message: `references unknown category "${s.category}" (not in project.categories)`,
+      });
     }
   });
   return errors;

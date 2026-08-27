@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CategorySchema } from './category.js';
 import { EdgeSchema } from './edge.js';
 import { IntentSchema } from './intent.js';
 import { RequirementSchema } from './requirement.js';
@@ -12,6 +13,8 @@ export const ProjectSchema = z.object({
   requirements: z.array(RequirementSchema),
   intents: z.array(IntentSchema),
   edges: z.array(EdgeSchema),
+  /** Optional content for the categories named by `System.category`; validated when present. */
+  categories: z.array(CategorySchema).optional(),
 });
 
 export type Project = z.infer<typeof ProjectSchema>;

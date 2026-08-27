@@ -1,6 +1,8 @@
 import { DiagramCanvas } from './features/diagram';
 import { EntityDetail, ProjectOverview } from './features/panel';
 import { AppShell } from './features/shell';
+import { FirstRunProvider } from './state/firstRun';
+import { NavigationProvider } from './state/navigation';
 import { ProjectProvider } from './state/projectStore';
 import { SelectionProvider } from './state/selection';
 
@@ -9,11 +11,15 @@ export function App() {
   return (
     <ProjectProvider>
       <SelectionProvider>
-        <AppShell
-          canvas={(project) => <DiagramCanvas project={project} />}
-          overview={<ProjectOverview />}
-          detail={<EntityDetail />}
-        />
+        <NavigationProvider>
+          <FirstRunProvider>
+            <AppShell
+              canvas={(project) => <DiagramCanvas project={project} />}
+              overview={<ProjectOverview />}
+              detail={<EntityDetail />}
+            />
+          </FirstRunProvider>
+        </NavigationProvider>
       </SelectionProvider>
     </ProjectProvider>
   );
