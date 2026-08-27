@@ -78,3 +78,14 @@ planning", appliesTo sys-shared-model, sys-seed-data, sys-client-panel. Append a
 ## Report format
 
 As in `_TEMPLATE.md`, plus the exact `shared/` diff and the `currentOnly`/`historyOf` signatures.
+
+## Revision (2026-08-27, design revision 5)
+
+- States are `superseded | withdrawn` (not "retired"); withdrawn carries a one-line `reason`.
+- **No global "Show retired" toggle.** Non-current entities never appear in main lists or on the
+  canvas. History is per system: in the system's detail panel, after "Why it is built this way",
+  a **Show history (N) / Hide history** control reveals the system's old requirements and intents,
+  always greyed (dashed border, 75% opacity, struck-through title, Superseded/Withdrawn pill,
+  "Replaced by: …" or the reason). See `docs/design/landing-v5.dc.html`.
+- Rationale (human): the current view is what the tool is about; history is available on demand,
+  scoped to the thing you're looking at, and visibly "old".
