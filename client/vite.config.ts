@@ -1,0 +1,18 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { fileURLToPath } from 'node:url';
+
+const clientPort = Number(process.env.CLIENT_PORT ?? 5173);
+const serverPort = Number(process.env.SERVER_PORT ?? 3001);
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: { '@app/shared': fileURLToPath(new URL('../shared/src/index.ts', import.meta.url)) },
+  },
+  server: {
+    port: clientPort,
+    strictPort: true,
+    proxy: { '/api': `http://127.0.0.1:${serverPort}` },
+  },
+});

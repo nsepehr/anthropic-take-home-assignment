@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "paths": { "@app/shared": ["shared/dist/index.d.ts"] }
+  },
+  "exclude": ["src/**/*.test.ts"]
+}
