@@ -9,6 +9,7 @@ import { useSelection } from '../../state/selection';
 import { useViewMode } from '../../state/viewMode';
 import { sizeForMode } from './cardSize';
 import { ArrowMarkers } from './components/ArrowMarkers';
+import { LaneLayer } from './components/LaneLayer';
 import { SystemEdge } from './SystemEdge';
 import { SystemNode } from './SystemNode';
 import './diagram.css';
@@ -20,14 +21,16 @@ const defaultEdgeOptions = { type: 'system' };
 interface Props {
   project: Project;
   /**
-   * Extra layer rendered as a React Flow child with the laid-out lane bounds — e.g.
-   * `(lanes) => <LaneLayer lanes={lanes} />`. The overlay owns its own `<ViewportPortal>`.
+   * Layer rendered as a React Flow child with the laid-out lane bounds; defaults to `LaneLayer`.
+   * The overlay owns its own `<ViewportPortal>`.
    */
   overlay?: (lanes: LaneBounds[]) => ReactNode;
 }
 
+const defaultOverlay = (lanes: LaneBounds[]) => <LaneLayer lanes={lanes} />;
+
 /** The architecture diagram: ELK-laid-out system cards and edges, selection via click. */
-export function DiagramCanvas({ project, overlay }: Props) {
+export function DiagramCanvas({ project, overlay = defaultOverlay }: Props) {
   const elements = useMemo(() => toFlowElements(project), [project]);
   const { mode } = useViewMode();
   const sizedNodes = useMemo(() => sizeForMode(elements.nodes, mode), [elements.nodes, mode]);
@@ -72,7 +75,7 @@ export function DiagramCanvas({ project, overlay }: Props) {
       proOptions={{ hideAttribution: true }}
     >
       <ArrowMarkers />
-      {overlay?.(laneRects)}
+      {overlay(laneRects)}
     </ReactFlow>
   );
 }

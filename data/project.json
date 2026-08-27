@@ -200,7 +200,7 @@
       "kind": "ui",
       "parentId": "sys-client-app",
       "paths": [
-        "client/src/features/lanes/",
+        "client/src/features/diagram/components/LaneLayer.tsx",
         "client/src/model/lanes.ts",
         "client/src/layout/useLanes.ts"
       ],
@@ -782,7 +782,7 @@
         "edgeIds": []
       },
       "summary": "`category` = which lane; `parentId` = which box. Lanes are ELK partitions in data order.",
-      "detail": "Schema: `System.category?: string` (additive). Layout: `elk.partitioning.activate` on the root, `elk.partitioning.partition: <lane index>` on each top-level node, direction RIGHT. Rendering: `LaneLayer` in `client/src/features/lanes/`. Out of scope: lane collapsing, filtering, per-lane colours, editing categories.",
+      "detail": "Schema: `System.category?: string` (additive). Layout: `elk.partitioning.activate` on the root, `elk.partitioning.partition: <lane index>` on each top-level node, direction RIGHT. Rendering: `LaneLayer` in `client/src/features/diagram/components/` (moved there by task 06 so features never import each other). Out of scope: lane collapsing, filtering, per-lane colours, editing categories.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T16:00:00+08:00",

@@ -13,7 +13,7 @@ export function SidePanel({ overview, detail }: SidePanelProps) {
   const { selectedId } = useSelection();
   return (
     <aside className="side-panel sb" aria-label="Details">
-      {selectedId === null ? overview : detail}
+      <div key={selectedId ?? 'overview'}>{selectedId === null ? overview : detail}</div>
     </aside>
   );
 }

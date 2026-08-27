@@ -1,5 +1,5 @@
 import { ViewportPortal } from '@xyflow/react';
-import { LANE_PADDING, type LaneBounds } from '../../model/lanes';
+import { LANE_PADDING, type LaneBounds } from '../../../model/lanes';
 
 const LANE_STYLE = {
   position: 'absolute',
