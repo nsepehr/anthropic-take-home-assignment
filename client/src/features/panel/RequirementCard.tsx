@@ -1,12 +1,6 @@
 import type { Requirement } from '@app/shared';
-import { ProvenanceDot, StatusDot, Tag, type TagVariant } from '../../components';
+import { ProvenanceDot, StatusDot, Tag } from '../../components';
 import { useCardState } from './components/useCardState';
-
-const STATUS_TAG: Record<Requirement['status'], TagVariant> = {
-  implemented: 'accent-2',
-  partial: 'accent',
-  planned: 'neutral',
-};
 
 /** One requirement in a list: status, title, provenance, one-line summary, tags. */
 export function RequirementCard({ requirement }: { requirement: Requirement }) {
@@ -20,8 +14,8 @@ export function RequirementCard({ requirement }: { requirement: Requirement }) {
       </div>
       <div className="panel-card-body">{requirement.summary}</div>
       <div className="panel-card-tags">
-        <Tag variant={STATUS_TAG[requirement.status]}>{requirement.status}</Tag>
-        <Tag>{requirement.kind}</Tag>
+        <Tag className={`tag-status-${requirement.status}`}>{requirement.status}</Tag>
+        <Tag className="tag-kind">{requirement.kind}</Tag>
       </div>
     </button>
   );

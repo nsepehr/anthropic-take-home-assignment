@@ -74,6 +74,19 @@
   --status-partial: var(--color-accent-500);
   --status-planned: var(--color-neutral-400);
 
+  /* Requirement pills: solid status tint with dark text; kind is a neutral outline */
+  --pill-status-implemented-bg: var(--color-accent-2-200);
+  --pill-status-implemented-fg: var(--color-accent-2-900);
+  --pill-status-implemented-border: var(--color-accent-2-300);
+  --pill-status-partial-bg: var(--color-accent-200);
+  --pill-status-partial-fg: var(--color-accent-900);
+  --pill-status-partial-border: var(--color-accent-300);
+  --pill-status-planned-bg: var(--color-neutral-300);
+  --pill-status-planned-fg: var(--color-neutral-900);
+  --pill-status-planned-border: var(--color-neutral-400);
+  --pill-kind-border: var(--color-neutral-400);
+  --pill-kind-fg: var(--color-neutral-800);
+
   /* Provenance */
   --prov-human: var(--color-accent-2-600);
   --prov-ai: var(--color-accent-500);

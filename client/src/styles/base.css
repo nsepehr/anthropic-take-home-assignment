@@ -208,6 +208,32 @@ a {
   border: 1px solid var(--color-accent);
   color: var(--color-accent);
 }
+/* requirement pills — distinct from the generic tints so they read on neutral surfaces */
+.tag-status-implemented,
+.tag-status-partial,
+.tag-status-planned,
+.tag-kind {
+  border: 1px solid var(--pill-kind-border);
+}
+.tag-status-implemented {
+  background: var(--pill-status-implemented-bg);
+  color: var(--pill-status-implemented-fg);
+  border-color: var(--pill-status-implemented-border);
+}
+.tag-status-partial {
+  background: var(--pill-status-partial-bg);
+  color: var(--pill-status-partial-fg);
+  border-color: var(--pill-status-partial-border);
+}
+.tag-status-planned {
+  background: var(--pill-status-planned-bg);
+  color: var(--pill-status-planned-fg);
+  border-color: var(--pill-status-planned-border);
+}
+.tag-kind {
+  background: transparent;
+  color: var(--pill-kind-fg);
+}
 
 /* — rounded frame: everything softens, small controls go pill — */
 .card {
