@@ -154,11 +154,10 @@
       "paths": [
         "client/src/state/projectStore.tsx",
         "client/src/state/selection.tsx",
-        "client/src/model/selection.ts",
-        "client/src/state/viewMode.tsx"
+        "client/src/model/selection.ts"
       ],
-      "summary": "Project, selection, and view-mode state exposed as React hooks.",
-      "detail": "`ProjectProvider`/`useProject` load the project once through `api/project.ts` (the client's only fetch call site). `SelectionProvider`/`useSelection` hold one selected id and derive `related`, `isHighlighted`, `isDimmed` with `relatedTo` from the shared model — no network round-trip. `useViewMode` is the global overview/deep-dive switch persisted in localStorage.",
+      "summary": "Project and selection state exposed as React hooks.",
+      "detail": "`ProjectProvider`/`useProject` load the project once through `api/project.ts` (the client's only fetch call site). `SelectionProvider`/`useSelection` hold one selected id and derive `related`, `isHighlighted`, `isDimmed` with `relatedTo` from the shared model — no network round-trip. The global view-mode switch that used to live here was removed by task 10 (deep dive is per item, in the detail card).",
       "provenance": {
         "source": "ai-inferred",
         "capturedAt": "2026-08-27T15:00:00Z",
@@ -817,7 +816,7 @@
       "appliesTo": {
         "systemIds": ["sys-client-shell"],
         "requirementIds": [],
-        "edgeIds": ["edge-shell-renders-panel"]
+        "edgeIds": ["edge-shell-renders-panel", "edge-shell-reads-state"]
       },
       "provenance": {
         "source": "human-verified",
@@ -836,7 +835,7 @@
       "appliesTo": {
         "systemIds": ["sys-client-shell", "sys-client-state"],
         "requirementIds": [],
-        "edgeIds": ["edge-shell-reads-state"]
+        "edgeIds": []
       },
       "provenance": {
         "source": "human-verified",
@@ -1062,9 +1061,9 @@
       "from": "sys-client-shell",
       "to": "sys-client-state",
       "kind": "reads",
-      "label": "selection, view mode",
-      "intentId": "int-global-view-mode",
-      "summary": "`Header.tsx:2-3` reads `useProject` and `useViewMode`; `SidePanel.tsx:2`, `CanvasFrame.tsx:2` and `Placeholder.tsx:1` read `useSelection` to switch between overview and detail."
+      "label": "selection",
+      "intentId": "int-panel-always-visible",
+      "summary": "`Header.tsx:2` and `AppShell.tsx:3` read `useProject`; `SidePanel.tsx:2`, `CanvasFrame.tsx:2` and `Placeholder.tsx:1` read `useSelection` to switch between the overview and detail slots."
     },
     {
       "id": "edge-diagram-reads-state",
@@ -1073,7 +1072,7 @@
       "kind": "reads",
       "label": "selection",
       "intentId": "int-selection-client-side",
-      "summary": "`DiagramCanvas.tsx:8-9`, `SystemNode.tsx:4-5` and `SystemEdge.tsx:4-5` import `useSelection` and `useViewMode`; clicks call `select`/`clear`, cards and edges derive their highlight from the selection."
+      "summary": "`DiagramCanvas.tsx:8`, `SystemNode.tsx:4` and `SystemEdge.tsx:4` import `useSelection`; clicks call `select`/`clear`, cards and edges derive their highlight from the selection."
     },
     {
       "id": "edge-panel-reads-state",
@@ -1082,7 +1081,7 @@
       "kind": "reads",
       "label": "selection",
       "intentId": "int-selection-client-side",
-      "summary": "`EntityDetail.tsx:2-3`, `DetailCard.tsx:3-4`, `ConnectedChips.tsx:3`, `ProjectOverview.tsx:1` and `components/useCardState.ts:1` import `useProject`, `useSelection` and `useViewMode`."
+      "summary": "`EntityDetail.tsx:2-3`, `DetailCard.tsx:4`, `ConnectedChips.tsx:3`, `ProjectOverview.tsx:1`, `components/DeepSection.tsx:3-4` and `components/useCardState.ts:1` import `useProject` and `useSelection`."
     },
     {
       "id": "edge-diagram-calls-layout",
