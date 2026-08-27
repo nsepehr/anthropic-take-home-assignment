@@ -36,20 +36,12 @@ export function intentsFor(project: Project, id: string): Intent[] {
 }
 
 /**
- * Everything to offer as a navigation chip from `id`: linked systems (including the other end of
- * every edge), requirements and intents — deduped, never including `id` itself.
+ * Everything to offer as a navigation chip from `id`: the systems, requirements and intents in its
+ * `relatedTo` closure (deduped there, never including `id` itself).
  */
 export function connectionsFor(project: Project, id: string): FoundEntity[] {
   const related = relatedTo(project, id);
-  const edges = new Set(related.edgeIds);
-  const neighbours = project.edges.filter((e) => edges.has(e.id)).flatMap((e) => [e.from, e.to]);
-  const ids = new Set([
-    ...related.systemIds,
-    ...neighbours,
-    ...related.requirementIds,
-    ...related.intentIds,
-  ]);
-  ids.delete(id);
+  const ids = [...related.systemIds, ...related.requirementIds, ...related.intentIds];
   const found: FoundEntity[] = [];
   for (const target of ids) {
     const hit = findEntity(project, target);

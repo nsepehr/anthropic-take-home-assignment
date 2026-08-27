@@ -891,6 +891,24 @@
         "capturedAt": "2026-08-27T15:45:00+08:00",
         "sessionRef": "planning chat 2026-08-27, deployment discussion"
       }
+    },
+    {
+      "id": "int-selection-closure-includes-neighbors",
+      "statement": "Selecting a thing lights up everything one hop away \u2014 connected systems, not just the arrows",
+      "rationale": "The question a selection answers is \"how does this fit together?\"; a lit arrow into a dimmed box answers half of it. Matches the design's related() rule. Fixed at the shared model (relatedTo) so canvas and panel agree.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-shared-model", "sys-client-diagram"],
+        "requirementIds": ["req-single-focused-interaction"],
+        "edgeIds": []
+      },
+      "summary": "relatedTo returns the one-hop closure: neighbour systems via edges, and for requirements/intents the edges between their systems.",
+      "detail": "system \u2192 its edges + both endpoints, requirements listing it, intents applying to it; requirement \u2192 its systems, intents, edges between those systems; intent \u2192 appliesTo + systems of its requirements + edges between; edge \u2192 endpoints + intent. Never the selected id itself.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T16:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, review of first build"
+      }
     }
   ],
   "edges": [

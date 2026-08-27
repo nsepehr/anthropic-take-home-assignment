@@ -29,7 +29,7 @@ describe('relatedTo', () => {
       edgeIds: [],
     });
     expect(sorted(relatedTo(project, 'sys-child'))).toEqual({
-      systemIds: ['sys-parent'],
+      systemIds: ['sys-other', 'sys-parent'],
       requirementIds: [],
       intentIds: ['int-a'],
       edgeIds: ['edge-1'],
@@ -42,6 +42,40 @@ describe('relatedTo', () => {
       requirementIds: [],
       intentIds: ['int-a'],
       edgeIds: [],
+    });
+  });
+
+  it('relatedTo(system) includes the neighbour system at the other end of each edge', () => {
+    expect(relatedTo(project, 'sys-child').systemIds).toContain('sys-other');
+    expect(relatedTo(project, 'sys-other').systemIds).toContain('sys-child');
+  });
+
+  it('relatedTo(system) does not include edges between two of its neighbours', () => {
+    const p = fullyLinkedProject();
+    p.edges.push(
+      { id: 'edge-2', from: 'sys-parent', to: 'sys-child', kind: 'calls' },
+      { id: 'edge-3', from: 'sys-parent', to: 'sys-other', kind: 'calls' },
+    );
+    expect(relatedTo(p, 'sys-child').edgeIds.sort()).toEqual(['edge-1', 'edge-2']);
+    expect(relatedTo(p, 'sys-child').systemIds.sort()).toEqual(['sys-other', 'sys-parent']);
+  });
+
+  it('relatedTo(requirement) includes edges between its systems, not edges leaving the set', () => {
+    const p = fullyLinkedProject();
+    p.requirements[0]!.systemIds = ['sys-child', 'sys-other'];
+    expect(relatedTo(p, 'req-a').edgeIds).toEqual(['edge-1']);
+    expect(relatedTo(project, 'req-b').edgeIds).toEqual([]);
+  });
+
+  it('relatedTo(intent) includes the systems of its requirements and the edges between them', () => {
+    const p = fullyLinkedProject();
+    p.intents[1]!.appliesTo = { systemIds: ['sys-other'], requirementIds: ['req-a'], edgeIds: [] };
+    p.requirements[0]!.systemIds = ['sys-child'];
+    expect(sorted(relatedTo(p, 'int-b'))).toEqual({
+      systemIds: ['sys-child', 'sys-other'],
+      requirementIds: ['req-a'],
+      intentIds: [],
+      edgeIds: ['edge-1'],
     });
   });
 
