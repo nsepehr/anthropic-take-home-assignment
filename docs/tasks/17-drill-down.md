@@ -87,3 +87,22 @@ sys-shared-model. Append at END. `docs/TASKS.md` row → review + changelog.
 ## Report format
 
 As in `_TEMPLATE.md`, plus `shared/` diff, the hook/prop signatures, inspection URL, screenshots.
+
+## Revision (2026-08-27, design revision 3) — SUPERSEDES the levels above
+
+Human reviewed a new Claude Design revision (`docs/design/landing-v3.dc.html`) and chose its
+navigation model over category levels:
+
+- **Atlas** (root): all systems in lanes, **no right panel**, hover → neighbours light, click →
+  open the system. Subline = mission.
+- **System focus** (scope = system id): ego graph — focused system centered as a large accent
+  card, inbound neighbours stacked left, outbound stacked right, accent edges labelled by kind;
+  click a neighbour to walk. Pure `egoLayout`, no ELK. Panel (380px) = EntityDetail with **Back**.
+  Subline = "N systems · M connections · you are inside one of them".
+- **Trail breadcrumb in the header**: `Architecture / hop / hop / current`; click to jump;
+  Esc = Back.
+- Keep `Project.categories` (schema + seed). Do not build category nodes/CategoryDetail now —
+  category collapsing stays in the backlog for large projects.
+- Rationale: the ego graph scales by edges-per-system, not total edges, and walking neighbour to
+  neighbour answers "how is this connected?" directly. Category levels solved the atlas's scale,
+  which is not the problem at 16 systems.
