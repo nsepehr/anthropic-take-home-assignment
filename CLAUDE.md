@@ -10,7 +10,7 @@ tooltips. Time-boxed take-home prototype; theme: Exploration & Understanding. Le
 Node 20+ · TypeScript everywhere · npm workspaces · **client/** Vite + React 18 + `@xyflow/react` 12
 
 - `elkjs` · **server/** Fastify · **shared/** the data-model types · Vitest · ESLint (flat) + Prettier.
-  Deploy target later: Fly.io (not set up yet).
+  Deploy target: Vercel (static client + one serverless function wrapping the Fastify app).
 
 ## Layout
 

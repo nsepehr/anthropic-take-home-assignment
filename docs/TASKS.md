@@ -19,7 +19,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 4. **Diagram core** — React Flow + ELK rendering from the model (look-and-feel from human's Claude Design work)
 5. **Hero interaction** — select any entity → connected entities highlight; detail panel; overview/deep-dive toggle
 6. **Trust layer** — provenance badges, evidence links, gaps/"unexplained" view
-7. **Ship** — Fly.io deploy, full seed data, README
+7. **Ship** — Vercel deploy, full seed data, README
 8. **Stretch** — AI chat that can @-tag systems/requirements/intents
 9. **Submission** — 5-min video, written rationale, transcript export (human)
 
