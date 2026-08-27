@@ -44,6 +44,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 3f  | `10-per-item-deep-dive`  | 4     | P0       | in-progress | agent: deep-dive         | 05, 06, 07 | Remove global toggle; per-selection Deep dive button; panel 360px; hide zero-count tags |
 | 3g  | `11-highlight-neighbors` | 4     | P0       | done        | agent: highlight         | 06, 07     | relatedTo includes edge-neighbor systems; connected cards tinted, not dimmed            |
 | 3h  | `12-seed-client-graph`   | 7     | P0       | in-progress | agent: seed-client       | 08         | Flatten client into real modules with import-evidenced edges                            |
+| 3i  | `13-edge-routing`        | 4     | P1       | in-progress | agent: edges             | 06         | Edges attach to the nearest side; human inspects before merge                           |
 | 4   | `04-selection-linking`   | 5     | P0       | todo        | —                        | 03         | Hero interaction: select entity → connected entities highlight                          |
 | 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                         |
 | 5   | `05-detail-panels`       | 5     | P1       | todo        | —                        | 03         | Requirement list, intent panel, overview/deep-dive toggle                               |
@@ -107,3 +108,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 12-seed-client-graph → in-progress (agent: seed-client)
 - 2026-08-27 — 11-highlight-neighbors → review (agent: highlight); relatedTo returns one-hop closure, connectionsFor edge walk removed
 - 2026-08-27 — 11-highlight-neighbors → done (human)
+- 2026-08-27 — 13-edge-routing → in-progress (agent: edges)
