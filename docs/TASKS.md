@@ -51,7 +51,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 5a  | `16-modeling-rules`      | 5     | P0       | done        | agent: modeling          | 01         | docs/MODELING.md + computeAdvisories in shared; applied to seed                                |
 | 5b  | `17-drill-down`          | 5     | P0       | done        | agent: drilldown         | 14         | Atlas → system focus (ego graph) with header trail; categories in schema; inspect before merge |
 | 5c  | `18-column-layout`       | 5     | P0       | in-progress | agent: columns (opus)    | 17         | Stage columns, stable vertical order, side arcs; drop ELK; inspect before merge                |
-| 5d  | `19-locks`               | 5     | P1       | in-progress | agent: locks (opus)      | 17         | Lock a box / a layer; persisted; header counter; feeds 18                                      |
+| 5d  | `19-locks`               | 5     | P1       | cut         | agent: locks (opus)      | 17         | Lock a box / a layer; persisted; header counter; feeds 18                                      |
 | 5e  | `20-lifecycle`           | 5     | P0       | done        | agent: lifecycle         | 16         | lifecycle {superseded,withdrawn} on every entity; current-only views; per-system history panel |
 | 5f  | `21-chat-scope-ui`       | 5     | P1       | in-progress | agent: chat (opus)       | 17         | Ask Claude drawer: @-mentions, scope chips, canvas attention, scripted reply; client-only      |
 | 4   | `04-selection-linking`   | 5     | P0       | todo        | —                        | 03         | Hero interaction: select entity → connected entities highlight                                 |
@@ -73,6 +73,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
   grew to ~25 edges: the overview should show categories as collapsed nodes with the edges between
   them aggregated; clicking a category drills into its modules; a breadcrumb backs out. Phase 1 stays
   flat and demo-clean instead of hiding edges ad hoc.
+- **Locks — parked 2026-08-27.** Built on branch `agent/19-locks` (not merged): the idle lock icon on every card read as "this component is inactive", which is worse than no lock. Needs a rethink in design (e.g. lock only in the panel / on hover / on a context menu) before any of it lands.
 - **Layout stability + locks** (2026-08-27): (a) column layout must be stable by default — barycenter
   order tie-broken by seed order, new systems append at the bottom of their column, categories only
   reorder when edge flow actually flips (goes into 18-column-layout); (b) explicit lock: additive
@@ -157,3 +158,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 21-chat-scope-ui → in-progress (agent: chat, Opus); design revision 6 recorded
 - 2026-08-27 — 20-lifecycle → review (agent: lifecycle): optional `lifecycle {state: superseded | withdrawn, supersededBy, since, reason}` on every entity and edge (absent = current); `currentOnly`/`historyOf`/`isCurrent` plus `historyFor(project, systemId)` in shared; gaps + advisories run on current entries only, new `requirement-orphaned` advisory; `Intent.status` deprecated but still accepted (mapped at validation time, `validate:data` prints a Deprecated note). Design revision 5: no global "Show retired" toggle and nothing non-current in the main lists or on the canvas — instead `HistorySection` in a system's panel ("Show history (N)" after "Why it is built this way") lists its superseded and withdrawn requirements and intents, greyed, struck through and pilled. Seed: intents migrated off `status`, `int-global-view-mode` superseded, plus the two decisions this revision replaced (`int-global-retired-toggle` superseded by `int-history-per-system`, `int-retired-inline-greyed` withdrawn) and `req-current-by-default`.
 - 2026-08-27 — 20-lifecycle → done (human): superseded/withdrawn lifecycle, current-only views, per-system history
+- 2026-08-27 — 19-locks → cut (human): idle lock icon makes cards look inactive; branch kept unmerged for a redesign
