@@ -29,7 +29,7 @@ layout and reports `status: 'idle' | 'layouting' | 'ready' | 'error'`; import
 **In:**
 
 - Install `@xyflow/react` and `elkjs`.
-- `client/src/api/project.ts`: `fetchProject()`, `fetchRelated(id)` (typed with `@app/shared`,
+- `client/src/api/project.ts`: `fetchProject()` (typed with `@app/shared`,
   errors surfaced as values not thrown strings). Only place `fetch` is called.
 - `client/src/state/`: `ProjectProvider` + `useProject()` (loading / error / project);
   `SelectionProvider` + `useSelection()` → `{ selectedId, select(id), clear(), related, isHighlighted(id), isDimmed(id) }`.

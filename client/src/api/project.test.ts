@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import seed from '../../../data/project.json';
-import { fetchProject, fetchRelated } from './project';
+import { fetchProject } from './project';
 
 function mockFetch(body: unknown, status = 200) {
   vi.stubGlobal(
@@ -35,16 +35,5 @@ describe('fetchProject', () => {
     );
     const result = await fetchProject();
     expect(result.ok).toBe(false);
-  });
-});
-
-describe('fetchRelated', () => {
-  it('accepts a Related shape and rejects anything else', async () => {
-    const related = { systemIds: ['a'], requirementIds: [], intentIds: [], edgeIds: [] };
-    mockFetch(related);
-    expect(await fetchRelated('a')).toEqual({ ok: true, data: related });
-
-    mockFetch({ systemIds: 'nope' });
-    expect((await fetchRelated('a')).ok).toBe(false);
   });
 });
