@@ -49,7 +49,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 3j  | `14-layout-lanes`        | 4     | P0       | done        | agent: layout            | 08, 13     | Lane order from edges; top-aligned compact lanes; fit; human inspects before merge             |
 | 4a  | `15-polish`              | 4     | P1       | done        | agent: polish            | 14         | Dead CSS/hooks, engines pin, click threshold                                                   |
 | 5a  | `16-modeling-rules`      | 5     | P0       | done        | agent: modeling          | 01         | docs/MODELING.md + computeAdvisories in shared; applied to seed                                |
-| 5b  | `17-drill-down`          | 5     | P0       | review      | agent: drilldown         | 14         | Atlas → system focus (ego graph) with header trail; categories in schema; inspect before merge |
+| 5b  | `17-drill-down`          | 5     | P0       | done        | agent: drilldown         | 14         | Atlas → system focus (ego graph) with header trail; categories in schema; inspect before merge |
 | 5c  | `18-column-layout`       | 5     | P0       | todo        | —                        | 17         | Stage columns, stable vertical order, side arcs; drop ELK; inspect before merge                |
 | 5d  | `19-locks`               | 5     | P1       | todo        | —                        | 17         | Lock a box / a layer; persisted; header counter; feeds 18                                      |
 | 5e  | `20-lifecycle`           | 5     | P0       | in-progress | agent: lifecycle         | 16         | lifecycle {current,superseded,retired} on every entity; current-only views; per-entity history |
@@ -150,3 +150,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — design revision 4 recorded; briefs 18-column-layout and 19-locks queued behind 17
 - 2026-08-27 — 20-lifecycle → in-progress (agent: lifecycle, Opus)
 - 2026-08-27 — 17-drill-down → review (agent: drilldown): atlas (hover previews neighbours, click selects, double-click / Open › enters focus) → system focus (pure `egoLayout` ego graph, labelled accent edges, 380px panel with Close/Clear/Back) → walk neighbours; header trail `Architecture / hop / current`, Esc = Back; first-time coach-mark; rev-4 tag/legend pills; `Project.categories` schema + validation + seed kept; `int-drill-down-by-category` superseded by `int-focus-ego-graph`; worktree left running for inspection
+- 2026-08-27 — 17-drill-down → done (human, visually approved): atlas → focus view, trail, helper, rev-4 tags
