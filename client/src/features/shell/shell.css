@@ -1,0 +1,88 @@
+/* Layout-only rules for the app shell. Colors, fonts, radii and the .seg/.sb/.tag classes come
+   from client/src/styles (task 04); only the variable/class names are used here. */
+
+.shell {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+.shell-header {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  padding: 26px 34px 20px;
+  flex: none;
+}
+.shell-header-name {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 29px;
+  line-height: 1.1;
+}
+.shell-header-mission {
+  font-size: 14px;
+  color: var(--color-neutral-700);
+  margin-top: 4px;
+}
+.shell-header-tools {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.shell-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--color-neutral-600);
+  white-space: nowrap;
+}
+
+.shell-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  padding: 0 22px 22px;
+}
+
+.canvas-frame {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  border-radius: var(--radius-lg);
+  background-color: var(--canvas-bg);
+  background-image: radial-gradient(var(--canvas-dot) 1px, transparent 1px);
+  background-size: var(--canvas-dot-size) var(--canvas-dot-size);
+  overflow: hidden;
+}
+.canvas-hint {
+  position: absolute;
+  left: 28px;
+  bottom: 22px;
+  font-size: 13px;
+  color: var(--color-neutral-600);
+  pointer-events: none;
+}
+
+.side-panel {
+  width: 400px;
+  flex: none;
+  margin-left: 18px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.shell-status {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-neutral-600);
+}

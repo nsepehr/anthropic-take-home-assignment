@@ -211,6 +211,20 @@
         "capturedAt": "2026-08-27T16:00:00+08:00",
         "sessionRef": "agent: category-lanes (task 08)"
       }
+    },
+    {
+      "id": "sys-client-shell",
+      "name": "App shell",
+      "kind": "ui",
+      "parentId": "sys-client-app",
+      "paths": ["client/src/features/shell/", "client/src/App.tsx"],
+      "summary": "The single-screen frame: header, canvas region and the always-visible 400px right panel with overview/detail slots.",
+      "detail": "`AppShell` is a 100vh flex column (no page scroll): `Header` shows the project name, mission, the provenance legend and the global Overview / Deep dive `.seg` control bound to `useViewMode()`; `CanvasFrame` is the rounded dotted-grid region that renders the `canvas` slot and a hint while nothing is selected; `SidePanel` scrolls on its own and switches on `useSelection().selectedId` between the `overview` and `detail` slots. Slots are props so the shell never imports other features; the canvas slot is a render prop that receives the loaded project. Layout-only CSS lives in `shell.css`; every color, font and radius is a token from `client/src/styles`.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T16:00:00+08:00",
+        "sessionRef": "agent: app-shell (task 05)"
+      }
     }
   ],
   "requirements": [
@@ -740,6 +754,42 @@
       },
       "summary": "`category` = which lane; `parentId` = which box. Lanes are ELK partitions in data order.",
       "detail": "Schema: `System.category?: string` (additive). Layout: `elk.partitioning.activate` on the root, `elk.partitioning.partition: <lane index>` on each top-level node, direction RIGHT. Rendering: `LaneLayer` in `client/src/features/lanes/`. Out of scope: lane collapsing, filtering, per-lane colours, editing categories.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T16:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, design review"
+      }
+    },
+    {
+      "id": "int-panel-always-visible",
+      "summary": "The right panel never goes empty: project overview by default, entity detail on selection.",
+      "detail": "Overrides the Claude Design mock, which hid the panel until a click. `SidePanel` takes both views as slots and switches on `selectedId`, so later panel tasks fill content without touching the frame.",
+      "statement": "The right panel always shows something: the whole project when nothing is selected, the entity when something is",
+      "rationale": "Newcomers need the overview before they click; no empty states. The design hid the panel until a selection was made — the human overrode that so the screen always answers 'what is this project?' or 'what is this thing?'.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-client-shell"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T16:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, design review"
+      }
+    },
+    {
+      "id": "int-global-view-mode",
+      "summary": "One Overview / Deep dive switch in the header drives every card and panel.",
+      "detail": "Overrides the per-card button in the design mock. The `.seg` control in `Header` binds to `useViewMode()`, which persists the choice in localStorage so a reload keeps the reader at the same altitude.",
+      "statement": "Overview vs deep dive is one global switch, not per card",
+      "rationale": "summary/detail is baked into the schema for every entity; one switch keeps the whole screen at one altitude. The design had a per-item button; the human moved it to the header, bound to `useViewMode()`, which persists across reloads.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-client-shell", "sys-client-state"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T16:00:00+08:00",
