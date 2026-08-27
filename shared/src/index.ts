@@ -6,6 +6,7 @@
 export * from './schema/index.js';
 export { validateProject, type ValidateResult, type ValidationError } from './validate.js';
 export { computeGaps, type Gaps } from './gaps.js';
+export { computeAdvisories, type Advisory, type AdvisoryCode } from './advisories.js';
 export { getSystem, relatedTo, type Related } from './related.js';
 
 /** Response shape of `GET /api/health`. */

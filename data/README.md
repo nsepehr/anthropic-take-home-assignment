@@ -17,7 +17,14 @@ Builds `shared/`, runs `validateProject()` over the file and prints either reada
 edges without an intent, intents that apply to nothing. Gaps are not errors; they are the honest
 "unexplained" signal the UI shows. Fix them by adding intent, not by deleting the entry.
 
+After the gaps it prints **advisories**: where the file breaks the modeling rules in
+[`docs/MODELING.md`](../docs/MODELING.md) (too many systems in a lane, unlabeled edges, summaries
+over 20 words, intents that describe instead of decide, …). Warnings only; the exit code stays 0.
+
 ## Appending (every task — CLAUDE.md rule 9)
+
+Read [`docs/MODELING.md`](../docs/MODELING.md) first: what counts as a System, when to nest, when
+an edge is evidenced, how to word requirements and intents.
 
 1. Add the `System`(s) you built or changed; set `paths` to the real files. Give every
    **top-level** system a `category` (the lane it sits in on the diagram: `Model`, `Server`,

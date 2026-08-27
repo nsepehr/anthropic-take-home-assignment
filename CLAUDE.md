@@ -71,8 +71,8 @@ Ports: `CLIENT_PORT` (default 5173) and `SERVER_PORT` (default 3001) come from `
 9. **Dogfood the model.** This project is its own demo. When you finish a task, append to
    `data/project.json`: the System(s) you built or changed, the Requirement(s) they serve (update
    `status`), and the Intent(s) behind non-obvious choices — with honest `provenance` (your brief's
-   stated decisions are `human-verified`; your own inferences are `ai-inferred`). Run
-   `npm run validate:data`. **Append new entries at the END of each array and never reorder or reformat
+   stated decisions are `human-verified`; your own inferences are `ai-inferred`). Follow the
+   modeling rules in `docs/MODELING.md` and run `npm run validate:data`. **Append new entries at the END of each array and never reorder or reformat
    existing entries** — several tasks edit this file in parallel and that keeps git auto-merging.
 
 **Tracker:** `docs/TASKS.md`. Set your row to `in-progress` when you start and `review` when you

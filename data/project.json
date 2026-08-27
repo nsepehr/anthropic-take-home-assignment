@@ -12,10 +12,11 @@
         "shared/src/validate.ts",
         "shared/src/gaps.ts",
         "shared/src/related.ts",
+        "shared/src/advisories.ts",
         "shared/src/index.ts"
       ],
       "summary": "The contract between server and client: Zod schemas for System, Requirement, Intent and Edge, plus validation and graph helpers.",
-      "detail": "Package `@app/shared`. Defines the four entity schemas with Zod and infers the TypeScript types from them, so there is exactly one definition. `validateProject()` checks shape and then referential integrity (unique ids, references resolving to the right entity type, edge endpoints existing, no `parentId` cycles) and returns readable path+message errors. `computeGaps()` reports what the model cannot explain. `relatedTo()` returns everything linked to an entity in either direction — the closure the UI will highlight on selection. Has no runtime dependency except `zod`. Built by task 01-schema-and-seed.",
+      "detail": "Package `@app/shared`. Defines the four entity schemas with Zod and infers the TypeScript types from them, so there is exactly one definition. `validateProject()` checks shape and then referential integrity (unique ids, references resolving to the right entity type, edge endpoints existing, no `parentId` cycles) and returns readable path+message errors. `computeGaps()` reports what the model cannot explain. `relatedTo()` returns everything linked to an entity in either direction — the closure the UI will highlight on selection. `computeAdvisories()` warns where the model breaks the rules in `docs/MODELING.md`. Has no runtime dependency except `zod`. Built by task 01-schema-and-seed.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T15:00:00+08:00",
@@ -34,7 +35,7 @@
         "server/src/stores/projectStore.ts",
         "server/src/routes/"
       ],
-      "summary": "A thin Fastify server that loads `data/project.json` once, validates it with `@app/shared`, and serves the whole project as one JSON payload.",
+      "summary": "A thin Fastify server that loads `data/project.json` once, validates it with `@app/shared`, and serves it as one JSON payload.",
       "detail": "`stores/projectStore.ts` reads the file named by `PROJECT_FILE` (default `data/project.json`) at startup, runs `validateProject()` and caches the result; if validation fails the server still boots and reports the errors. Routes in `server/src/routes/`: `GET /api/project` (the validated Project — the same shape as `data/project.json` — or 500 with readable errors), `GET /api/health` (adds `project: { loaded, name }`), and dev-only `POST /api/project/reload` (absent when `NODE_ENV=production`). `app.ts` is the composition root; `config.ts` is the only reader of `process.env`. Built by task 02-api; per-entity routes (`/gaps`, `/related/:id`, `/entities/:id`) were removed by 02b-api-trim after human review.",
       "provenance": {
         "source": "human-verified",
@@ -48,7 +49,7 @@
       "kind": "module",
       "category": "Client",
       "paths": ["client/src/api/project.ts", "client/vite.config.ts"],
-      "summary": "The only network edge of the client: fetches `/api/project` once and validates the payload with the shared schema before anything renders.",
+      "summary": "The only network edge of the client: fetches `/api/project` once and validates it with the shared schema before rendering.",
       "detail": "`fetchProject(url)` is the single `fetch` call in `client/src` (`api/project.ts:21`). It returns a typed `ApiResult` — `ok` with a `Project` that passed `validateProject` from `@app/shared`, or a readable error for network failures, non-2xx responses and payloads that fail the schema — so the rest of the client trusts the types. `vite.config.ts` proxies `/api` to the Fastify port from `.env.local` in dev; in production the same path is served by the Vercel function.",
       "provenance": {
         "source": "ai-inferred",
@@ -78,11 +79,12 @@
       "paths": [
         "CLAUDE.md",
         "docs/MODULARITY.md",
+        "docs/MODELING.md",
         "docs/AGENT_WORKFLOW.md",
         "docs/tasks/",
         "docs/TASKS.md"
       ],
-      "summary": "The briefs, rules and tracker that direct the AI agents building this repo: what to build, where to work, and how to leave the seed data behind.",
+      "summary": "The briefs, rules and tracker that direct the AI agents building this repo and how they leave seed data behind.",
       "detail": "`CLAUDE.md` holds the non-negotiable rules: every task in its own worktree via the scripts (rule 1), ports from `.env.local` (rule 2), scope is the brief (rule 3), modularity per `docs/MODULARITY.md` (rule 5), `npm run check` green before finishing (rule 7) and rule 9 — every task appends the systems, requirements and intents it produced to `data/project.json`, which is the dogfooding loop that makes this diagram describe its own construction. `docs/tasks/<slug>.md` briefs name the files each agent owns; `docs/TASKS.md` is the hand-edited tracker (todo → in-progress → review → done); `docs/AGENT_WORKFLOW.md` is the long-form lifecycle.",
       "provenance": {
         "source": "ai-inferred",
@@ -355,7 +357,7 @@
       "status": "planned",
       "systemIds": ["sys-client-diagram"],
       "evidence": [],
-      "summary": "A user opens the app and sees systems, the requirements they serve and the intent behind them together, without reading code.",
+      "summary": "A user opens the app and sees systems, the requirements they serve and the intent behind them, without reading code.",
       "detail": "The product's core requirement. Systems render as boxes and edges as arrows; requirements and intents are front-and-center content on and around the nodes, not tooltips. The client currently renders a hello page, so this is entirely ahead of us; the model that makes it possible is in place.",
       "provenance": {
         "source": "human-verified",
@@ -373,7 +375,7 @@
         "shared/src/schema/entity.ts (EntityBase: summary + detail required)",
         "client/src/features/panel/DetailCard.tsx"
       ],
-      "summary": "Every system, requirement and intent reads as a one-sentence summary; a per-item Deep dive button in the detail card reveals its detail.",
+      "summary": "Every entity reads as a one-sentence summary; a per-item Deep dive button in the detail card reveals its detail.",
       "detail": "The schema requires `summary` and `detail` on every first-class entity, and the seed fills both. Canvas cards and list cards always show the summary; the detail card has a \"Deep dive\" / \"Hide deep dive\" button that reveals that entity's deep section (How it works / Evidence / Rationale) and collapses again when the selection changes. Partial: the button is built, but edges keep their label hidden and cards never show detail.",
       "provenance": {
         "source": "human-verified",
@@ -392,7 +394,7 @@
         "shared/src/gaps.ts",
         "data/project.json"
       ],
-      "summary": "For each entity the user can see whether a human verified it or an AI inferred it, when, and from where.",
+      "summary": "Each entity shows whether a human verified it or an AI inferred it, when, and from where.",
       "detail": "Schema and seed side is done: `provenance` is required on every entity and the seed mixes `human-verified` and `ai-inferred` entries honestly. `computeGaps` surfaces what the model cannot explain. The UI badge and gaps panel are not built. Partial.",
       "provenance": {
         "source": "human-verified",
@@ -860,7 +862,7 @@
         "edgeIds": []
       },
       "summary": "One panel, three questions, always in the same order: what, what it must do, why.",
-      "detail": "Headings are fixed per entity type: a system shows \"Requirements\" and \"Why it is built this way\"; an intent shows \"Requirements it serves\"; a requirement shows \"Intents\". The global overview / deep-dive switch decides whether cards show summary or detail and rationale; there is no per-item deep-dive button.",
+      "detail": "Headings are fixed per entity type: a system shows \"Requirements\" and \"Why it is built this way\"; an intent shows \"Requirements it serves\"; a requirement shows \"Intents\". A per-item Deep dive button in the detail card reveals detail and rationale; there is no global switch.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T16:00:00+08:00",
@@ -931,7 +933,7 @@
         "requirementIds": ["req-overview-deep-dive"],
         "edgeIds": []
       },
-      "summary": "A \"Deep dive\" button in the detail card reveals one entity's depth; there is no global Overview / Deep dive switch.",
+      "summary": "A \"Deep dive\" button in the detail card reveals one entity's depth; there is no global switch.",
       "detail": "Supersedes int-global-view-mode. `DetailCard` holds an `expanded` flag and renders `DeepSection` when set; `SidePanel` remounts the card on selection (`key={selectedId}`), so the flag resets for free. The header keeps only name, mission and the provenance legend. Canvas cards, list cards and edges never show detail or labels.",
       "provenance": {
         "source": "human-verified",
@@ -995,8 +997,8 @@
       "rationale": "Fixed right\u2192left handles read wrong for backward or vertical connections; the reader should follow an arrow without tracing a loop. Decided after human review of the first build.",
       "status": "active",
       "appliesTo": { "systemIds": ["sys-client-diagram"], "requirementIds": [], "edgeIds": [] },
-      "summary": "Every card renders four hidden handles; after ELK layout a pure `chooseHandles(sourceRect, targetRect)` picks sides by the dominant axis of the center-to-center vector and edges get those handle ids.",
-      "detail": "Option chosen over ELK orthogonal edge sections (more code, coordinate transforms for nested nodes) and React Flow floating edges (rect intersections). Ties resolve horizontally, matching the left-to-right lane flow. Container edges use the container's absolute rect, so child\u2192parent arrows meet the nearest container side.",
+      "summary": "Each card has four hidden handles; after layout, pure `chooseHandles` picks the sides by the dominant axis between centers.",
+      "detail": "Every card renders four hidden handles; after ELK layout a pure `chooseHandles(sourceRect, targetRect)` picks sides by the dominant axis of the center-to-center vector and edges get those handle ids. Option chosen over ELK orthogonal edge sections (more code, coordinate transforms for nested nodes) and React Flow floating edges (rect intersections). Ties resolve horizontally, matching the left-to-right lane flow. Container edges use the container's absolute rect, so child\u2192parent arrows meet the nearest container side.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T16:10:00+08:00",
@@ -1013,12 +1015,48 @@
         "requirementIds": [],
         "edgeIds": []
       },
-      "summary": "`orderLanesByFlow` counts edges between lanes and emits, repeatedly, the lane nothing remaining points at (Workflow → Client → Server → Model for this seed); a cycle is broken by dropping its lightest back-edges. Each lane is then top-aligned and the band takes the tallest lane's height.",
-      "detail": "ELK options were measured on the seed: NETWORK_SIMPLEX placement with 40/20 spacing gave 1 crossing and the shortest edges without breaking lane separation; post-compaction was rejected because it pulls nodes across lane boundaries.",
+      "summary": "Lanes are ordered by counting edges between them so the diagram reads along the dependency flow; ties keep seed order.",
+      "detail": "`orderLanesByFlow` counts edges between lanes and emits, repeatedly, the lane nothing remaining points at (Workflow → Client → Server → Model for this seed); a cycle is broken by dropping its lightest back-edges. Each lane is then top-aligned and the band takes the tallest lane's height. ELK options were measured on the seed: NETWORK_SIMPLEX placement with 40/20 spacing gave 1 crossing and the shortest edges without breaking lane separation; post-compaction was rejected because it pulls nodes across lane boundaries.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T16:30:00+08:00",
         "sessionRef": "planning chat 2026-08-27, layout review"
+      }
+    },
+    {
+      "id": "int-rules-make-compact-models",
+      "statement": "Compactness is enforced by written modeling rules and advisories, so the diagram stays legible as the project grows",
+      "rationale": "Once the seed reached about 25 edges the flat view got hard to read. Rules written for humans and LLMs alike shape what gets captured, and `computeAdvisories` turns them into warnings the validator prints without failing the file, so the signal a human already spots by eye is surfaced automatically.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-shared-model", "sys-seed-data", "sys-agent-rules"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "summary": "Written modeling rules plus computed advisories keep the model compact; they are warnings, not errors.",
+      "detail": "`docs/MODELING.md` states the rules: 3–6 categories, 3–8 systems each, edges only when evidenced, 20-word summaries, rationale not description, provenance honesty, append-only. `computeAdvisories(project, now)` in `shared/src/advisories.ts` checks each rule; `scripts/validate-data.mjs` prints the result after the gaps report, grouped by code, and still exits 0.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T17:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, phase-2 planning"
+      }
+    },
+    {
+      "id": "int-phase1-flat-drilldown-next",
+      "statement": "Phase 1 stays a flat view; the scaling answer is drill-down by category, not hiding edges",
+      "rationale": "Hiding edges ad hoc would make the overview lie about the dependency graph. Collapsing categories into nodes with aggregated edges, then drilling in, keeps every edge reachable while the top level stays readable.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-client-diagram"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "summary": "The flat view stays; scaling comes from drill-down by category, never from hiding edges.",
+      "detail": "The overview shows categories as collapsed nodes with the edges between them aggregated; clicking a category drills into its systems and a breadcrumb backs out. Built by task 17-drill-down, in parallel with these modeling rules.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T17:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, phase-2 planning"
       }
     }
   ],
@@ -1029,7 +1067,8 @@
       "to": "sys-server-api",
       "kind": "calls",
       "label": "GET /api/project",
-      "summary": "`fetchProject` in `client/src/api/project.ts` fetches `/api/project` once at startup (called from `ProjectProvider`) and parses it with `validateProject`; Vite proxies `/api` to the Fastify port.",
+      "summary": "`fetchProject` (`client/src/api/project.ts`) fetches `/api/project` once at startup; Vite proxies `/api` to Fastify.",
+      "detail": "`fetchProject` in `client/src/api/project.ts` fetches `/api/project` once at startup (called from `ProjectProvider`) and parses it with `validateProject`; Vite proxies `/api` to the Fastify port.",
       "intentId": "int-api-single-payload"
     },
     {
@@ -1038,7 +1077,8 @@
       "to": "sys-shared-model",
       "kind": "depends",
       "intentId": "int-backend-first",
-      "summary": "`api/project.ts` imports `validateProject` and the `Project` type from `@app/shared` (Vite alias to `shared/src`) so the payload is checked against the one schema before it is trusted.",
+      "summary": "`api/project.ts` imports `validateProject` and `Project` from `@app/shared`, so the payload is checked before it is trusted.",
+      "detail": "`api/project.ts` imports `validateProject` and the `Project` type from `@app/shared` (Vite alias to `shared/src`) so the payload is checked against the one schema before it is trusted.",
       "label": "validateProject"
     },
     {
@@ -1046,6 +1086,7 @@
       "from": "sys-server-api",
       "to": "sys-shared-model",
       "kind": "depends",
+      "label": "validateProject, Project",
       "intentId": "int-backend-first",
       "summary": "The server validates the seed with `validateProject` and types its responses with `@app/shared`."
     },
@@ -1164,7 +1205,8 @@
       "kind": "depends",
       "label": "tokens + components",
       "intentId": "int-design-tokens-single-source",
-      "summary": "`main.tsx:3` imports `styles/index.css`; `Header.tsx:1` imports `ProvenanceDot` from `components/`. Diagram (`SystemCard.tsx:2`, `CardTags.tsx:2`) and panel (`DetailCard.tsx:6`, `IntentCard.tsx:3`, `RequirementCard.tsx:3`) import from `components/` too; only this one edge is drawn to keep the lane readable."
+      "summary": "`main.tsx:3` imports `styles/index.css`; shell, diagram and panel all import from `components/`, drawn as one edge.",
+      "detail": "`main.tsx:3` imports `styles/index.css`; `Header.tsx:1` imports `ProvenanceDot` from `components/`. Diagram (`SystemCard.tsx:2`, `CardTags.tsx:2`) and panel (`DetailCard.tsx:6`, `IntentCard.tsx:3`, `RequirementCard.tsx:3`) import from `components/` too; only this one edge is drawn to keep the lane readable."
     },
     {
       "id": "edge-worktree-calls-ports",
@@ -1191,7 +1233,8 @@
       "kind": "calls",
       "label": "npm run dev -w server",
       "intentId": "int-isolated-worktrees",
-      "summary": "`dev.mjs:19` spawns `npm run dev -w server` with `SERVER_PORT` in the environment; the Fastify server listens on 127.0.0.1 at that port."
+      "summary": "`dev.mjs:19` spawns `npm run dev -w server` with `SERVER_PORT` in the environment.",
+      "detail": "`dev.mjs:19` spawns `npm run dev -w server` with `SERVER_PORT` in the environment; the Fastify server listens on 127.0.0.1 at that port."
     },
     {
       "id": "edge-dev-runner-calls-client",
@@ -1200,7 +1243,8 @@
       "kind": "calls",
       "label": "npm run dev -w client",
       "intentId": "int-isolated-worktrees",
-      "summary": "`dev.mjs:19` spawns `npm run dev -w client` with `CLIENT_PORT` in the environment; Vite serves the app shell and proxies `/api` to `SERVER_PORT`."
+      "summary": "`dev.mjs:19` spawns `npm run dev -w client` with `CLIENT_PORT`; Vite proxies `/api` to `SERVER_PORT`.",
+      "detail": "`dev.mjs:19` spawns `npm run dev -w client` with `CLIENT_PORT` in the environment; Vite serves the app shell and proxies `/api` to `SERVER_PORT`."
     },
     {
       "id": "edge-rules-depend-worktree",
@@ -1209,7 +1253,8 @@
       "kind": "depends",
       "label": "rule 1: own worktree",
       "intentId": "int-isolated-worktrees",
-      "summary": "CLAUDE.md rule 1 mandates that every task runs in a worktree created by `scripts/new-worktree.sh` and ends with `scripts/finish-worktree.sh`; the rules have no teeth without the scripts."
+      "summary": "CLAUDE.md rule 1: every task runs in a worktree made by `scripts/new-worktree.sh`; the rules need the scripts.",
+      "detail": "CLAUDE.md rule 1 mandates that every task runs in a worktree created by `scripts/new-worktree.sh` and ends with `scripts/finish-worktree.sh`; the rules have no teeth without the scripts."
     },
     {
       "id": "edge-rules-write-seed",
@@ -1218,7 +1263,8 @@
       "kind": "writes",
       "label": "rule 9: dogfood",
       "intentId": "int-project-is-own-demo",
-      "summary": "CLAUDE.md rule 9 requires every task to append the systems, requirements and intents it produced to `data/project.json` with honest provenance, and to keep `npm run validate:data` green. This is the loop by which the diagram describes its own construction."
+      "summary": "CLAUDE.md rule 9: every task appends its systems, requirements and intents to `data/project.json` with honest provenance.",
+      "detail": "CLAUDE.md rule 9 requires every task to append the systems, requirements and intents it produced to `data/project.json` with honest provenance, and to keep `npm run validate:data` green. This is the loop by which the diagram describes its own construction."
     },
     {
       "id": "edge-check-depends-shared",
@@ -1227,7 +1273,8 @@
       "kind": "depends",
       "label": "tests shared (+ server, client)",
       "intentId": "int-tests-pin-intent",
-      "summary": "`npm run check` (`package.json:24`) runs `typecheck --workspaces`, ESLint, Prettier and `vitest run` over the shared, server and client workspaces; shared is drawn as the representative of the three."
+      "summary": "`npm run check` (`package.json:24`) runs typecheck, ESLint, Prettier and Vitest over all workspaces; shared represents the three.",
+      "detail": "`npm run check` (`package.json:24`) runs `typecheck --workspaces`, ESLint, Prettier and `vitest run` over the shared, server and client workspaces; shared is drawn as the representative of the three."
     }
   ]
 }
