@@ -79,3 +79,13 @@ and stays thin; broken seed is surfaced not hidden" (`human-verified`, from this
 ## Report format
 
 As in `_TEMPLATE.md`.
+
+## Revision (2026-08-27, after review)
+
+Human review found the route surface over-designed: the client loads the whole model with one
+`GET /api/project` and computes selection closures and gaps locally from `@app/shared`, so
+`/related/:id`, `/entities/:id` and `/gaps` duplicated client logic for a hypothetical curl user.
+Decision: **remove them**. Keep `GET /api/project`, `GET /api/health`, dev-only `POST /api/project/reload`.
+Also move the store to `server/src/stores/projectStore.ts` to match `docs/MODULARITY.md` (the
+original brief contradicted it). Record this as an intent in the seed: "API is one payload —
+the whole model in one call; the client derives everything else" (human-verified, planning chat).
