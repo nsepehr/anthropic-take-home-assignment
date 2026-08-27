@@ -80,6 +80,7 @@
 
   /* Diagram */
   --dim-opacity: 0.22;
+  --edge-idle-opacity: 0.45;
   --canvas-bg: var(--color-neutral-100);
   --canvas-dot: var(--color-neutral-300);
   --canvas-dot-size: 22px;

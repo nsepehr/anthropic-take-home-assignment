@@ -125,6 +125,10 @@
     stroke 0.18s,
     stroke-width 0.18s;
 }
+/* With nothing selected, edges recede so the cards read first; selecting lights the relevant ones. */
+.diagram-edge.is-idle {
+  opacity: var(--edge-idle-opacity);
+}
 .diagram-edge.is-lit {
   opacity: 1;
 }
