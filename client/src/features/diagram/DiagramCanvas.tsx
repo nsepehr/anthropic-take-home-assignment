@@ -1,12 +1,9 @@
 import { useCallback, useMemo, useRef, type ReactNode } from 'react';
-import {
-  ReactFlow,
-  ViewportPortal,
-  type EdgeMouseHandler,
-  type NodeMouseHandler,
-} from '@xyflow/react';
+import { ReactFlow, type EdgeMouseHandler, type NodeMouseHandler } from '@xyflow/react';
 import type { Project } from '@app/shared';
+import type { PartitionOf } from '../../layout/elk';
 import { useLayout } from '../../layout/useLayout';
+import { laneBounds, laneIndex, type LaneBounds } from '../../model/lanes';
 import { toFlowElements } from '../../model/toFlow';
 import { useSelection } from '../../state/selection';
 import { useViewMode } from '../../state/viewMode';
@@ -22,8 +19,11 @@ const defaultEdgeOptions = { type: 'system' };
 
 interface Props {
   project: Project;
-  /** Rendered inside the viewport (pans/zooms with the graph) — e.g. category lanes. */
-  overlay?: ReactNode;
+  /**
+   * Extra layer rendered as a React Flow child with the laid-out lane bounds — e.g.
+   * `(lanes) => <LaneLayer lanes={lanes} />`. The overlay owns its own `<ViewportPortal>`.
+   */
+  overlay?: (lanes: LaneBounds[]) => ReactNode;
 }
 
 /** The architecture diagram: ELK-laid-out system cards and edges, selection via click. */
@@ -31,7 +31,17 @@ export function DiagramCanvas({ project, overlay }: Props) {
   const elements = useMemo(() => toFlowElements(project), [project]);
   const { mode } = useViewMode();
   const sizedNodes = useMemo(() => sizeForMode(elements.nodes, mode), [elements.nodes, mode]);
-  const { nodes, status, error } = useLayout(sizedNodes, elements.edges);
+  // Lanes: categories partition the ELK layout; their bounds follow from the positioned nodes.
+  const lanes = useMemo(() => laneIndex(project), [project]);
+  const partitionOf = useCallback<PartitionOf>(
+    (id) => {
+      const category = lanes.categoryById.get(id);
+      return category === undefined ? undefined : lanes.order.indexOf(category);
+    },
+    [lanes],
+  );
+  const { nodes, status, error } = useLayout(sizedNodes, elements.edges, undefined, partitionOf);
+  const laneRects = useMemo(() => laneBounds(nodes, lanes), [nodes, lanes]);
   const { select, clear } = useSelection();
   // Once laid out, keep the canvas mounted through re-layouts (mode toggle) so the viewport survives.
   const laidOut = useRef(false);
@@ -62,7 +72,7 @@ export function DiagramCanvas({ project, overlay }: Props) {
       proOptions={{ hideAttribution: true }}
     >
       <ArrowMarkers />
-      {overlay && <ViewportPortal>{overlay}</ViewportPortal>}
+      {overlay?.(laneRects)}
     </ReactFlow>
   );
 }
