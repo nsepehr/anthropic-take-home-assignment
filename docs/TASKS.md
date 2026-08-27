@@ -42,7 +42,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 3d  | `07-detail-panel`        | 4     | P0       | in-progress | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                          |
 | 3e  | `08-category-lanes`      | 4     | P0       | done        | agent: category-lanes    | 03, 04, 05 | System.category in schema; ELK partitions; lane overlay                                 |
 | 3f  | `10-per-item-deep-dive`  | 4     | P0       | in-progress | agent: deep-dive         | 05, 06, 07 | Remove global toggle; per-selection Deep dive button; panel 360px; hide zero-count tags |
-| 3g  | `11-highlight-neighbors` | 4     | P0       | review      | agent: highlight         | 06, 07     | relatedTo includes edge-neighbor systems; connected cards tinted, not dimmed            |
+| 3g  | `11-highlight-neighbors` | 4     | P0       | done        | agent: highlight         | 06, 07     | relatedTo includes edge-neighbor systems; connected cards tinted, not dimmed            |
 | 3h  | `12-seed-client-graph`   | 7     | P0       | in-progress | agent: seed-client       | 08         | Flatten client into real modules with import-evidenced edges                            |
 | 4   | `04-selection-linking`   | 5     | P0       | todo        | —                        | 03         | Hero interaction: select entity → connected entities highlight                          |
 | 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                         |
@@ -106,3 +106,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 09-deploy-vercel → review (agent: deploy-vercel)
 - 2026-08-27 — 12-seed-client-graph → in-progress (agent: seed-client)
 - 2026-08-27 — 11-highlight-neighbors → review (agent: highlight); relatedTo returns one-hop closure, connectionsFor edge walk removed
+- 2026-08-27 — 11-highlight-neighbors → done (human)
