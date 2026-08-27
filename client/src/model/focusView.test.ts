@@ -10,6 +10,7 @@ describe('focusView', () => {
     const view = focusView(project, 'sys-client-state')!;
     expect(view.focus.system.id).toBe('sys-client-state');
     expect(ids(view.inbound)).toEqual([
+      'sys-client-chat',
       'sys-client-diagram',
       'sys-client-panel',
       'sys-client-shell',
@@ -18,7 +19,7 @@ describe('focusView', () => {
     expect(
       view.edges.every((e) => e.from === 'sys-client-state' || e.to === 'sys-client-state'),
     ).toBe(true);
-    expect(view.edges).toHaveLength(5);
+    expect(view.edges).toHaveLength(6);
   });
 
   it('a neighbour connected both ways appears once, on the inbound side', () => {

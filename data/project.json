@@ -282,6 +282,26 @@
         "capturedAt": "2026-08-27T18:30:00+08:00",
         "sessionRef": "agent: drilldown (task 17)"
       }
+    },
+    {
+      "id": "sys-client-chat",
+      "name": "Ask Claude chat",
+      "kind": "ui",
+      "category": "Client",
+      "paths": [
+        "client/src/features/chat/",
+        "client/src/state/chat.tsx",
+        "client/src/model/chatScope.ts",
+        "client/src/model/chatReply.ts",
+        "client/src/model/chatThread.ts"
+      ],
+      "summary": "The drawer where a request is scoped: @-mentions resolve to systems and the canvas shows them.",
+      "detail": "`model/chatScope.ts` is pure: `mentionables` lists every system, requirement and intent; `systemsOf` resolves one mention to systems (a System is itself, a Requirement its `systemIds`, an Intent its `appliesTo.systemIds`); `attentionSet` unions them; `filterMenu` and `mentionQuery` drive the `@` menu. `model/chatThread.ts` is the reducer (toggle, draft, add/remove mention, send) and `model/chatReply.ts` writes the scripted reply from the resolved context. `state/chat.tsx` holds one `useReducer` and exposes `useChat()` plus `useMention(found)` for the round `@` buttons. `features/chat/` renders the drawer; `SystemNode` reads `attention` and adds `.is-in-scope` / `.is-out-of-scope`. There is no network call and nothing is written back to the model.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T18:30:00+08:00",
+        "sessionRef": "agent: chat (task 21)"
+      }
     }
   ],
   "requirements": [
@@ -1245,6 +1265,23 @@
         "capturedAt": "2026-08-27T19:10:00+08:00",
         "sessionRef": "planning chat 2026-08-27, design revision 4"
       }
+    },
+    {
+      "id": "int-chat-scope-is-context",
+      "statement": "The chat's job in this phase is to prove it knows what the request is about: mentions resolve to systems, and the canvas shows them and their connections",
+      "rationale": "The value of an AI assistant on a codebase map is context, not generation — anyone can generate text, few tools can say which parts of the system a request touches. Demonstrating resolution is the honest first step: no model call, no edit, nothing claimed that is not derived from the map. The write-side apply flow is next, and it needs this scoping to be trustworthy first.",
+      "appliesTo": {
+        "systemIds": ["sys-client-chat", "sys-client-diagram"],
+        "requirementIds": [],
+        "edgeIds": ["edge-chat-reads-state", "edge-shell-depends-chat"]
+      },
+      "summary": "Phase 1 of the chat captures and shows context; it does not call a model or write to the map.",
+      "detail": "From design revision 6 (`docs/design/landing-v6.dc.html`): the drawer, `@` mentions from the composer or from the round buttons on cards, scope chips, canvas attention in the sage ramp, and a scripted reply naming the resolved systems, their connections and the requirements and intents they carry. The mock's draft/apply flow and the \"Chat edit · review\" pills are recorded as backlog, deliberately not built.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T18:30:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, AI-chat scoping"
+      }
     }
   ],
   "edges": [
@@ -1495,6 +1532,24 @@
       "kind": "calls",
       "label": "back / open",
       "summary": "`DetailCard` Back calls `back()`; a system chip in `ConnectedChips` calls `open(id)`."
+    },
+    {
+      "id": "edge-chat-reads-state",
+      "from": "sys-client-chat",
+      "to": "sys-client-state",
+      "kind": "reads",
+      "label": "useProject",
+      "summary": "`state/chat.tsx` reads `useProject()` to resolve mentions and count what they touch.",
+      "intentId": "int-chat-scope-is-context"
+    },
+    {
+      "id": "edge-shell-depends-chat",
+      "from": "sys-client-shell",
+      "to": "sys-client-chat",
+      "kind": "depends",
+      "label": "chat slot",
+      "summary": "`AppShell` renders the `chat` slot under the canvas+panel row; `App.tsx` fills it with `<ChatDrawer />`.",
+      "intentId": "int-chat-scope-is-context"
     }
   ],
   "categories": [

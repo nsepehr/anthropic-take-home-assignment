@@ -120,3 +120,11 @@
   /* History: superseded / withdrawn entries, shown only inside a system's history section */
   --history-opacity: 0.75;
 }
+
+/* Chat scope (design rev 6). Sage, so "in the chat scope" reads differently from selection
+   (accent) and from locks (an accent-2 border): here it is a ring and a chip fill. */
+:root {
+  --chat-chip-bg: var(--color-accent-2-300);
+  --chat-chip-fg: var(--color-accent-2-900);
+  --chat-scope-ring: var(--color-accent-2-500);
+}

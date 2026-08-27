@@ -10,10 +10,12 @@ import './shell.css';
 export interface AppShellProps extends SidePanelProps {
   /** Renders the diagram once the project has loaded. */
   canvas: (project: Project) => ReactNode;
+  /** The chat drawer, mounted under the canvas+panel row once the project has loaded. */
+  chat?: ReactNode;
 }
 
 /** Single-screen frame: header + subline, then canvas + right panel. 100vh; only the panel scrolls. */
-export function AppShell({ canvas, overview, detail }: AppShellProps) {
+export function AppShell({ canvas, overview, detail, chat }: AppShellProps) {
   const { loading, error, project } = useProject();
   return (
     <div className="shell">
@@ -29,6 +31,7 @@ export function AppShell({ canvas, overview, detail }: AppShellProps) {
           </>
         )}
       </div>
+      {project && chat}
     </div>
   );
 }

@@ -5,3 +5,6 @@ export type { ButtonProps, ButtonVariant } from './Button';
 export { KindDot } from './KindDot';
 export { StatusDot } from './StatusDot';
 export { ProvenanceDot } from './ProvenanceDot';
+export { MentionButton } from './MentionButton';
+export type { MentionButtonProps } from './MentionButton';
+export { Dot } from './Dot';

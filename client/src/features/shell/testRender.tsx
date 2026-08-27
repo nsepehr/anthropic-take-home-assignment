@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { renderToString } from 'react-dom/server';
 import type { Project } from '@app/shared';
 import { seedProject } from '../../test/seed';
+import { ChatProvider } from '../../state/chat';
 import { FirstRunProvider } from '../../state/firstRun';
 import { NavigationProvider } from '../../state/navigation';
 import { ProjectProvider } from '../../state/projectStore';
@@ -24,7 +25,9 @@ export function renderInShell(
     <ProjectProvider initialProject={project ?? undefined}>
       <SelectionProvider initialSelectedId={selectedId}>
         <NavigationProvider initialTrail={trail}>
-          <FirstRunProvider>{ui}</FirstRunProvider>
+          <FirstRunProvider>
+            <ChatProvider>{ui}</ChatProvider>
+          </FirstRunProvider>
         </NavigationProvider>
       </SelectionProvider>
     </ProjectProvider>,
