@@ -237,3 +237,8 @@
   cursor: pointer;
   text-decoration: underline;
 }
+
+.panel-list-more {
+  align-self: flex-start;
+  font-size: 12px;
+}

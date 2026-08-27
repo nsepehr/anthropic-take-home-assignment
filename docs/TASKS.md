@@ -135,4 +135,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 14-layout-lanes → review (agent: layout): lane order from edges, top-aligned uniform band, ELK NETWORK_SIMPLEX + 40/20, fit padding 0.08; awaiting human inspection
 - 2026-08-27 — 14-layout-lanes → done (human, visually approved)
 - 2026-08-27 — 15-polish, 16-modeling-rules, 17-drill-down → in-progress (phase 2 kickoff)
-- 2026-08-27 — 15-polish → review: removed dead `.seg*` CSS, engines.node `22.x` + `.nvmrc` 22, `nodeClickDistance`/`paneClickDistance` on the canvas, docs/design README updated; `useLanes.ts` kept (still used by DiagramCanvas)
+- 2026-08-27 — 15-polish → review: removed dead `.seg*` CSS, engines.node `22.x` + `.nvmrc` 22, `nodeClickDistance`/`paneClickDistance` on the canvas, docs/design README updated; `useLanes.ts` kept (still used by DiagramCanvas); EntityList collapses after 5 items ("Show N more" / "Show less", `collapseAfter` + `defaultExpanded` props)
