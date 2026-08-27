@@ -48,8 +48,10 @@ Ports: `CLIENT_PORT` (default 5173) and `SERVER_PORT` (default 3001) come from `
    unless your brief says otherwise.
 5. **Code principles**
    - Maintainability: small, focused modules with one job; clear names; no clever indirection.
-   - Modularity: hard boundaries — `shared` (types/model, no runtime deps) → `server` (API, file
-     analysis) → `client` (rendering/interaction). Client never imports server code and vice versa.
+   - **Modularity is the #1 principle — read `docs/MODULARITY.md` and follow its folder
+     conventions exactly.** Hard boundaries: `shared` (model, no runtime deps) ← `server` (API) and
+     ← `client` (rendering). One job per module, small exports, pure core / effectful edges,
+     composition roots contain no logic, features never import each other, no file over ~150 lines.
    - Security basics: no secrets in the repo (`.env*` is gitignored; `.env.example` documents keys);
      validate/parse inputs at the API boundary; no `dangerouslySetInnerHTML` (lint-enforced), no
      `eval`, no shelling out with user input; serve on `127.0.0.1` in dev.
