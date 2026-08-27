@@ -8,3 +8,5 @@ the interfaces it depends on so parallel tasks don't collide. If two briefs need
 of them owns it and the other declares a dependency.
 
 Agents: read `CLAUDE.md` first, then your brief, then `docs/AGENT_WORKFLOW.md` if you need detail.
+
+Status of every task (and the phase it belongs to) lives in `docs/TASKS.md` — update your row there.

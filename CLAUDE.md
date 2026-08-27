@@ -19,7 +19,7 @@ shared/src/     data model = THE CONTRACT between server and client (import as @
 server/src/     Fastify app. app.ts builds routes (testable via app.inject); index.ts listens
 client/src/     React app. main.tsx → App.tsx
 scripts/        ports.mjs, dev.mjs, new-worktree.sh, finish-worktree.sh
-docs/           AGENT_WORKFLOW.md (full lifecycle), tasks/ (briefs; _TEMPLATE.md)
+docs/           AGENT_WORKFLOW.md (full lifecycle), TASKS.md (tracker), tasks/ (briefs; _TEMPLATE.md)
 ```
 
 ## Commands (run from repo/worktree root)
@@ -71,5 +71,8 @@ Ports: `CLIENT_PORT` (default 5173) and `SERVER_PORT` (default 3001) come from `
    `status`), and the Intent(s) behind non-obvious choices — with honest `provenance` (your brief's
    stated decisions are `human-verified`; your own inferences are `ai-inferred`). Run
    `npm run validate:data`. Until task 01 lands this file doesn't exist; then it's mandatory.
+
+**Tracker:** `docs/TASKS.md`. Set your row to `in-progress` when you start and `review` when you
+finish, and append a changelog line. The human marks `done` after merge.
 
 See `docs/AGENT_WORKFLOW.md` for the full lifecycle and merge/conflict guidance.
