@@ -1392,9 +1392,9 @@
     {
       "id": "int-apply-demo-not-built",
       "statement": "The write side is shown, not built: a modal explains the apply flow so the demo is honest about scope",
-      "rationale": "The chat is client-only by design — it resolves mentions and reads the context back, and never writes. Leaving that unexplained makes the prototype look either finished (it isn't) or aimless (it isn't). A five-step walkthrough behind a ghost button under the reply states exactly what Apply would do — draft a change, show it as a proposal, write it to data/project.json tagged AI-inferred, mark the card 'Chat edit · review' until a human verifies it, and gate every write on validate:data and the advisories — and its footer says none of it is built here. Cost: one modal and no write path, against a drafting engine the time box could not have finished honestly.",
+      "rationale": "The chat is client-only by design — it resolves mentions and reads the context back, and never writes. Leaving that unexplained makes the prototype look either finished (it isn't) or aimless (it isn't). A five-step walkthrough behind a ghost button under the reply states exactly what Apply would do — draft a change, show it as a proposal, write it to data/project.json tagged AI-inferred, mark the card 'Chat edit · review' until a human verifies it, and gate every write on validate:data and the advisories — and its footer says none of it is built here. Cost: one modal and no write path, against a drafting engine the time box could not have finished honestly. The chat → capture hop is deliberately not drawn as an edge: `docs/MODELING.md` admits an edge only when it is evidenced by an import, a call, a read, a write or an event, and nothing in the app writes through that hop yet. The loop — chat → capture → seed → model → UI → chat — is shown in the modal and stated here instead, which is the same discipline the rest of the map is held to.",
       "appliesTo": {
-        "systemIds": ["sys-client-chat"],
+        "systemIds": ["sys-client-chat", "sys-capture-workflow"],
         "requirementIds": [],
         "edgeIds": []
       },
