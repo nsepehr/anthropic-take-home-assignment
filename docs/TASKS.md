@@ -69,6 +69,11 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
   grew to ~25 edges: the overview should show categories as collapsed nodes with the edges between
   them aggregated; clicking a category drills into its modules; a breadcrumb backs out. Phase 1 stays
   flat and demo-clean instead of hiding edges ad hoc.
+- **Layout stability + locks** (2026-08-27): (a) column layout must be stable by default — barycenter
+  order tie-broken by seed order, new systems append at the bottom of their column, categories only
+  reorder when edge flow actually flips (goes into 18-column-layout); (b) explicit lock: additive
+  `System.pinned?: { category, rank }` honoured first by the layout and never reassigned by the
+  write side; lock icon on the card toggles it (human-verified provenance).
 - Edge bundling / aggregated cross-lane edges in the overview.
 - Search / filter by requirement or intent.
 
