@@ -302,6 +302,20 @@
         "capturedAt": "2026-08-27T18:30:00+08:00",
         "sessionRef": "agent: chat (task 21)"
       }
+    },
+    {
+      "id": "sys-capture-workflow",
+      "name": "Capture workflow",
+      "kind": "workflow",
+      "category": "Workflow",
+      "paths": ["docs/ONBOARDING.md", ".claude/skills/capture-model/SKILL.md"],
+      "summary": "How a new repo gets a project.json: an LLM proposes from evidence, a human verifies, provenance records both.",
+      "detail": "`docs/ONBOARDING.md` is the workflow in prose: the inputs worth reading (tree and manifests, imports, README and docs, tests and CI, git log and PR bodies, the human conversation) and five passes over them — categories as stages of the dependency flow, systems as module boundaries with evidenced edges, requirements from README and test names with status from CI, intents from commit bodies and comments that say \"because\", and everything produced landing `ai-inferred`. `.claude/skills/capture-model/SKILL.md` is the same workflow as a runnable Claude Code skill: it quotes the binding limits from `docs/MODELING.md` verbatim, carries the JSON shape inline so it works from a fresh repo, stops after each pass to have the human confirm/edit/drop per numbered entry before flipping provenance to `human-verified`, appends at the end of each array, and gates the write on `npm run validate:data` — with bootstrap steps for vendoring `shared/` and `scripts/validate-data.mjs` into a target repo that is not this one.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T23:45:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, wrap-up"
+      }
     }
   ],
   "requirements": [
@@ -1313,6 +1327,26 @@
         "capturedAt": "2026-08-27T21:00:00+08:00",
         "sessionRef": "planning chat 2026-08-27, layout review — Client split after advisories"
       }
+    },
+    {
+      "id": "int-capture-is-the-product",
+      "statement": "The viewer is the read side; the capture workflow — an LLM proposing, a human verifying, provenance recorded — is the product’s core engine",
+      "rationale": "A diagram of one hand-written seed file is a demo, not a product: the hard part is getting a model out of a repo nobody has modeled, and keeping it true as the repo moves. Fully automatic extraction was rejected because an LLM that invents rationale produces exactly what a reader trusts most and cannot check; a purely manual model was rejected because nobody maintains one. So the LLM proposes only what it can cite, everything it writes lands `ai-inferred`, and a human confirms per entry to reach `human-verified` — the provenance split in the schema exists to make that division visible in the UI instead of hiding it.",
+      "appliesTo": {
+        "systemIds": ["sys-capture-workflow", "sys-seed-data", "sys-agent-rules"],
+        "requirementIds": [],
+        "edgeIds": [
+          "edge-capture-workflow-writes-seed",
+          "edge-agent-rules-depends-capture-workflow"
+        ]
+      },
+      "summary": "The capture workflow, not the diagram, is the core engine: an LLM proposes, a human verifies, provenance records both.",
+      "detail": "Every piece of the model has a provenance source because capture is a two-party process. Passes (a)-(d) of `docs/ONBOARDING.md` produce entries an LLM can source from the tree, the imports, the tests and the git history; pass (e) makes all of them `ai-inferred` regardless of confidence, because confidence is not verification; pass (f) is the loop where a human confirms, edits or drops each one and only then does the entry become `human-verified` with a `sessionRef` naming where they said so. `validate:data` gates the write, and gaps stay visible rather than being filled with plausible prose. The honesty rules exist for one failure mode above all: an invented rationale is indistinguishable from a real one and is the claim a reader leans on hardest.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T23:45:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, wrap-up"
+      }
     }
   ],
   "edges": [
@@ -1581,6 +1615,26 @@
       "label": "chat slot",
       "summary": "`AppShell` renders the `chat` slot under the canvas+panel row; `App.tsx` fills it with `<ChatDrawer />`.",
       "intentId": "int-chat-scope-is-context"
+    },
+    {
+      "id": "edge-capture-workflow-writes-seed",
+      "from": "sys-capture-workflow",
+      "to": "sys-seed-data",
+      "kind": "writes",
+      "label": "generates and appends",
+      "summary": "The `capture-model` skill writes `data/project.json`, appending at the end of each array, gated by `npm run validate:data`.",
+      "detail": "First capture runs every pass and creates the file; an update reads it, works only on what the diff touched, and appends new entries at the end of each array so parallel branches auto-merge. `SKILL.md` (\"Write and validate\") requires `npm run validate:data` to pass before the batch is handed back; errors are a bug in the output, advisories must be explained, and gaps are reported rather than papered over.",
+      "intentId": "int-capture-is-the-product"
+    },
+    {
+      "id": "edge-agent-rules-depends-capture-workflow",
+      "from": "sys-agent-rules",
+      "to": "sys-capture-workflow",
+      "kind": "depends",
+      "label": "rule 9",
+      "summary": "`CLAUDE.md` rule 9 — every task appends to `data/project.json` — is the ongoing half of the capture workflow.",
+      "detail": "The skill handles the first capture of a repo; rule 9 keeps the model true afterwards by making every finished task append the systems, requirements and intents it produced with honest provenance. `docs/ONBOARDING.md` step (h) names rule 9 as the prototype of that ongoing capture and tells a target repo to put the same rule in its own `CLAUDE.md` or PR template.",
+      "intentId": "int-capture-is-the-product"
     }
   ],
   "categories": [

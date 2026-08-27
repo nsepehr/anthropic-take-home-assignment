@@ -75,6 +75,9 @@ Ports: `CLIENT_PORT` (default 5173) and `SERVER_PORT` (default 3001) come from `
    modeling rules in `docs/MODELING.md` and run `npm run validate:data`. **Append new entries at the END of each array and never reorder or reformat
    existing entries** — several tasks edit this file in parallel and that keeps git auto-merging.
 
+**New repo?** `docs/ONBOARDING.md` — how any repo gets its `data/project.json` (an LLM proposes from
+evidence, a human verifies); runnable as the `capture-model` skill.
+
 **Tracker:** `docs/TASKS.md`. Set your row to `in-progress` when you start and `review` when you
 finish, and append a changelog line. The human marks `done` after merge.
 
