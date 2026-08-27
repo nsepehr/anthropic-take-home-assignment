@@ -38,9 +38,9 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 3b  | `05-app-shell`           | 4     | P0       | done        | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots                  |
 | 3c  | `06-system-node`         | 4     | P0       | done        | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                              |
 | 3d  | `07-detail-panel`        | 4     | P0       | done        | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                                 |
-| 3b  | `05-app-shell`           | 4     | P0       | in-progress | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots                  |
+| 3b  | `05-app-shell`           | 4     | P0       | done        | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots                  |
 | 3c  | `06-system-node`         | 4     | P0       | done        | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                              |
-| 3d  | `07-detail-panel`        | 4     | P0       | in-progress | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                                 |
+| 3d  | `07-detail-panel`        | 4     | P0       | done        | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                                 |
 | 3e  | `08-category-lanes`      | 4     | P0       | done        | agent: category-lanes    | 03, 04, 05 | System.category in schema; ELK partitions; lane overlay                                        |
 | 3f  | `10-per-item-deep-dive`  | 4     | P0       | done        | agent: deep-dive         | 05, 06, 07 | Remove global toggle; per-selection Deep dive button; panel 360px; hide zero-count tags        |
 | 3g  | `11-highlight-neighbors` | 4     | P0       | done        | agent: highlight         | 06, 07     | relatedTo includes edge-neighbor systems; connected cards tinted, not dimmed                   |
