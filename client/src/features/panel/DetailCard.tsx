@@ -3,9 +3,10 @@ import type { FoundEntity } from '../../model/entities';
 import { entityLabel } from '../../model/entities';
 import { panelAction } from '../../model/panelAction';
 import { useNavigation } from '../../state/navigation';
+import { useMention } from '../../state/chat';
 import { useSelection } from '../../state/selection';
 import { DeepSection } from './components/DeepSection';
-import { Button, ProvenanceDot } from '../../components';
+import { Button, MentionButton, ProvenanceDot } from '../../components';
 
 function kicker(found: FoundEntity): string {
   switch (found.type) {
@@ -37,6 +38,7 @@ export function DetailCard({ found, defaultExpanded = false }: Props) {
   const action = panelAction(scope, selectedId);
   const openable =
     found.type === 'system' && !(scope.level === 'system' && scope.id === found.entity.id);
+  const mention = useMention(found);
   const [expanded, setExpanded] = useState(defaultExpanded);
   const { provenance } = found.entity;
   const human = provenance.source === 'human-verified';
@@ -45,6 +47,7 @@ export function DetailCard({ found, defaultExpanded = false }: Props) {
       <div className="panel-detail-head">
         <span className="card-kicker">{kicker(found)}</span>
         <div className="panel-detail-actions">
+          <MentionButton {...mention} large />
           {openable && (
             <Button variant="primary" onClick={() => open(found.entity.id)}>
               Open ›

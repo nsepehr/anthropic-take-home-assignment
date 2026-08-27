@@ -1,0 +1,297 @@
+/* "Ask Claude" drawer (design revision 6). Layout only — every colour, radius and shadow is a
+   token from client/src/styles. */
+
+.chat {
+  flex: none;
+  margin: 0 22px 20px;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-neutral-300);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+/* — header button — */
+.chat-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px 24px;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.chat-head:hover {
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+.chat-head-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  flex: none;
+}
+.chat-head-title {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 17px;
+}
+.chat-head-hint {
+  font-size: 12.5px;
+  color: var(--color-neutral-700);
+}
+.chat-head-scope {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--color-neutral-600);
+  white-space: nowrap;
+}
+.chat-chevron {
+  flex: none;
+  color: var(--color-neutral-600);
+  transition: transform 0.18s;
+}
+.chat-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.chat-body {
+  border-top: 1px solid var(--color-divider);
+}
+
+/* — thread — */
+.chat-thread {
+  height: min(232px, 26vh);
+  min-height: 132px;
+  overflow-y: auto;
+  padding: 16px 24px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.chat-empty {
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chat-empty-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-neutral-700);
+}
+.chat-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chat-example {
+  font: inherit;
+  font-size: 12.5px;
+  padding: 6px 14px;
+  border: 1px dashed var(--color-neutral-400);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-800);
+  cursor: pointer;
+}
+.chat-example:hover {
+  border-style: solid;
+  background: var(--color-bg);
+}
+
+.chat-turn {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: min(680px, 88%);
+}
+.chat-turn.is-user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+.chat-turn.is-assistant {
+  align-self: flex-start;
+}
+.chat-turn-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.chat-bubble {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 13px;
+  white-space: pre-line;
+}
+.is-user .chat-bubble {
+  background: var(--color-accent-200);
+}
+.is-assistant .chat-bubble {
+  background: var(--color-bg);
+  border: 1px solid var(--color-divider);
+}
+
+/* — scope chips — */
+.chat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--chat-chip-bg);
+  color: var(--chat-chip-fg);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.chat-chip-dot {
+  --dot-size: 6px;
+}
+.chat-chip-x {
+  font: inherit;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.chat-chip-x:hover {
+  opacity: 1;
+}
+
+/* — composer — */
+.chat-composer {
+  position: relative;
+  border-top: 1px solid var(--color-divider);
+  padding: 13px 24px 17px;
+}
+.chat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.chat-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.chat-input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 13.5px;
+  padding: 10px 17px;
+  border: 1.5px solid var(--color-neutral-300);
+  border-radius: 999px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+.chat-input::placeholder {
+  color: var(--color-neutral-500);
+}
+.chat-input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+/* — @ menu — */
+.chat-menu {
+  position: absolute;
+  bottom: calc(100% - 8px);
+  left: 24px;
+  width: min(460px, calc(100% - 48px));
+  max-height: 244px;
+  overflow-y: auto;
+  padding: 6px;
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-neutral-300);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  z-index: 5;
+}
+.chat-menu-empty {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  color: var(--color-neutral-600);
+}
+.chat-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.chat-menu-row.is-first,
+.chat-menu-row:hover {
+  background: var(--color-accent-100);
+}
+.chat-menu-label {
+  font-size: 12.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-menu-kind {
+  margin-left: auto;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--color-neutral-600);
+  flex: none;
+}
+
+/* — the round "@" button on entity cards — */
+.mention-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 13px;
+  line-height: 1;
+  color: var(--color-accent-2-800);
+  background: transparent;
+  cursor: pointer;
+}
+.mention-btn:hover {
+  background: var(--color-accent-2-200);
+}
+.mention-btn.is-in-scope {
+  background: var(--color-accent-2-600);
+  color: var(--color-bg);
+}
+.mention-btn--lg {
+  width: 30px;
+  height: 30px;
+  font-size: 15px;
+}
+
+/* — canvas attention: what the chat scope resolves to, over hover and selection — */
+div.diagram-card.is-in-scope {
+  opacity: 1;
+  box-shadow: 0 0 0 3px var(--chat-scope-ring);
+}
+div.diagram-card.is-out-of-scope {
+  opacity: var(--dim-opacity);
+}

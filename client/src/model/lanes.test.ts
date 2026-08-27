@@ -5,11 +5,11 @@ import { categoryOf, laneOrder } from './lanes';
 
 describe('categoryOf', () => {
   it('returns a top-level system’s own category', () => {
-    expect(categoryOf(seedProject, 'sys-client-api')).toBe('Client');
+    expect(categoryOf(seedProject, 'sys-client-api')).toBe('Client core');
   });
 
   it('gives a nested system its ancestor’s category', () => {
-    expect(categoryOf(seedProject, 'sys-client-layout')).toBe('Client');
+    expect(categoryOf(seedProject, 'sys-client-layout')).toBe('Client core');
     expect(categoryOf(seedProject, 'sys-worktree-scripts')).toBe('Workflow');
   });
 
@@ -20,7 +20,13 @@ describe('categoryOf', () => {
 
 describe('laneOrder', () => {
   it('orders the seed lanes along the dependency flow, each category once', () => {
-    expect(laneOrder(seedProject)).toEqual(['Workflow', 'Client', 'Server', 'Model']);
+    expect(laneOrder(seedProject)).toEqual([
+      'Workflow',
+      'Client UI',
+      'Client core',
+      'Server',
+      'Model',
+    ]);
   });
 
   it('ignores categories that only nested systems carry (they cannot form a lane)', () => {

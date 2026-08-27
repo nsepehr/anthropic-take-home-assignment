@@ -2,6 +2,8 @@ import { memo } from 'react';
 import { Handle, Position, useStore, type NodeProps } from '@xyflow/react';
 import type { Side } from '../../model/edgeSides';
 import type { SystemNode as SystemNodeType } from '../../model/toFlow';
+import { scopeStateOf } from '../../model/chatScope';
+import { useChat } from '../../state/chat';
 import { useNavigation } from '../../state/navigation';
 import { useSelection } from '../../state/selection';
 import { elementState } from './cardState';
@@ -12,6 +14,7 @@ import { SystemCard } from './components/SystemCard';
 export const SystemNode = memo(function SystemNode({ id, data }: NodeProps<SystemNodeType>) {
   const selection = useSelection();
   const { open } = useNavigation();
+  const { attention } = useChat();
   const isParent = useStore((s) => s.parentLookup.has(id));
   const state = elementState(id, selection);
 
@@ -26,6 +29,7 @@ export const SystemNode = memo(function SystemNode({ id, data }: NodeProps<Syste
           requirementCount={data.requirementCount}
           intentCount={data.intentCount}
           state={state}
+          scope={scopeStateOf(attention, id)}
           focus={data.focus}
           onOpen={data.focus ? undefined : () => open(id)}
         />

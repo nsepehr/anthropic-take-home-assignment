@@ -26,46 +26,87 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 
 ## Tasks
 
-| #   | Slug / Title             | Phase | Priority | Status      | Owner                    | Depends on | Notes                                                                                          |
-| --- | ------------------------ | ----- | -------- | ----------- | ------------------------ | ---------- | ---------------------------------------------------------------------------------------------- |
-| 0   | `repo-setup`             | 1     | P0       | done        | agent: repo-setup        | —          | Bootstrap monorepo + worktree/ports scripts + CLAUDE.md                                        |
-| 0   | `task-tracker`           | 1     | P0       | done        | agent: task-tracker      | —          | This file                                                                                      |
-| 1   | `01-schema-and-seed`     | 2     | P0       | done        | agent: schema-and-seed   | —          | Zod model in shared/, validateProject, relatedTo, data/project.json; brief exists              |
-| 2   | `02-api`                 | 3     | P0       | done        | agent: api               | 01         | GET /api/project (validated), /api/health, dev-only reload                                     |
-| 2b  | `02b-api-trim`           | 3     | P0       | done        | agent: api-trim          | 02         | Trim API to single payload; move store to stores/; record intent                               |
-| 3   | `03-client-foundation`   | 4     | P0       | done        | agent: client-foundation | 01, 02     | React Flow + ELK renders systems/edges/nesting                                                 |
-| 3a  | `04-design-tokens`       | 4     | P0       | done        | agent: design-tokens     | 03         | Organic tokens/classes → client/src/styles; base components; brief exists                      |
-| 3b  | `05-app-shell`           | 4     | P0       | done        | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots                  |
-| 3c  | `06-system-node`         | 4     | P0       | done        | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                              |
-| 3d  | `07-detail-panel`        | 4     | P0       | done        | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                                 |
-| 3b  | `05-app-shell`           | 4     | P0       | done        | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots                  |
-| 3c  | `06-system-node`         | 4     | P0       | done        | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                              |
-| 3d  | `07-detail-panel`        | 4     | P0       | done        | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                                 |
-| 3e  | `08-category-lanes`      | 4     | P0       | done        | agent: category-lanes    | 03, 04, 05 | System.category in schema; ELK partitions; lane overlay                                        |
-| 3f  | `10-per-item-deep-dive`  | 4     | P0       | done        | agent: deep-dive         | 05, 06, 07 | Remove global toggle; per-selection Deep dive button; panel 360px; hide zero-count tags        |
-| 3g  | `11-highlight-neighbors` | 4     | P0       | done        | agent: highlight         | 06, 07     | relatedTo includes edge-neighbor systems; connected cards tinted, not dimmed                   |
-| 3h  | `12-seed-client-graph`   | 7     | P0       | done        | agent: seed-client       | 08         | Flatten client + workflow into real modules with evidenced edges                               |
-| 3i  | `13-edge-routing`        | 4     | P1       | done        | agent: edges             | 06         | Edges attach to the nearest side; human inspects before merge                                  |
-| 3j  | `14-layout-lanes`        | 4     | P0       | done        | agent: layout            | 08, 13     | Lane order from edges; top-aligned compact lanes; fit; human inspects before merge             |
-| 4a  | `15-polish`              | 4     | P1       | done        | agent: polish            | 14         | Dead CSS/hooks, engines pin, click threshold                                                   |
-| 5a  | `16-modeling-rules`      | 5     | P0       | done        | agent: modeling          | 01         | docs/MODELING.md + computeAdvisories in shared; applied to seed                                |
-| 5b  | `17-drill-down`          | 5     | P0       | done        | agent: drilldown         | 14         | Atlas → system focus (ego graph) with header trail; categories in schema; inspect before merge |
-| 5c  | `18-column-layout`       | 5     | P0       | done        | agent: columns (opus)    | 17         | Stage columns, stable vertical order, side arcs; drop ELK; inspect before merge                |
-| 5d  | `19-locks`               | 5     | P1       | cut         | agent: locks (opus)      | 17         | Lock a box / a layer; persisted; header counter; feeds 18                                      |
-| 5e  | `20-lifecycle`           | 5     | P0       | done        | agent: lifecycle         | 16         | lifecycle {superseded,withdrawn} on every entity; current-only views; per-system history panel |
-| 5f  | `21-chat-scope-ui`       | 5     | P1       | in-progress | agent: chat (opus)       | 17         | Ask Claude drawer: @-mentions, scope chips, canvas attention, scripted reply; client-only      |
-| 5g  | `22-search`              | 5     | P1       | in-progress | agent: search (opus)     | 17         | Client-side substring search; semantic is the goal                                             |
-| 5h  | `24-feature-kind`        | 5     | P1       | in-progress | agent: feature (opus)    | 16         | Requirement.kind gains feature; seed retag; pill                                               |
-| 5i  | `25-model-generator`     | 5     | P0       | in-progress | agent: generator (opus)  | 16         | ONBOARDING.md + capture-model Claude Code skill                                                |
-| 5j  | `23-chat-apply-demo`     | 5     | P2       | todo        | —                        | 21         | Modal explaining what Apply would do                                                           |
-| 4   | `04-selection-linking`   | 5     | P0       | done        | —                        | 03         | Delivered by 11-highlight-neighbors + 17                                                       |
-| 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                                |
-| 5   | `05-detail-panels`       | 5     | P1       | done        | —                        | 03         | Delivered by 07 + 10-per-item-deep-dive                                                        |
-| 6   | `06-trust-layer`         | 6     | P1       | done        | —                        | 04         | Provenance pills (15), advisories (16), history (20); gaps view not surfaced in UI             |
-| 7   | `09-deploy-vercel`       | 7     | P1       | done        | agent: deploy-vercel     | 02, 03     | Live: https://anthropic-take-home-assignment.vercel.app (vercel.json, api/, DEPLOY.md)         |
-| 8   | `08-seed-complete`       | 7     | P1       | todo        | —                        | 01         | Seed describes the finished project, honest provenance                                         |
-| 9   | `09-readme`              | 7     | P1       | todo        | —                        | —          | How to run, architecture, links                                                                |
-| 10  | `10-chat`                | 8     | P2       | done        | —                        | 04         | Client-only scope UI delivered by 21; write-side in backlog                                    |
+<<<<<<< HEAD
+
+| #       | Slug / Title             | Phase | Priority | Status      | Owner                    | Depends on | Notes                                                                                          |
+| ------- | ------------------------ | ----- | -------- | ----------- | ------------------------ | ---------- | ---------------------------------------------------------------------------------------------- |
+| 0       | `repo-setup`             | 1     | P0       | done        | agent: repo-setup        | —          | Bootstrap monorepo + worktree/ports scripts + CLAUDE.md                                        |
+| 0       | `task-tracker`           | 1     | P0       | done        | agent: task-tracker      | —          | This file                                                                                      |
+| 1       | `01-schema-and-seed`     | 2     | P0       | done        | agent: schema-and-seed   | —          | Zod model in shared/, validateProject, relatedTo, data/project.json; brief exists              |
+| 2       | `02-api`                 | 3     | P0       | done        | agent: api               | 01         | GET /api/project (validated), /api/health, dev-only reload                                     |
+| 2b      | `02b-api-trim`           | 3     | P0       | done        | agent: api-trim          | 02         | Trim API to single payload; move store to stores/; record intent                               |
+| 3       | `03-client-foundation`   | 4     | P0       | done        | agent: client-foundation | 01, 02     | React Flow + ELK renders systems/edges/nesting                                                 |
+| 3a      | `04-design-tokens`       | 4     | P0       | done        | agent: design-tokens     | 03         | Organic tokens/classes → client/src/styles; base components; brief exists                      |
+| 3b      | `05-app-shell`           | 4     | P0       | done        | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots                  |
+| 3c      | `06-system-node`         | 4     | P0       | done        | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                              |
+| 3d      | `07-detail-panel`        | 4     | P0       | done        | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                                 |
+| 3b      | `05-app-shell`           | 4     | P0       | done        | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots                  |
+| 3c      | `06-system-node`         | 4     | P0       | done        | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                              |
+| 3d      | `07-detail-panel`        | 4     | P0       | done        | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                                 |
+| 3e      | `08-category-lanes`      | 4     | P0       | done        | agent: category-lanes    | 03, 04, 05 | System.category in schema; ELK partitions; lane overlay                                        |
+| 3f      | `10-per-item-deep-dive`  | 4     | P0       | done        | agent: deep-dive         | 05, 06, 07 | Remove global toggle; per-selection Deep dive button; panel 360px; hide zero-count tags        |
+| 3g      | `11-highlight-neighbors` | 4     | P0       | done        | agent: highlight         | 06, 07     | relatedTo includes edge-neighbor systems; connected cards tinted, not dimmed                   |
+| 3h      | `12-seed-client-graph`   | 7     | P0       | done        | agent: seed-client       | 08         | Flatten client + workflow into real modules with evidenced edges                               |
+| 3i      | `13-edge-routing`        | 4     | P1       | done        | agent: edges             | 06         | Edges attach to the nearest side; human inspects before merge                                  |
+| 3j      | `14-layout-lanes`        | 4     | P0       | done        | agent: layout            | 08, 13     | Lane order from edges; top-aligned compact lanes; fit; human inspects before merge             |
+| 4a      | `15-polish`              | 4     | P1       | done        | agent: polish            | 14         | Dead CSS/hooks, engines pin, click threshold                                                   |
+| 5a      | `16-modeling-rules`      | 5     | P0       | done        | agent: modeling          | 01         | docs/MODELING.md + computeAdvisories in shared; applied to seed                                |
+| 5b      | `17-drill-down`          | 5     | P0       | done        | agent: drilldown         | 14         | Atlas → system focus (ego graph) with header trail; categories in schema; inspect before merge |
+| 5c      | `18-column-layout`       | 5     | P0       | done        | agent: columns (opus)    | 17         | Stage columns, stable vertical order, side arcs; drop ELK; inspect before merge                |
+| 5d      | `19-locks`               | 5     | P1       | cut         | agent: locks (opus)      | 17         | Lock a box / a layer; persisted; header counter; feeds 18                                      |
+| 5e      | `20-lifecycle`           | 5     | P0       | done        | agent: lifecycle         | 16         | lifecycle {superseded,withdrawn} on every entity; current-only views; per-system history panel |
+| 5f      | `21-chat-scope-ui`       | 5     | P1       | done        | agent: chat (opus)       | 17         | Ask Claude drawer: @-mentions, scope chips, canvas attention, scripted reply; client-only      |
+| 5g      | `22-search`              | 5     | P1       | in-progress | agent: search (opus)     | 17         | Client-side substring search; semantic is the goal                                             |
+| 5h      | `24-feature-kind`        | 5     | P1       | in-progress | agent: feature (opus)    | 16         | Requirement.kind gains feature; seed retag; pill                                               |
+| 5i      | `25-model-generator`     | 5     | P0       | in-progress | agent: generator (opus)  | 16         | ONBOARDING.md + capture-model Claude Code skill                                                |
+| 5j      | `23-chat-apply-demo`     | 5     | P2       | todo        | —                        | 21         | Modal explaining what Apply would do                                                           |
+| 4       | `04-selection-linking`   | 5     | P0       | done        | —                        | 03         | Delivered by 11-highlight-neighbors + 17                                                       |
+| 11      | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                                |
+| 5       | `05-detail-panels`       | 5     | P1       | done        | —                        | 03         | Delivered by 07 + 10-per-item-deep-dive                                                        |
+| 6       | `06-trust-layer`         | 6     | P1       | done        | —                        | 04         | Provenance pills (15), advisories (16), history (20); gaps view not surfaced in UI             |
+| 7       | `09-deploy-vercel`       | 7     | P1       | done        | agent: deploy-vercel     | 02, 03     | Live: https://anthropic-take-home-assignment.vercel.app (vercel.json, api/, DEPLOY.md)         |
+| 8       | `08-seed-complete`       | 7     | P1       | todo        | —                        | 01         | Seed describes the finished project, honest provenance                                         |
+| 9       | `09-readme`              | 7     | P1       | todo        | —                        | —          | How to run, architecture, links                                                                |
+| 10      | `10-chat`                | 8     | P2       | done        | —                        | 04         | Client-only scope UI delivered by 21; write-side in backlog                                    |
+| ======= |
+| #       | Slug / Title             | Phase | Priority | Status      | Owner                    | Depends on | Notes                                                                                          |
+| ---     | ------------------------ | ----- | -------- | ------      | ------------------------ | ---------- | ---------------------------------------------------------------------------------------------- |
+| 0       | `repo-setup`             | 1     | P0       | done        | agent: repo-setup        | —          | Bootstrap monorepo + worktree/ports scripts + CLAUDE.md                                        |
+| 0       | `task-tracker`           | 1     | P0       | done        | agent: task-tracker      | —          | This file                                                                                      |
+| 1       | `01-schema-and-seed`     | 2     | P0       | done        | agent: schema-and-seed   | —          | Zod model in shared/, validateProject, relatedTo, data/project.json; brief exists              |
+| 2       | `02-api`                 | 3     | P0       | done        | agent: api               | 01         | GET /api/project (validated), /api/health, dev-only reload                                     |
+| 2b      | `02b-api-trim`           | 3     | P0       | done        | agent: api-trim          | 02         | Trim API to single payload; move store to stores/; record intent                               |
+| 3       | `03-client-foundation`   | 4     | P0       | done        | agent: client-foundation | 01, 02     | React Flow + ELK renders systems/edges/nesting                                                 |
+| 3a      | `04-design-tokens`       | 4     | P0       | done        | agent: design-tokens     | 03         | Organic tokens/classes → client/src/styles; base components; brief exists                      |
+| 3b      | `05-app-shell`           | 4     | P0       | done        | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots                  |
+| 3c      | `06-system-node`         | 4     | P0       | done        | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                              |
+| 3d      | `07-detail-panel`        | 4     | P0       | done        | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                                 |
+| 3b      | `05-app-shell`           | 4     | P0       | done        | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots                  |
+| 3c      | `06-system-node`         | 4     | P0       | done        | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                              |
+| 3d      | `07-detail-panel`        | 4     | P0       | done        | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                                 |
+| 3e      | `08-category-lanes`      | 4     | P0       | done        | agent: category-lanes    | 03, 04, 05 | System.category in schema; ELK partitions; lane overlay                                        |
+| 3f      | `10-per-item-deep-dive`  | 4     | P0       | done        | agent: deep-dive         | 05, 06, 07 | Remove global toggle; per-selection Deep dive button; panel 360px; hide zero-count tags        |
+| 3g      | `11-highlight-neighbors` | 4     | P0       | done        | agent: highlight         | 06, 07     | relatedTo includes edge-neighbor systems; connected cards tinted, not dimmed                   |
+| 3h      | `12-seed-client-graph`   | 7     | P0       | done        | agent: seed-client       | 08         | Flatten client + workflow into real modules with evidenced edges                               |
+| 3i      | `13-edge-routing`        | 4     | P1       | done        | agent: edges             | 06         | Edges attach to the nearest side; human inspects before merge                                  |
+| 3j      | `14-layout-lanes`        | 4     | P0       | done        | agent: layout            | 08, 13     | Lane order from edges; top-aligned compact lanes; fit; human inspects before merge             |
+| 4a      | `15-polish`              | 4     | P1       | done        | agent: polish            | 14         | Dead CSS/hooks, engines pin, click threshold                                                   |
+| 5a      | `16-modeling-rules`      | 5     | P0       | done        | agent: modeling          | 01         | docs/MODELING.md + computeAdvisories in shared; applied to seed                                |
+| 5b      | `17-drill-down`          | 5     | P0       | done        | agent: drilldown         | 14         | Atlas → system focus (ego graph) with header trail; categories in schema; inspect before merge |
+| 5c      | `18-column-layout`       | 5     | P0       | done        | agent: columns (opus)    | 17         | Stage columns, stable vertical order, side arcs; drop ELK; inspect before merge                |
+| 5d      | `19-locks`               | 5     | P1       | cut         | agent: locks (opus)      | 17         | Lock a box / a layer; persisted; header counter; feeds 18                                      |
+| 5e      | `20-lifecycle`           | 5     | P0       | done        | agent: lifecycle         | 16         | lifecycle {superseded,withdrawn} on every entity; current-only views; per-system history panel |
+| 5f      | `21-chat-scope-ui`       | 5     | P1       | done        | agent: chat (opus)       | 17         | Ask Claude drawer: @-mentions, scope chips, canvas attention, scripted reply; client-only      |
+| 4       | `04-selection-linking`   | 5     | P0       | done        | —                        | 03         | Delivered by 11-highlight-neighbors + 17                                                       |
+| 11      | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                                |
+| 5       | `05-detail-panels`       | 5     | P1       | done        | —                        | 03         | Delivered by 07 + 10-per-item-deep-dive                                                        |
+| 6       | `06-trust-layer`         | 6     | P1       | done        | —                        | 04         | Provenance pills (15), advisories (16), history (20); gaps view not surfaced in UI             |
+| 7       | `09-deploy-vercel`       | 7     | P1       | done        | agent: deploy-vercel     | 02, 03     | Live: https://anthropic-take-home-assignment.vercel.app (vercel.json, api/, DEPLOY.md)         |
+| 8       | `08-seed-complete`       | 7     | P1       | todo        | —                        | 01         | Seed describes the finished project, honest provenance                                         |
+| 9       | `09-readme`              | 7     | P1       | todo        | —                        | —          | How to run, architecture, links                                                                |
+| 10      | `10-chat`                | 8     | P2       | done        | —                        | 04         | Client-only scope UI delivered by 21; write-side in backlog                                    |
+
+> > > > > > > agent/21-chat-scope-ui
 
 ## Backlog (client)
 
@@ -166,4 +207,11 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 18-column-layout → review (agent: columns): atlas laid out by one rule — one column per category in `laneOrder` flow order, systems stacked inside, ordered by neighbour barycenter with seed order as the tie-break so a new system appends instead of shuffling; intra-column edges drawn as quiet side arcs (`ArcEdge`), cross-column edges keep the bezier + nearest-side handles; `lockedIds` + `previous` accepted so task 19 can pin a row; viewport fitted from the layout's own bounds (React Flow's `fitView` never fires for pre-sized nodes); atlas cards pinned to 124px with a 2-line summary, legible at 1440×900 (fit scale 0.65 ≥ 0.6); `elkjs` removed — the 1.44 MB `elk.bundled` chunk is gone; `int-columns-are-stages` appended and the stale ELK text in sys-client-layout / sys-client-diagram refreshed; worktree left running for inspection
 - 2026-08-27 — 18-column-layout → done (human, visually approved): stage columns, ELK removed
 - 2026-08-27 — tracker reconciled after hour-4: stale phase-1 rows marked done/superseded
+  <<<<<<< HEAD
 - 2026-08-27 — wrap-up sprint: 22-search, 24-feature-kind, 25-model-generator launched (Opus); locks dropped for good
+  \=======
+- 2026-08-27 — 21-chat-scope-ui → review (agent: chat, Opus): Ask Claude drawer (header button, thread, composer), `@` menu over systems/requirements/intents, scope chips (Backspace unchips), round `@` buttons on DetailCard/RequirementCard/IntentCard, canvas attention (sage ring on the resolved systems, everything else dimmed), scripted reply naming resolved systems + connections + requirement/intent counts; pure `model/chatScope.ts` / `chatReply.ts` / `chatThread.ts`; no network, no writes to the model; worktree left running on :5177 for inspection
+
+> > > > > > > agent/21-chat-scope-ui
+
+- 2026-08-27 — 21-chat-scope-ui → done (human, visually approved); Client split into UI/core stages

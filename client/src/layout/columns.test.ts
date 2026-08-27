@@ -25,7 +25,7 @@ const rectOf = (
 
 describe('columnLayout on the seed', () => {
   it('puts every top-level system in exactly one column, in flow order', () => {
-    expect(order).toEqual(['Workflow', 'Client', 'Server', 'Model']);
+    expect(order).toEqual(['Workflow', 'Client UI', 'Client core', 'Server', 'Model']);
     const topLevel = seedProject.systems.filter((s) => !s.parentId);
     expect(seedLayout.nodes).toHaveLength(topLevel.length);
     expect(new Set(seedLayout.nodes.map((n) => n.id)).size).toBe(topLevel.length);

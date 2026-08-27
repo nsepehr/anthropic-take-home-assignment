@@ -49,7 +49,7 @@
       "id": "sys-client-api",
       "name": "Client API",
       "kind": "module",
-      "category": "Client",
+      "category": "Client core",
       "paths": ["client/src/api/project.ts", "client/vite.config.ts"],
       "summary": "The only network edge of the client: fetches `/api/project` once and validates it with the shared schema before rendering.",
       "detail": "`fetchProject(url)` is the single `fetch` call in `client/src` (`api/project.ts:21`). It returns a typed `ApiResult` — `ok` with a `Project` that passed `validateProject` from `@app/shared`, or a readable error for network failures, non-2xx responses and payloads that fail the schema — so the rest of the client trusts the types. `vite.config.ts` proxies `/api` to the Fastify port from `.env.local` in dev; in production the same path is served by the Vercel function.",
@@ -154,7 +154,7 @@
       "id": "sys-client-state",
       "name": "Client state",
       "kind": "module",
-      "category": "Client",
+      "category": "Client core",
       "paths": [
         "client/src/state/projectStore.tsx",
         "client/src/state/selection.tsx",
@@ -172,7 +172,7 @@
       "id": "sys-client-layout",
       "name": "Client layout",
       "kind": "module",
-      "category": "Client",
+      "category": "Client core",
       "paths": [
         "client/src/layout/columns.ts",
         "client/src/layout/columnOrder.ts",
@@ -195,7 +195,7 @@
       "id": "sys-client-styles",
       "name": "Client styles",
       "kind": "module",
-      "category": "Client",
+      "category": "Client core",
       "paths": ["client/src/styles/", "client/src/components/"],
       "summary": "The Organic design tokens and base classes, plus the shared presentational components that consume them.",
       "detail": "`styles/tokens.css` holds the `:root` variables ported verbatim from `docs/design/organic.css` plus app semantic tokens (`--kind-*`, `--status-*`, `--prov-*`, `--dim-opacity`, `--canvas-*`) derived from the ramps. `styles/base.css` carries the base rules and `.btn/.tag/.card/.seg` classes; `styles/index.css` is the single stylesheet entry. `components/` has `Tag`, `Button`, `KindDot`, `StatusDot`, `ProvenanceDot` — presentational only, typed from `@app/shared`. Every feature (shell, diagram, panel) imports from `components/` and relies on the tokens; on the diagram only the shell→styles edge is drawn to keep the Client lane readable.",
@@ -209,7 +209,7 @@
       "id": "sys-client-shell",
       "name": "App shell",
       "kind": "ui",
-      "category": "Client",
+      "category": "Client UI",
       "paths": ["client/src/features/shell/", "client/src/App.tsx", "client/src/main.tsx"],
       "summary": "The single-screen frame: header, canvas region and the always-visible 400px right panel with overview/detail slots.",
       "detail": "`AppShell` is a 100vh flex column (no page scroll): `Header` shows the project name, mission, the provenance legend and the global Overview / Deep dive `.seg` control bound to `useViewMode()`; `CanvasFrame` is the rounded dotted-grid region that renders the `canvas` slot and a hint while nothing is selected; `SidePanel` scrolls on its own and switches on `useSelection().selectedId` between the `overview` and `detail` slots. Slots are props so the shell folder never imports other features — `App.tsx` (the composition root, owned here) is where the diagram and panel are plugged into the slots and the state providers are stacked; the canvas slot is a render prop that receives the loaded project. Layout-only CSS lives in `shell.css`; every color, font and radius is a token from `client/src/styles`.",
@@ -223,7 +223,7 @@
       "id": "sys-client-panel",
       "name": "Detail panel",
       "kind": "ui",
-      "category": "Client",
+      "category": "Client UI",
       "paths": ["client/src/features/panel/", "client/src/model/entities.ts"],
       "summary": "The right panel: the selected entity's what / must-do / why, or the whole project when nothing is selected.",
       "detail": "`EntityDetail` dispatches on the selected id: a headline `DetailCard` (kicker, title, summary, and in deep dive the system's how-it-works, the requirement's evidence, or the intent's rationale), then the entity's requirements and intents as clickable cards, then `ConnectedChips` for every linked entity. `ProjectOverview` shows mission, counts and every requirement and intent. The pure lookups (`findEntity`, `requirementsFor`, `intentsFor`, `connectionsFor`) live in `client/src/model/entities.ts` and derive everything from `relatedTo`. For a system, `HistorySection` follows the intents list with a \"Show history (N)\" control that reveals the system's superseded and withdrawn requirements and intents — read from `fullProject` via `historyFor`, greyed, struck through and pilled with what happened to them.",
@@ -237,7 +237,7 @@
       "id": "sys-client-diagram",
       "name": "Diagram canvas",
       "kind": "ui",
-      "category": "Client",
+      "category": "Client UI",
       "paths": [
         "client/src/features/diagram/",
         "client/src/features/diagram/components/LaneLayer.tsx"
@@ -268,7 +268,7 @@
       "id": "sys-client-navigation",
       "name": "Navigation state",
       "kind": "module",
-      "category": "Client",
+      "category": "Client UI",
       "paths": [
         "client/src/state/navigation.tsx",
         "client/src/model/scope.ts",
@@ -281,6 +281,26 @@
         "source": "ai-inferred",
         "capturedAt": "2026-08-27T18:30:00+08:00",
         "sessionRef": "agent: drilldown (task 17)"
+      }
+    },
+    {
+      "id": "sys-client-chat",
+      "name": "Ask Claude chat",
+      "kind": "ui",
+      "category": "Client UI",
+      "paths": [
+        "client/src/features/chat/",
+        "client/src/state/chat.tsx",
+        "client/src/model/chatScope.ts",
+        "client/src/model/chatReply.ts",
+        "client/src/model/chatThread.ts"
+      ],
+      "summary": "The drawer where a request is scoped: @-mentions resolve to systems and the canvas shows them.",
+      "detail": "`model/chatScope.ts` is pure: `mentionables` lists every system, requirement and intent; `systemsOf` resolves one mention to systems (a System is itself, a Requirement its `systemIds`, an Intent its `appliesTo.systemIds`); `attentionSet` unions them; `filterMenu` and `mentionQuery` drive the `@` menu. `model/chatThread.ts` is the reducer (toggle, draft, add/remove mention, send) and `model/chatReply.ts` writes the scripted reply from the resolved context. `state/chat.tsx` holds one `useReducer` and exposes `useChat()` plus `useMention(found)` for the round `@` buttons. `features/chat/` renders the drawer; `SystemNode` reads `attention` and adds `.is-in-scope` / `.is-out-of-scope`. There is no network call and nothing is written back to the model.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T18:30:00+08:00",
+        "sessionRef": "agent: chat (task 21)"
       }
     }
   ],
@@ -1040,10 +1060,14 @@
     {
       "id": "int-edges-attach-nearest-side",
       "statement": "Arrows attach to the side of a card that faces the other end",
-      "rationale": "Fixed right\u2192left handles read wrong for backward or vertical connections; the reader should follow an arrow without tracing a loop. Decided after human review of the first build.",
-      "appliesTo": { "systemIds": ["sys-client-diagram"], "requirementIds": [], "edgeIds": [] },
+      "rationale": "Fixed right→left handles read wrong for backward or vertical connections; the reader should follow an arrow without tracing a loop. Decided after human review of the first build.",
+      "appliesTo": {
+        "systemIds": ["sys-client-diagram"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
       "summary": "Each card has four hidden handles; after layout, pure `chooseHandles` picks the sides by the dominant axis between centers.",
-      "detail": "Every card renders four hidden handles; after ELK layout a pure `chooseHandles(sourceRect, targetRect)` picks sides by the dominant axis of the center-to-center vector and edges get those handle ids. Option chosen over ELK orthogonal edge sections (more code, coordinate transforms for nested nodes) and React Flow floating edges (rect intersections). Ties resolve horizontally, matching the left-to-right lane flow. Container edges use the container's absolute rect, so child\u2192parent arrows meet the nearest container side.",
+      "detail": "Every card renders four hidden handles; after ELK layout a pure `chooseHandles(sourceRect, targetRect)` picks sides by the dominant axis of the center-to-center vector and edges get those handle ids. Option chosen over ELK orthogonal edge sections (more code, coordinate transforms for nested nodes) and React Flow floating edges (rect intersections). Ties resolve horizontally, matching the left-to-right lane flow. Container edges use the container's absolute rect, so child→parent arrows meet the nearest container side.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T16:10:00+08:00",
@@ -1244,6 +1268,50 @@
         "source": "human-verified",
         "capturedAt": "2026-08-27T19:10:00+08:00",
         "sessionRef": "planning chat 2026-08-27, design revision 4"
+      }
+    },
+    {
+      "id": "int-chat-scope-is-context",
+      "statement": "The chat's job in this phase is to prove it knows what the request is about: mentions resolve to systems, and the canvas shows them and their connections",
+      "rationale": "The value of an AI assistant on a codebase map is context, not generation — anyone can generate text, few tools can say which parts of the system a request touches. Demonstrating resolution is the honest first step: no model call, no edit, nothing claimed that is not derived from the map. The write-side apply flow is next, and it needs this scoping to be trustworthy first.",
+      "appliesTo": {
+        "systemIds": ["sys-client-chat", "sys-client-diagram"],
+        "requirementIds": [],
+        "edgeIds": ["edge-chat-reads-state", "edge-shell-depends-chat"]
+      },
+      "summary": "Phase 1 of the chat captures and shows context; it does not call a model or write to the map.",
+      "detail": "From design revision 6 (`docs/design/landing-v6.dc.html`): the drawer, `@` mentions from the composer or from the round buttons on cards, scope chips, canvas attention in the sage ramp, and a scripted reply naming the resolved systems, their connections and the requirements and intents they carry. The mock's draft/apply flow and the \"Chat edit · review\" pills are recorded as backlog, deliberately not built.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T18:30:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, AI-chat scoping"
+      }
+    },
+    {
+      "id": "int-client-split-into-stages",
+      "statement": "Client is two stages, UI and core, because the advisories (category-too-large, category-internal-edges) and the legibility floor all said so",
+      "rationale": "Three independent signals agreed before anyone redrew anything: `category-too-large` (9 top-level systems against a max of 8), `category-internal-edges` (13 connections inside Client against 5 leaving it), and the atlas failing its own legibility floor — one column nine cards tall made the seed project fit only at 0.58 zoom against a 0.6 minimum. The split is not cosmetic: every edge crossing the new boundary runs UI to core and none runs back, so the boundary was already in the code and the category was simply too coarse to show it. The alternative — relaxing the legibility floor — would have hidden the modeling problem behind a weaker guarantee. Trade-off accepted: five lanes instead of four, one nearer the six-lane advisory limit.",
+      "appliesTo": {
+        "systemIds": [
+          "sys-client-shell",
+          "sys-client-diagram",
+          "sys-client-panel",
+          "sys-client-chat",
+          "sys-client-navigation",
+          "sys-client-state",
+          "sys-client-api",
+          "sys-client-layout",
+          "sys-client-styles"
+        ],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "summary": "The Client lane became Client UI and Client core, following the dependency flow the edges already had.",
+      "detail": "`Client UI` is shell, diagram, panel, chat and navigation; `Client core` is state, api, layout and styles. `orderLanesByFlow` places them Workflow → Client UI → Client core → Server → Model with no back-edges. Data-only change: no layout code and no test was touched, and the atlas returned above its legibility floor on the split alone.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T21:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, layout review — Client split after advisories"
       }
     }
   ],
@@ -1495,6 +1563,24 @@
       "kind": "calls",
       "label": "back / open",
       "summary": "`DetailCard` Back calls `back()`; a system chip in `ConnectedChips` calls `open(id)`."
+    },
+    {
+      "id": "edge-chat-reads-state",
+      "from": "sys-client-chat",
+      "to": "sys-client-state",
+      "kind": "reads",
+      "label": "useProject",
+      "summary": "`state/chat.tsx` reads `useProject()` to resolve mentions and count what they touch.",
+      "intentId": "int-chat-scope-is-context"
+    },
+    {
+      "id": "edge-shell-depends-chat",
+      "from": "sys-client-shell",
+      "to": "sys-client-chat",
+      "kind": "depends",
+      "label": "chat slot",
+      "summary": "`AppShell` renders the `chat` slot under the canvas+panel row; `App.tsx` fills it with `<ChatDrawer />`.",
+      "intentId": "int-chat-scope-is-context"
     }
   ],
   "categories": [
@@ -1510,6 +1596,28 @@
       }
     },
     {
+      "id": "Client UI",
+      "name": "Client UI",
+      "summary": "What the user sees and drives: the app frame, the atlas canvas, the detail panel, the Ask Claude drawer and the navigation trail.",
+      "detail": "The `features/` layer plus the navigation state that binds it. `shell` owns the 100vh frame — header, canvas slot, panel slot and the chat drawer beneath them; `diagram` renders the React Flow atlas and the ego-graph focus view; `panel` renders the project overview and per-entity detail; `chat` scopes a request with `@` mentions and rings the systems it resolves to; `navigation` holds the drill-down trail. Features never import each other — they meet in Client core. Ordered before Client core because every edge between the two runs that way.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T21:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, layout review — Client split after advisories"
+      }
+    },
+    {
+      "id": "Client core",
+      "name": "Client core",
+      "summary": "What the UI reads from: the loaded project and selection, the API client, the pure layout functions and the design tokens.",
+      "detail": "`state/` holds the loaded project (filtered to current entries), the selection and the chat scope; `api/` fetches the single `/api/project` payload and validates it with the shared model; `layout/` turns the model into stage columns and the ego graph with pure, synchronous functions, so the atlas is on screen at first paint; `styles/` is the token layer every component draws from. Nothing here imports a feature, which is what lets the UI half be rearranged without touching it.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T21:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, layout review — Client split after advisories"
+      }
+    },
+    {
       "id": "Client",
       "name": "Client",
       "summary": "The web app: an atlas of all systems, and an ego graph with a detail panel for each.",
@@ -1518,6 +1626,12 @@
         "source": "human-verified",
         "capturedAt": "2026-08-27T18:30:00+08:00",
         "sessionRef": "planning chat 2026-08-27, phase-2 planning"
+      },
+      "lifecycle": {
+        "state": "superseded",
+        "supersededBy": "Client UI",
+        "since": "2026-08-27T21:00:00+08:00",
+        "reason": "Split into Client UI and Client core: 9 top-level systems tripped category-too-large and category-internal-edges, and the atlas stopped fitting at a legible scale"
       }
     },
     {

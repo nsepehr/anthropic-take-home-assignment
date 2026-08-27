@@ -19,11 +19,12 @@ function laneProject(lanes: string[], laneEdges: [string, string][]): Project {
 const categories = (lanes: string[]) => new Map(lanes.map((l) => [l, l]));
 
 describe('orderLanesByFlow', () => {
-  it('orders the seed along its dependency flow: Workflow → Client → Server → Model', () => {
-    const seedOrder = ['Model', 'Server', 'Client', 'Workflow'];
+  it('orders the seed along its dependency flow: Workflow → Client UI → Client core → Server → Model', () => {
+    const seedOrder = ['Model', 'Server', 'Client core', 'Client UI', 'Workflow'];
     expect(orderLanesByFlow(seedProject, seedCategories, seedOrder)).toEqual([
       'Workflow',
-      'Client',
+      'Client UI',
+      'Client core',
       'Server',
       'Model',
     ]);
