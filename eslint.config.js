@@ -5,7 +5,15 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
-  { ignores: ['**/dist/**', '**/node_modules/**', '**/*.config.*', 'vitest.workspace.ts'] },
+  {
+    ignores: [
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/.vercel/**',
+      '**/*.config.*',
+      'vitest.workspace.ts',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -15,7 +23,7 @@ export default tseslint.config(
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ['server/**/*.ts', 'scripts/**/*.mjs'],
+    files: ['server/**/*.ts', 'api/**/*.ts', 'scripts/**/*.mjs'],
     languageOptions: { globals: globals.node },
   },
   {
