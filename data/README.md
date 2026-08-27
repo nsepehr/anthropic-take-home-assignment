@@ -21,9 +21,11 @@ edges without an intent, intents that apply to nothing. Gaps are not errors; the
 
 1. Add the `System`(s) you built or changed; set `paths` to the real files.
 2. Add or update the `Requirement`(s) they serve; set `status` honestly and cite `evidence`.
-3. Add an `Intent` for each non-obvious choice: statement, rationale, rejected alternatives,
-   trade-offs, and `appliesTo`. Decisions stated in your brief are `human-verified`; your own
-   inferences are `ai-inferred`.
+3. Add an `Intent` for each non-obvious choice: statement, rationale (fold rejected alternatives
+   and trade-offs into the prose), and `appliesTo`. Links are stored **once**: a system's
+   requirements live on `Requirement.systemIds`, its intents on `Intent.appliesTo`; `relatedTo`
+   derives the reverse. Decisions stated in your brief are `human-verified`; your own inferences
+   are `ai-inferred`.
 4. Add `Edge`s for real dependencies only. Keep them thin; hang the "why" on `intentId`.
 5. Ids are slugs prefixed by type (`sys-`, `req-`, `int-`, `edge-`) and must be unique across all
    entity types. The model stores no coordinates; layout is computed by the client.

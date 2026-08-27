@@ -41,6 +41,18 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 9   | `09-readme`              | 7     | P1       | todo        | —                      | —          | How to run, architecture, links                                                   |
 | 10  | `10-chat`                | 8     | P2       | todo        | —                      | 04         | Stretch: AI chat that @-tags systems/requirements/intents                         |
 
+## Backlog (schema)
+
+Cut from the phase-1 model on 2026-08-27 to keep it minimal. Each is re-addable as an optional
+field or enum value without a breaking change.
+
+- Feature entity (or a `feature` requirement kind) — to be discussed next
+- Intent `status: active | superseded` + `supersededBy`
+- `alternativesRejected` / `tradeoffs` on Intent (currently folded into `rationale` prose)
+- Explicit Requirement → Intent links (currently only Intent.appliesTo.requirementIds)
+- Edge provenance
+- Computed/derived fields exposed in the model beyond `relatedTo` / `gaps`
+
 ## Changelog
 
 Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.

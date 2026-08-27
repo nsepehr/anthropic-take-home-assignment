@@ -8,7 +8,10 @@ export interface Gaps {
   intentsWithoutTarget: string[];
 }
 
-/** Reports what the model leaves unexplained. Honest by design: gaps are surfaced, not hidden. */
+/**
+ * Reports what the model leaves unexplained. Honest by design: gaps are surfaced, not hidden.
+ * A system or edge is explained if any intent's `appliesTo` names it (or, for edges, `intentId`).
+ */
 export function computeGaps(project: Project): Gaps {
   const intentTargets = new Set<string>();
   for (const intent of project.intents) {
@@ -17,9 +20,7 @@ export function computeGaps(project: Project): Gaps {
   }
 
   return {
-    systemsWithoutIntent: project.systems
-      .filter((s) => s.intentIds.length === 0 && !intentTargets.has(s.id))
-      .map((s) => s.id),
+    systemsWithoutIntent: project.systems.filter((s) => !intentTargets.has(s.id)).map((s) => s.id),
     requirementsWithoutSystem: project.requirements
       .filter((r) => r.systemIds.length === 0)
       .map((r) => r.id),

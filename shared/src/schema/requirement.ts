@@ -10,7 +10,6 @@ export const RequirementSchema = EntityBase.extend({
   kind: RequirementKind,
   status: RequirementStatus,
   systemIds: z.array(z.string()),
-  intentIds: z.array(z.string()),
   evidence: z.array(z.string()),
 });
 

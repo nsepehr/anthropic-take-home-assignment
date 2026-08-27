@@ -32,8 +32,8 @@ describe('validateProject', () => {
 
   it('a reference to the wrong entity type is an error', () => {
     const project = fullyLinkedProject();
-    project.systems[0]!.intentIds.push('req-a');
-    expect(errorsOf(project)[0]?.path).toBe('systems.0.intentIds.1');
+    project.intents[0]!.appliesTo.systemIds.push('req-a');
+    expect(errorsOf(project)[0]?.path).toBe('intents.0.appliesTo.systemIds.2');
   });
 
   it('edge endpoints must exist', () => {

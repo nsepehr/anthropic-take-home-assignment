@@ -70,13 +70,10 @@ function checkReferences(project: Project, ids: IdIndex): ValidationError[] {
   project.systems.forEach((s, i) => {
     const p = `systems.${i}`;
     if (s.parentId) ref(`${p}.parentId`, s.parentId, 'systems');
-    refs(`${p}.requirementIds`, s.requirementIds, 'requirements');
-    refs(`${p}.intentIds`, s.intentIds, 'intents');
   });
   project.requirements.forEach((r, i) => {
     const p = `requirements.${i}`;
     refs(`${p}.systemIds`, r.systemIds, 'systems');
-    refs(`${p}.intentIds`, r.intentIds, 'intents');
   });
   project.intents.forEach((it, i) => {
     const p = `intents.${i}.appliesTo`;

@@ -54,11 +54,11 @@ describe('relatedTo', () => {
     });
   });
 
-  it('follows links recorded on only one side', () => {
-    const p = fullyLinkedProject();
-    p.systems[0]!.intentIds = []; // int-a still applies to sys-parent
-    expect(relatedTo(p, 'sys-parent').intentIds).toEqual(['int-a']);
-    expect(relatedTo(p, 'int-a').systemIds).toContain('sys-parent');
+  it('derives reverse links from the single stored direction', () => {
+    // Nothing on sys-parent or req-a points at int-a; only int-a.appliesTo does.
+    expect(relatedTo(project, 'sys-parent').intentIds).toEqual(['int-a']);
+    expect(relatedTo(project, 'req-a').intentIds).toEqual(['int-a']);
+    expect(relatedTo(project, 'sys-parent').requirementIds).toEqual(['req-a']);
   });
 
   it('never includes the entity itself and returns empty for unknown ids', () => {

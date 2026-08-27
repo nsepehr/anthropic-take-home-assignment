@@ -13,7 +13,8 @@ export function getSystem(project: Project, id: string): System | undefined {
 
 /**
  * Everything directly linked to `id` in either direction: the closure the UI highlights when one
- * thing is selected. Links are followed both ways so a one-sided reference still counts.
+ * thing is selected. Links are stored once (Requirement.systemIds, Intent.appliesTo, Edge
+ * endpoints/intentId, System.parentId) and followed both ways here.
  * The entity itself is never included in the result.
  */
 export function relatedTo(project: Project, id: string): Related {
@@ -25,9 +26,7 @@ export function relatedTo(project: Project, id: string): Related {
   for (const s of project.systems) {
     if (s.id === id) {
       if (s.parentId) systems.add(s.parentId);
-      s.requirementIds.forEach((r) => requirements.add(r));
-      s.intentIds.forEach((i) => intents.add(i));
-    } else if (s.parentId === id || s.requirementIds.includes(id) || s.intentIds.includes(id)) {
+    } else if (s.parentId === id) {
       systems.add(s.id);
     }
   }
@@ -35,8 +34,7 @@ export function relatedTo(project: Project, id: string): Related {
   for (const r of project.requirements) {
     if (r.id === id) {
       r.systemIds.forEach((s) => systems.add(s));
-      r.intentIds.forEach((i) => intents.add(i));
-    } else if (r.systemIds.includes(id) || r.intentIds.includes(id)) {
+    } else if (r.systemIds.includes(id)) {
       requirements.add(r.id);
     }
   }
