@@ -46,13 +46,20 @@
       "id": "sys-client-app",
       "name": "Client app",
       "kind": "ui",
-      "paths": ["client/src/App.tsx", "client/src/main.tsx", "client/vite.config.ts"],
-      "summary": "A Vite + React hello page that pings the server; the architecture diagram is not built yet.",
-      "detail": "Today `App.tsx` renders a heading and the result of `fetch('/api/health')`, proxied by Vite to the server. `@xyflow/react` and `elkjs` are installed as the chosen diagram stack but no diagram, node component, or layout code exists yet. The client resolves `@app/shared` straight to `shared/src/index.ts` via a Vite alias and never imports server code.",
+      "paths": [
+        "client/src/App.tsx",
+        "client/src/main.tsx",
+        "client/src/api/project.ts",
+        "client/src/model/toFlow.ts",
+        "client/src/features/debug/",
+        "client/vite.config.ts"
+      ],
+      "summary": "React app that turns the project model into an interactive architecture diagram.",
+      "detail": "Vite + React 18. `App.tsx` is a composition root wiring providers and the current top-level feature; `api/` is the only place `fetch` is called (responses parsed with `validateProject`); `model/toFlow.ts` maps Systems/Edges to React Flow elements; `features/debug/` is a throwaway page proving the pipeline until the designed UI replaces it.",
       "provenance": {
-        "source": "human-verified",
-        "capturedAt": "2026-08-27T14:35:46+08:00",
-        "sessionRef": "commit 47b4a68 (bootstrap)"
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T15:00:00Z",
+        "sessionRef": "agent: client-foundation (task 03)"
       }
     },
     {
@@ -136,6 +143,39 @@
         "capturedAt": "2026-08-27T14:35:46+08:00",
         "sessionRef": "commit 47b4a68 (bootstrap); CLAUDE.md rule 6"
       }
+    },
+    {
+      "id": "sys-client-state",
+      "name": "Client state",
+      "kind": "module",
+      "parentId": "sys-client-app",
+      "paths": [
+        "client/src/state/projectStore.tsx",
+        "client/src/state/selection.tsx",
+        "client/src/model/selection.ts",
+        "client/src/state/viewMode.tsx"
+      ],
+      "summary": "Project, selection, and view-mode state exposed as React hooks.",
+      "detail": "`ProjectProvider`/`useProject` load the project once via the API. `SelectionProvider`/`useSelection` hold one selected id and derive `related`, `isHighlighted`, `isDimmed` with `relatedTo` from the shared model — no network round-trip. `useViewMode` is the global overview/deep-dive switch persisted in localStorage.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T15:00:00Z",
+        "sessionRef": "agent: client-foundation (task 03)"
+      }
+    },
+    {
+      "id": "sys-client-layout",
+      "name": "Client layout",
+      "kind": "module",
+      "parentId": "sys-client-app",
+      "paths": ["client/src/layout/elk.ts", "client/src/layout/useLayout.ts"],
+      "summary": "Pure ELK layout pipeline: flow elements in, positioned nodes out.",
+      "detail": "`layoutWithElk` builds a compound ELK graph (children nested by `parentId`, `INCLUDE_CHILDREN` so cross-group edges route) and returns nodes with parent-relative positions and ELK-computed parent sizes. `useLayout` wraps the async call and reports `idle | layouting | ready | error`.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T15:00:00Z",
+        "sessionRef": "agent: client-foundation (task 03)"
+      }
     }
   ],
   "requirements": [
@@ -178,8 +218,12 @@
       "title": "One single, focused hero interaction",
       "kind": "functional",
       "status": "partial",
-      "systemIds": ["sys-client-app", "sys-shared-model"],
-      "evidence": ["shared/src/related.ts", "shared/src/related.test.ts"],
+      "systemIds": ["sys-client-app", "sys-shared-model", "sys-client-state"],
+      "evidence": [
+        "shared/src/related.ts",
+        "shared/src/related.test.ts",
+        "client/src/model/selection.ts"
+      ],
       "summary": "Select one thing and everything connected to it — systems, requirements, intents, edges — lights up.",
       "detail": "From the assignment's guidance to do one interaction well. The chosen interaction is select-to-highlight. The data side is done: `relatedTo(project, id)` returns the closure in both directions and is tested. The UI side does not exist yet, hence `partial`.",
       "provenance": {
@@ -238,8 +282,11 @@
       "title": "Overview and deep-dive language for every entity",
       "kind": "functional",
       "status": "partial",
-      "systemIds": ["sys-shared-model"],
-      "evidence": ["shared/src/schema/entity.ts (EntityBase: summary + detail required)"],
+      "systemIds": ["sys-shared-model", "sys-client-state"],
+      "evidence": [
+        "shared/src/schema/entity.ts (EntityBase: summary + detail required)",
+        "client/src/state/viewMode.tsx"
+      ],
       "summary": "Every system, requirement and intent can be read as a one-sentence overview or a deep dive, toggled globally.",
       "detail": "The schema requires `summary` and `detail` on every first-class entity, and the seed fills both. The global overview/deep-dive toggle in the UI is not built. Partial.",
       "provenance": {
@@ -553,6 +600,42 @@
         "capturedAt": "2026-08-27T15:10:00+08:00",
         "sessionRef": "docs/tasks/02-api.md (Scope: projectStore; Goal)"
       }
+    },
+    {
+      "id": "int-selection-client-side",
+      "statement": "The selection closure is computed client-side from the shared model, not via the API.",
+      "rationale": "Highlighting must be instant and there should be one source of truth: `relatedTo` in `@app/shared` runs in the browser over the already-loaded project. `GET /api/project/related/:id` exists for curl/reviewers, but the UI never waits on it for a click.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-client-state", "sys-shared-model"],
+        "requirementIds": ["req-single-focused-interaction"],
+        "edgeIds": ["edge-client-depends-shared"]
+      },
+      "summary": "Selection highlight is computed in the browser with relatedTo.",
+      "detail": "Client state holds only the selected id; everything derived (related ids, highlighted/dimmed) is a pure function of project + id so it is trivially testable and never stale.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00Z",
+        "sessionRef": "task 03-client-foundation brief"
+      }
+    },
+    {
+      "id": "int-layout-pure-pipeline",
+      "statement": "Layout is a pure pipeline: model → flow elements → ELK positions.",
+      "rationale": "The design pass restyles nodes without touching logic: `toFlowElements` and `layoutWithElk` take model data and return plain data, so custom node components and tokens can be swapped in on top. React Flow 12 needs parents before children and parent-relative child positions; the pipeline guarantees both.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-client-layout", "sys-client-app"],
+        "requirementIds": ["req-one-view-understanding"],
+        "edgeIds": []
+      },
+      "summary": "Model to positioned nodes is pure data transformation.",
+      "detail": "No component computes layout; `useLayout` is the only effectful wrapper and merely resolves the async ELK call and reports status.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00Z",
+        "sessionRef": "task 03-client-foundation brief"
+      }
     }
   ],
   "edges": [
@@ -561,8 +644,8 @@
       "from": "sys-client-app",
       "to": "sys-server-api",
       "kind": "calls",
-      "label": "GET /api/health",
-      "summary": "The client fetches `/api/health`; Vite proxies `/api` to the Fastify port."
+      "label": "GET /api/project",
+      "summary": "The client fetches `/api/project` once at startup and parses it with `validateProject`; Vite proxies `/api` to the Fastify port."
     },
     {
       "id": "edge-client-depends-shared",
