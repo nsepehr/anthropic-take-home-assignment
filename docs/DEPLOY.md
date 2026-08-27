@@ -1,5 +1,9 @@
 # Deploy (Vercel)
 
+**Production:** https://anthropic-take-home-assignment.vercel.app (stable alias; per-deployment URLs such as
+`https://anthropic-take-home-assignment-<hash>-nima16.vercel.app` are behind Vercel SSO deployment
+protection, so share the alias).
+
 The Vite client is served as static files; the Fastify app runs unchanged as one serverless
 function (`api/[...path].ts`) behind `/api/*`. `vercel.json` holds all settings; no env vars needed.
 

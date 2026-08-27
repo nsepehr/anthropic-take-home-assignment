@@ -281,11 +281,16 @@
       "id": "req-deployed-prototype",
       "title": "Deployed prototype",
       "kind": "constraint",
-      "status": "partial",
-      "systemIds": ["sys-server-api", "sys-client-shell"],
-      "evidence": ["CLAUDE.md (Stack: 'Deploy target later: Fly.io (not set up yet)')"],
+      "status": "implemented",
+      "systemIds": ["sys-server-api", "sys-client-shell", "sys-deploy-vercel"],
+      "evidence": [
+        "https://anthropic-take-home-assignment.vercel.app (production alias)",
+        "vercel.json",
+        "api/[...path].ts",
+        "docs/DEPLOY.md"
+      ],
       "summary": "The prototype is reachable at a public URL, not only on a laptop.",
-      "detail": "From the assignment. The chosen target is Fly.io, but nothing is configured: there is no Dockerfile or `fly.toml`, and the server binds `127.0.0.1` in dev. Deployment is a later task.",
+      "detail": "From the assignment. First production deploy shipped 2026-08-27 to Vercel: the static client on the CDN plus the Fastify app as one serverless function under /api/*. Live at https://anthropic-take-home-assignment.vercel.app (per-deployment URL https://anthropic-take-home-assignment-hgs9d2yql-nima16.vercel.app is behind Vercel SSO deployment protection; the alias is public). Verified: /api/health reports the project loaded, /api/project returns 16 systems, the diagram renders and cards open their panel.",
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T15:00:00+08:00",

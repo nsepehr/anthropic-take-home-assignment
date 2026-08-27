@@ -50,7 +50,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                         |
 | 5   | `05-detail-panels`       | 5     | P1       | todo        | —                        | 03         | Requirement list, intent panel, overview/deep-dive toggle                               |
 | 6   | `06-trust-layer`         | 6     | P1       | todo        | —                        | 04         | Provenance badges, evidence links, gaps view                                            |
-| 7   | `09-deploy-vercel`       | 7     | P1       | review      | agent: deploy-vercel     | 02, 03     | vercel.json + api/[...path].ts Fastify wrapper + DEPLOY.md                              |
+| 7   | `09-deploy-vercel`       | 7     | P1       | done        | agent: deploy-vercel     | 02, 03     | Live: https://anthropic-take-home-assignment.vercel.app (vercel.json, api/, DEPLOY.md)  |
 | 8   | `08-seed-complete`       | 7     | P1       | todo        | —                        | 01         | Seed describes the finished project, honest provenance                                  |
 | 9   | `09-readme`              | 7     | P1       | todo        | —                        | —          | How to run, architecture, links                                                         |
 | 10  | `10-chat`                | 8     | P2       | todo        | —                        | 04         | Stretch: AI chat that @-tags systems/requirements/intents                               |
@@ -127,3 +127,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 13-edge-routing → review (agent: edges): four hidden handles per card + pure `chooseHandles`; worktree left running for inspection
 - 2026-08-27 — 13-edge-routing → done (human, visually approved)
 - 2026-08-27 — 14-layout-lanes → in-progress (agent: layout)
+- 2026-08-27 — 09-deploy-vercel → done (human deployed); production https://anthropic-take-home-assignment.vercel.app; recorded by agent: deployer (15-record-deploy)
