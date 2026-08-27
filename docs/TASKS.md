@@ -45,6 +45,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 3g  | `11-highlight-neighbors` | 4     | P0       | done        | agent: highlight         | 06, 07     | relatedTo includes edge-neighbor systems; connected cards tinted, not dimmed            |
 | 3h  | `12-seed-client-graph`   | 7     | P0       | done        | agent: seed-client       | 08         | Flatten client + workflow into real modules with evidenced edges                        |
 | 3i  | `13-edge-routing`        | 4     | P1       | done        | agent: edges             | 06         | Edges attach to the nearest side; human inspects before merge                           |
+| 3j  | `14-layout-lanes`        | 4     | P0       | in-progress | agent: layout            | 08, 13     | Lane order from edges; top-aligned compact lanes; fit; human inspects before merge      |
 | 4   | `04-selection-linking`   | 5     | P0       | todo        | —                        | 03         | Hero interaction: select entity → connected entities highlight                          |
 | 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                         |
 | 5   | `05-detail-panels`       | 5     | P1       | todo        | —                        | 03         | Requirement list, intent panel, overview/deep-dive toggle                               |
@@ -116,3 +117,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 12-seed-client-graph → done (human); client + workflow lanes are connected graphs
 - 2026-08-27 — 13-edge-routing → review (agent: edges): four hidden handles per card + pure `chooseHandles`; worktree left running for inspection
 - 2026-08-27 — 13-edge-routing → done (human, visually approved)
+- 2026-08-27 — 14-layout-lanes → in-progress (agent: layout)
