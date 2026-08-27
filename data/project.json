@@ -25,13 +25,21 @@
       "id": "sys-server-api",
       "name": "Server API",
       "kind": "service",
-      "paths": ["server/src/app.ts", "server/src/index.ts"],
-      "summary": "A Fastify server that so far exposes only `GET /api/health`.",
-      "detail": "`buildApp()` in `server/src/app.ts` constructs the Fastify instance without listening, so route tests use `app.inject`. `index.ts` listens on `127.0.0.1` at `SERVER_PORT` from `.env.local`. The only route today is `/api/health`, returning `HealthStatus` from `@app/shared`. Serving `data/project.json` through `validateProject()` is the next planned step; it is not implemented yet.",
+      "paths": [
+        "server/src/app.ts",
+        "server/src/index.ts",
+        "server/src/config.ts",
+        "server/src/projectStore.ts",
+        "server/src/routes/",
+        "server/src/services/entities.ts",
+        "server/src/lib/slug.ts"
+      ],
+      "summary": "A thin Fastify server that loads `data/project.json` once, validates it with `@app/shared`, and serves the project, its gaps report and per-entity lookups as JSON.",
+      "detail": "`projectStore.ts` reads the file named by `PROJECT_FILE` (default `data/project.json`) at startup, runs `validateProject()` and caches the result; if validation fails the server still boots and reports the errors. Routes in `server/src/routes/`: `GET /api/project` (the validated Project, or 500 with readable errors), `GET /api/project/gaps` (Gaps), `GET /api/project/related/:id` (the `relatedTo` closure; 400 for a non-slug id, 404 for an unknown one), `GET /api/project/entities/:id` (the entity plus its `type`), `GET /api/health` (adds `project: { loaded, name }`), and dev-only `POST /api/project/reload` (absent when `NODE_ENV=production`). `app.ts` is the composition root; `config.ts` is the only reader of `process.env`. Built by task 02-api.",
       "provenance": {
         "source": "human-verified",
-        "capturedAt": "2026-08-27T14:35:46+08:00",
-        "sessionRef": "commit 47b4a68 (bootstrap)"
+        "capturedAt": "2026-08-27T15:10:00+08:00",
+        "sessionRef": "docs/tasks/02-api.md"
       }
     },
     {
@@ -135,14 +143,18 @@
       "id": "req-self-contained-demo",
       "title": "Self-contained evaluation / demo mode",
       "kind": "constraint",
-      "status": "planned",
+      "status": "partial",
       "systemIds": ["sys-server-api", "sys-seed-data"],
-      "evidence": ["data/project.json"],
+      "evidence": [
+        "data/project.json",
+        "server/src/projectStore.ts",
+        "server/src/routes/project.ts (GET /api/project, /gaps, /related/:id, /entities/:id)"
+      ],
       "summary": "A reviewer can run and evaluate the prototype without external services or credentials.",
-      "detail": "From the assignment. The app must work from a clone with no API keys: the server serves the checked-in `data/project.json` rather than analysing a repo live or calling an LLM. The seed file exists; the server does not serve it yet, so this is still planned.",
+      "detail": "From the assignment. The app must work from a clone with no API keys: the server serves the checked-in `data/project.json` rather than analysing a repo live or calling an LLM. The server now serves the validated seed, its gaps and related-entity closures; the client does not render them yet and nothing is deployed, so this is partial.",
       "provenance": {
         "source": "human-verified",
-        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "capturedAt": "2026-08-27T15:10:00+08:00",
         "sessionRef": "claude-code session 2026-08-27, planning chat"
       }
     },
@@ -523,6 +535,24 @@
         "capturedAt": "2026-08-27T16:00:00+08:00",
         "sessionRef": "claude-code session 2026-08-27, planning chat"
       }
+    },
+    {
+      "id": "int-server-thin-validate-once",
+      "statement": "The server validates the project once at boot and stays thin; a broken seed is surfaced, not hidden.",
+      "rationale": "The server's whole job is load, validate, serve. Validating once and caching keeps every route a pure lookup over the model, and keeps analysis or AI out of the server so it can be added as a separate task later. If the seed fails validation the server must still boot: `/api/project` returns 500 with the readable path+message errors and `/api/health` reports `loaded: false`, so an author sees exactly what is wrong instead of a crash loop or a silently empty diagram. Alternatives rejected: crashing at startup on an invalid file; validating on every request; serving whatever parses even if references dangle. Trade-off: editing the seed needs `POST /api/project/reload` (dev only) or a restart.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-server-api"],
+        "requirementIds": ["req-self-contained-demo", "req-provenance-on-claims"],
+        "edgeIds": ["edge-server-depends-shared", "edge-server-reads-seed"]
+      },
+      "summary": "Load once, validate once, serve; if the data is broken, say so loudly.",
+      "detail": "`server/src/projectStore.ts` holds the `ValidateResult` for the process; routes read it through `store.current()`. `projectStore.test.ts` pins that an invalid fixture still boots the app with a 500 on `/api/project`.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:10:00+08:00",
+        "sessionRef": "docs/tasks/02-api.md (Scope: projectStore; Goal)"
+      }
     }
   ],
   "edges": [
@@ -548,7 +578,7 @@
       "to": "sys-shared-model",
       "kind": "depends",
       "intentId": "int-backend-first",
-      "summary": "The server types its responses with `@app/shared`."
+      "summary": "The server validates the seed with `validateProject`, answers `/related/:id` with `relatedTo`, and types its responses with `@app/shared`."
     },
     {
       "id": "edge-seed-conforms-shared",
@@ -566,6 +596,15 @@
       "kind": "calls",
       "intentId": "int-isolated-worktrees",
       "summary": "`dev.mjs` runs `ports.mjs` before starting servers so ports are always allocated."
+    },
+    {
+      "id": "edge-server-reads-seed",
+      "from": "sys-server-api",
+      "to": "sys-seed-data",
+      "kind": "reads",
+      "label": "PROJECT_FILE",
+      "intentId": "int-server-thin-validate-once",
+      "summary": "The server reads `data/project.json` at boot (path overridable with `PROJECT_FILE`) and on `POST /api/project/reload` in dev."
     }
   ]
 }

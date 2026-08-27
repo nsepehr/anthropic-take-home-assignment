@@ -1,0 +1,50 @@
+{
+  "name": "Fixture project",
+  "mission": "A tiny valid project for server tests.",
+  "systems": [
+    {
+      "id": "sys-a",
+      "name": "A",
+      "kind": "service",
+      "paths": ["a/"],
+      "summary": "System A.",
+      "detail": "System A in detail.",
+      "provenance": { "source": "human-verified", "capturedAt": "2026-08-27T00:00:00Z" }
+    },
+    {
+      "id": "sys-b",
+      "name": "B",
+      "kind": "module",
+      "paths": ["b/"],
+      "summary": "System B.",
+      "detail": "System B in detail.",
+      "provenance": { "source": "ai-inferred", "capturedAt": "2026-08-27T00:00:00Z" }
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req-a",
+      "title": "Requirement A",
+      "kind": "functional",
+      "status": "partial",
+      "systemIds": ["sys-a"],
+      "evidence": [],
+      "summary": "Requirement A.",
+      "detail": "Requirement A in detail.",
+      "provenance": { "source": "human-verified", "capturedAt": "2026-08-27T00:00:00Z" }
+    }
+  ],
+  "intents": [
+    {
+      "id": "int-a",
+      "statement": "Do A.",
+      "rationale": "Because.",
+      "status": "active",
+      "appliesTo": { "systemIds": ["sys-a"], "requirementIds": ["req-a"], "edgeIds": ["edge-a"] },
+      "summary": "Intent A.",
+      "detail": "Intent A in detail.",
+      "provenance": { "source": "human-verified", "capturedAt": "2026-08-27T00:00:00Z" }
+    }
+  ],
+  "edges": [{ "id": "edge-a", "from": "sys-a", "to": "sys-b", "kind": "calls" }]
+}

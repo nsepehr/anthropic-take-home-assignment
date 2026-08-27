@@ -1,14 +1,22 @@
 import Fastify from 'fastify';
-import type { HealthStatus } from '@app/shared';
+import { loadConfig, type Config } from './config.js';
+import { createProjectStore, type ProjectStore } from './projectStore.js';
+import { healthRoutes } from './routes/health.js';
+import { projectRoutes } from './routes/project.js';
 
-/** Builds the Fastify app without listening, so tests can use `app.inject`. */
-export function buildApp() {
-  const app = Fastify({ logger: process.env.NODE_ENV !== 'test' });
+export interface BuildAppOptions {
+  config?: Config;
+  store?: ProjectStore;
+}
 
-  app.get('/api/health', async (): Promise<HealthStatus> => ({
-    status: 'ok',
-    uptimeSeconds: Math.round(process.uptime()),
-  }));
+/** Composition root. Builds the Fastify app without listening, so tests can use `app.inject`. */
+export function buildApp(options: BuildAppOptions = {}) {
+  const config = options.config ?? loadConfig();
+  const store = options.store ?? createProjectStore(config.projectFile);
+  const app = Fastify({ logger: !config.isTest });
+
+  app.register(healthRoutes, { store });
+  app.register(projectRoutes, { store, allowReload: !config.isProduction });
 
   return app;
 }

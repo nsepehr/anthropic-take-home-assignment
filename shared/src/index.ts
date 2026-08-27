@@ -12,4 +12,6 @@ export { getSystem, relatedTo, type Related } from './related.js';
 export interface HealthStatus {
   status: 'ok';
   uptimeSeconds: number;
+  /** Whether the project file loaded and validated; `name` is present only when it did. */
+  project?: { loaded: true; name: string } | { loaded: false };
 }

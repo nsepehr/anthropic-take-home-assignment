@@ -1,0 +1,20 @@
+{
+  "name": "Broken fixture",
+  "mission": "A requirement points at a system that does not exist.",
+  "systems": [],
+  "requirements": [
+    {
+      "id": "req-a",
+      "title": "Requirement A",
+      "kind": "functional",
+      "status": "planned",
+      "systemIds": ["sys-ghost"],
+      "evidence": [],
+      "summary": "Requirement A.",
+      "detail": "Requirement A in detail.",
+      "provenance": { "source": "human-verified", "capturedAt": "2026-08-27T00:00:00Z" }
+    }
+  ],
+  "intents": [],
+  "edges": []
+}
