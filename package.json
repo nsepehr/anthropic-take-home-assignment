@@ -21,7 +21,8 @@
     "typecheck": "npm run typecheck --workspaces",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm test"
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm test",
+    "validate:data": "npm run build -w shared && node scripts/validate-data.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

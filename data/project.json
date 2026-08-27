@@ -1,0 +1,626 @@
+{
+  "name": "Codebase Map",
+  "mission": "A post-IDE interface for understanding a codebase: systems, their connections, the requirements they serve, and the human intent behind them — in one view.",
+  "systems": [
+    {
+      "id": "sys-shared-model",
+      "name": "Shared data model",
+      "kind": "module",
+      "paths": [
+        "shared/src/schema.ts",
+        "shared/src/validate.ts",
+        "shared/src/gaps.ts",
+        "shared/src/related.ts",
+        "shared/src/index.ts"
+      ],
+      "requirementIds": [
+        "req-overview-deep-dive",
+        "req-provenance-on-claims",
+        "req-single-focused-interaction",
+        "req-parallel-agents-safe"
+      ],
+      "intentIds": [
+        "int-intent-first-class",
+        "int-summary-and-detail",
+        "int-trust-provenance-gaps",
+        "int-zod-single-definition",
+        "int-edges-lightweight"
+      ],
+      "summary": "The contract between server and client: Zod schemas for System, Requirement, Intent and Edge, plus validation and graph helpers.",
+      "detail": "Package `@app/shared`. Defines the four entity schemas with Zod and infers the TypeScript types from them, so there is exactly one definition. `validateProject()` checks shape and then referential integrity (unique ids, references resolving to the right entity type, edge endpoints existing, no `parentId` cycles) and returns readable path+message errors. `computeGaps()` reports what the model cannot explain. `relatedTo()` returns everything linked to an entity in either direction — the closure the UI will highlight on selection. Has no runtime dependency except `zod`. Built by task 01-schema-and-seed.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "docs/tasks/01-schema-and-seed.md"
+      }
+    },
+    {
+      "id": "sys-server-api",
+      "name": "Server API",
+      "kind": "service",
+      "paths": ["server/src/app.ts", "server/src/index.ts"],
+      "requirementIds": ["req-self-contained-demo"],
+      "intentIds": ["int-backend-first"],
+      "summary": "A Fastify server that so far exposes only `GET /api/health`.",
+      "detail": "`buildApp()` in `server/src/app.ts` constructs the Fastify instance without listening, so route tests use `app.inject`. `index.ts` listens on `127.0.0.1` at `SERVER_PORT` from `.env.local`. The only route today is `/api/health`, returning `HealthStatus` from `@app/shared`. Serving `data/project.json` through `validateProject()` is the next planned step; it is not implemented yet.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T14:35:46+08:00",
+        "sessionRef": "commit 47b4a68 (bootstrap)"
+      }
+    },
+    {
+      "id": "sys-client-app",
+      "name": "Client app",
+      "kind": "ui",
+      "paths": ["client/src/App.tsx", "client/src/main.tsx", "client/vite.config.ts"],
+      "requirementIds": ["req-one-view-understanding", "req-single-focused-interaction"],
+      "intentIds": ["int-react-flow-elk", "int-backend-first"],
+      "summary": "A Vite + React hello page that pings the server; the architecture diagram is not built yet.",
+      "detail": "Today `App.tsx` renders a heading and the result of `fetch('/api/health')`, proxied by Vite to the server. `@xyflow/react` and `elkjs` are installed as the chosen diagram stack but no diagram, node component, or layout code exists yet. The client resolves `@app/shared` straight to `shared/src/index.ts` via a Vite alias and never imports server code.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T14:35:46+08:00",
+        "sessionRef": "commit 47b4a68 (bootstrap)"
+      }
+    },
+    {
+      "id": "sys-seed-data",
+      "name": "Seed data",
+      "kind": "store",
+      "paths": ["data/project.json", "data/README.md"],
+      "requirementIds": ["req-dogfood-seed", "req-provenance-on-claims"],
+      "intentIds": ["int-project-is-own-demo", "int-trust-provenance-gaps"],
+      "summary": "The hand-written record of this project, validated against the shared schema; it is the tool's own demo content.",
+      "detail": "`data/project.json` conforms to `ProjectSchema`. It is not a mock: every entry describes the repo as it exists, captured from the planning conversation and the commit history, with `provenance` saying whether a human verified it or an AI inferred it. Every task appends its systems, requirements and intents here (CLAUDE.md rule 9) and runs `npm run validate:data`, which also prints the gaps report.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "docs/tasks/01-schema-and-seed.md"
+      }
+    },
+    {
+      "id": "sys-agent-workflow",
+      "name": "Agent workflow",
+      "kind": "workflow",
+      "paths": ["CLAUDE.md", "docs/AGENT_WORKFLOW.md", "docs/tasks/", "scripts/"],
+      "requirementIds": ["req-parallel-agents-safe"],
+      "intentIds": ["int-isolated-worktrees"],
+      "summary": "The rules and scripts that let several AI coding agents work on this repo in parallel without colliding.",
+      "detail": "Each task is a brief in `docs/tasks/<slug>.md` that names the files the agent owns. The agent runs in its own git worktree and branch (`agent/<slug>`) with its own allocated ports, must keep `npm run check` green, and finishes with `scripts/finish-worktree.sh`, which rebases on `main` and re-runs the checks. Merges are fast-forward only and done by the human. `CLAUDE.md` holds the short rules; `docs/AGENT_WORKFLOW.md` the long form.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T14:35:46+08:00",
+        "sessionRef": "commit 47b4a68 (bootstrap); CLAUDE.md"
+      }
+    },
+    {
+      "id": "sys-worktree-scripts",
+      "name": "Worktree scripts",
+      "kind": "module",
+      "parentId": "sys-agent-workflow",
+      "paths": ["scripts/new-worktree.sh", "scripts/finish-worktree.sh"],
+      "requirementIds": ["req-parallel-agents-safe"],
+      "intentIds": ["int-isolated-worktrees"],
+      "summary": "Shell scripts that open a task worktree and close it out with a rebase and full check run.",
+      "detail": "`new-worktree.sh <slug>` creates branch `agent/<slug>` from `main`, adds a worktree at `../worktrees/<slug>`, installs dependencies and allocates ports. `finish-worktree.sh` refuses uncommitted changes, rebases onto `main`, runs `npm run check` and prints the fast-forward merge commands. Neither script merges or pushes.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T14:35:46+08:00",
+        "sessionRef": "commit 47b4a68 (bootstrap)"
+      }
+    },
+    {
+      "id": "sys-ports-allocator",
+      "name": "Ports allocator",
+      "kind": "module",
+      "parentId": "sys-agent-workflow",
+      "paths": ["scripts/ports.mjs", "scripts/env.mjs"],
+      "requirementIds": ["req-parallel-agents-safe"],
+      "intentIds": ["int-isolated-worktrees"],
+      "summary": "Gives each worktree its own free CLIENT_PORT and SERVER_PORT, written to a gitignored `.env.local`.",
+      "detail": "`scripts/ports.mjs` reads the `.env.local` of every sibling worktree (via `git worktree list`) so it never hands out a port another agent has claimed, then probes the OS on IPv4, IPv6 and unspecified hosts before accepting a port. It is idempotent: re-running keeps existing ports unless `--force` is passed. `env.mjs` is the tiny dependency-free `.env.local` parser shared with the dev runner.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T14:35:46+08:00",
+        "sessionRef": "commit 47b4a68 (bootstrap)"
+      }
+    },
+    {
+      "id": "sys-dev-runner",
+      "name": "Dev runner",
+      "kind": "module",
+      "parentId": "sys-agent-workflow",
+      "paths": ["scripts/dev.mjs"],
+      "requirementIds": [],
+      "intentIds": [],
+      "summary": "`npm run dev`: allocates ports, then starts the server and client dev servers with those ports in the environment.",
+      "detail": "`scripts/dev.mjs` first runs the ports allocator synchronously, loads `.env.local`, prints the two URLs, and spawns `npm run dev` in the `server` and `client` workspaces. It forwards SIGINT/SIGTERM to both children and exits if either child fails. The Vite dev server proxies `/api` to the Fastify port.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T14:35:46+08:00",
+        "sessionRef": "commit 47b4a68 (bootstrap)"
+      }
+    },
+    {
+      "id": "sys-check-suite",
+      "name": "Check suite",
+      "kind": "workflow",
+      "parentId": "sys-agent-workflow",
+      "paths": ["package.json", "eslint.config.js", "vitest.workspace.ts", "tsconfig.base.json"],
+      "requirementIds": ["req-parallel-agents-safe"],
+      "intentIds": ["int-tests-pin-intent"],
+      "summary": "`npm run check` — typecheck, lint, format check and Vitest across all three workspaces; the definition of green.",
+      "detail": "Root scripts run `tsc --noEmit` per workspace, ESLint (flat config, with a lint rule banning `dangerouslySetInnerHTML`), Prettier in check mode and `vitest run` over the `client`, `server` and `shared` workspaces. Every module ships with a small test that pins its intent so a parallel agent cannot silently break it. `finish-worktree.sh` runs this suite after rebasing.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T14:35:46+08:00",
+        "sessionRef": "commit 47b4a68 (bootstrap); CLAUDE.md rule 6"
+      }
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req-self-contained-demo",
+      "title": "Self-contained evaluation / demo mode",
+      "kind": "constraint",
+      "status": "planned",
+      "systemIds": ["sys-server-api", "sys-seed-data"],
+      "intentIds": ["int-project-is-own-demo"],
+      "evidence": ["data/project.json"],
+      "summary": "A reviewer can run and evaluate the prototype without external services or credentials.",
+      "detail": "From the assignment. The app must work from a clone with no API keys: the server serves the checked-in `data/project.json` rather than analysing a repo live or calling an LLM. The seed file exists; the server does not serve it yet, so this is still planned.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "req-deployed-prototype",
+      "title": "Deployed prototype",
+      "kind": "constraint",
+      "status": "planned",
+      "systemIds": ["sys-server-api", "sys-client-app"],
+      "intentIds": [],
+      "evidence": ["CLAUDE.md (Stack: 'Deploy target later: Fly.io (not set up yet)')"],
+      "summary": "The prototype is reachable at a public URL, not only on a laptop.",
+      "detail": "From the assignment. The chosen target is Fly.io, but nothing is configured: there is no Dockerfile or `fly.toml`, and the server binds `127.0.0.1` in dev. Deployment is a later task.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "req-single-focused-interaction",
+      "title": "One single, focused hero interaction",
+      "kind": "functional",
+      "status": "partial",
+      "systemIds": ["sys-client-app", "sys-shared-model"],
+      "intentIds": ["int-backend-first"],
+      "evidence": ["shared/src/related.ts", "shared/src/related.test.ts"],
+      "summary": "Select one thing and everything connected to it — systems, requirements, intents, edges — lights up.",
+      "detail": "From the assignment's guidance to do one interaction well. The chosen interaction is select-to-highlight. The data side is done: `relatedTo(project, id)` returns the closure in both directions and is tested. The UI side does not exist yet, hence `partial`.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "task 01-schema-and-seed: status inferred from relatedTo existing without any UI"
+      }
+    },
+    {
+      "id": "req-written-video-rationale",
+      "title": "Written and video rationale",
+      "kind": "constraint",
+      "status": "planned",
+      "systemIds": [],
+      "intentIds": ["int-project-is-own-demo"],
+      "evidence": [],
+      "summary": "The submission includes a written explanation and a short video walking through the design decisions.",
+      "detail": "From the assignment. Nothing exists yet. Because the seed data records intents with rationale and rejected alternatives, the written rationale can largely be generated from — or at least cross-checked against — `data/project.json`.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "req-ai-transcripts",
+      "title": "AI transcripts submitted",
+      "kind": "constraint",
+      "status": "planned",
+      "systemIds": [],
+      "intentIds": [],
+      "evidence": [],
+      "summary": "The conversations with AI coding agents used to build the prototype are part of the submission.",
+      "detail": "From the assignment. No system in the repo serves this; it is a process obligation on the human. The `sessionRef` field on every entity's provenance is the model's hook for pointing at those transcripts once they are collected.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "req-one-view-understanding",
+      "title": "Understand architecture, features and intent from one view",
+      "kind": "functional",
+      "status": "planned",
+      "systemIds": ["sys-client-app"],
+      "intentIds": ["int-intent-first-class", "int-react-flow-elk"],
+      "evidence": [],
+      "summary": "A user opens the app and sees systems, the requirements they serve and the intent behind them together, without reading code.",
+      "detail": "The product's core requirement. Systems render as boxes and edges as arrows; requirements and intents are front-and-center content on and around the nodes, not tooltips. The client currently renders a hello page, so this is entirely ahead of us; the model that makes it possible is in place.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "req-overview-deep-dive",
+      "title": "Overview and deep-dive language for every entity",
+      "kind": "functional",
+      "status": "partial",
+      "systemIds": ["sys-shared-model"],
+      "intentIds": ["int-summary-and-detail"],
+      "evidence": ["shared/src/schema.ts (EntityBase: summary + detail required)"],
+      "summary": "Every system, requirement and intent can be read as a one-sentence overview or a deep dive, toggled globally.",
+      "detail": "The schema requires `summary` and `detail` on every first-class entity, and the seed fills both. The global overview/deep-dive toggle in the UI is not built. Partial.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "req-provenance-on-claims",
+      "title": "Every claim shows its provenance",
+      "kind": "non-functional",
+      "status": "partial",
+      "systemIds": ["sys-shared-model", "sys-seed-data"],
+      "intentIds": ["int-trust-provenance-gaps"],
+      "evidence": [
+        "shared/src/schema.ts (ProvenanceSchema)",
+        "shared/src/gaps.ts",
+        "data/project.json"
+      ],
+      "summary": "For each entity the user can see whether a human verified it or an AI inferred it, when, and from where.",
+      "detail": "Schema and seed side is done: `provenance` is required on every entity and the seed mixes `human-verified` and `ai-inferred` entries honestly. `computeGaps` surfaces what the model cannot explain. The UI badge and gaps panel are not built. Partial.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "req-parallel-agents-safe",
+      "title": "Parallel agents can't silently break each other",
+      "kind": "non-functional",
+      "status": "implemented",
+      "systemIds": [
+        "sys-agent-workflow",
+        "sys-worktree-scripts",
+        "sys-ports-allocator",
+        "sys-check-suite",
+        "sys-shared-model"
+      ],
+      "intentIds": ["int-isolated-worktrees", "int-tests-pin-intent"],
+      "evidence": [
+        "scripts/new-worktree.sh",
+        "scripts/ports.mjs",
+        "scripts/finish-worktree.sh",
+        "CLAUDE.md rules 1, 2, 6",
+        "shared/src/*.test.ts"
+      ],
+      "summary": "Several AI agents build features at the same time; isolation plus tests catch collisions before merge.",
+      "detail": "Served by three mechanisms that all exist today: isolated worktrees with their own branch and ports; intent-pinning tests per module run by `npm run check`; and `finish-worktree.sh`, which rebases on `main` and re-runs the suite before a merge is allowed. Contract changes in `shared/` must be called out in each report.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat; CLAUDE.md"
+      }
+    },
+    {
+      "id": "req-dogfood-seed",
+      "title": "The seed data describes this project itself and stays current",
+      "kind": "functional",
+      "status": "implemented",
+      "systemIds": ["sys-seed-data", "sys-shared-model"],
+      "intentIds": ["int-project-is-own-demo"],
+      "evidence": [
+        "data/project.json",
+        "data/README.md",
+        "package.json (validate:data)",
+        "CLAUDE.md rule 9"
+      ],
+      "summary": "`data/project.json` is a validated, honest record of this repo that every task appends to.",
+      "detail": "Implemented by this task: the seed exists, validates, and CLAUDE.md rule 9 obliges every later task to append its systems, requirements and intents with honest provenance and run `npm run validate:data`.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "docs/tasks/01-schema-and-seed.md; CLAUDE.md rule 9"
+      }
+    }
+  ],
+  "intents": [
+    {
+      "id": "int-intent-first-class",
+      "statement": "Intent is a first-class entity, not a field on System.",
+      "rationale": "One decision typically explains several systems and edges at once. Modelling it as its own entity with `appliesTo` lets the UI put intent front and center and cross-link it, instead of burying it in a tooltip on one node.",
+      "alternativesRejected": [
+        "A `rationale` string field on each System",
+        "Free-text notes attached to edges"
+      ],
+      "tradeoffs": "More ids to keep consistent by hand; the validator and gaps report exist partly to make that manageable.",
+      "appliesTo": {
+        "systemIds": ["sys-shared-model"],
+        "requirementIds": ["req-one-view-understanding"],
+        "edgeIds": []
+      },
+      "summary": "Decisions get their own boxes in the model because one decision usually explains many things.",
+      "detail": "The schema has `Intent { statement, rationale, alternativesRejected, tradeoffs, appliesTo: { systemIds, requirementIds, edgeIds } }`. Systems and requirements also point back via `intentIds`, so links can be followed from either side.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "int-summary-and-detail",
+      "statement": "Every entity carries both a one-sentence summary and a deep-dive detail.",
+      "rationale": "Different readers need different depth: a newcomer wants plain language, a maintainer wants the full story. Baking both into the schema means the UI can toggle overview/deep dive globally without any entity being left out.",
+      "alternativesRejected": [
+        "A single description field, truncated for overview mode",
+        "Generating the summary at render time"
+      ],
+      "tradeoffs": "Authors must write two texts per entity; the seed is longer to maintain.",
+      "appliesTo": {
+        "systemIds": ["sys-shared-model"],
+        "requirementIds": ["req-overview-deep-dive"],
+        "edgeIds": []
+      },
+      "summary": "Simple and deep language are both required fields, not an afterthought.",
+      "detail": "`EntityBase` in `shared/src/schema.ts` requires non-empty `summary` and `detail` on System, Requirement and Intent. Edges make both optional to stay lightweight (see int-edges-lightweight).",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "int-project-is-own-demo",
+      "statement": "The project is its own demo; the seed data is captured from the build process, not mocked.",
+      "rationale": "A mocked example codebase would prove nothing about whether the model captures real intent. Recording this repo's own decisions as they are made tests the model for real and gives the demo honest content.",
+      "alternativesRejected": [
+        "A fictional sample project",
+        "Analysing a well-known open-source repo"
+      ],
+      "tradeoffs": "The demo content is small and about a tooling project, which is less flashy than a big product codebase.",
+      "appliesTo": {
+        "systemIds": ["sys-seed-data"],
+        "requirementIds": [
+          "req-self-contained-demo",
+          "req-dogfood-seed",
+          "req-written-video-rationale"
+        ],
+        "edgeIds": ["edge-seed-conforms-shared"]
+      },
+      "summary": "The demo data is this repo's real history, so the tool is tested on itself.",
+      "detail": "CLAUDE.md rule 9 makes appending to `data/project.json` part of every task's definition of done. Provenance distinguishes what the human decided in the planning chat from what an agent inferred while building.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "int-react-flow-elk",
+      "statement": "Use React Flow (@xyflow/react) with elkjs layout, rather than LikeC4, Cytoscape or Mermaid.",
+      "rationale": "Nodes must be rich React components showing requirements and intent as content, so the rendering layer has to be React-native. React Flow gives full control over nodes and edges; elkjs supplies a proper layered layout for nested systems.",
+      "alternativesRejected": [
+        "LikeC4 — too opinionated for an intent-first UI",
+        "Cytoscape — canvas-only, no React nodes",
+        "Mermaid — static output, no interaction"
+      ],
+      "tradeoffs": "More layout and interaction code to write ourselves; elkjs adds bundle weight.",
+      "appliesTo": {
+        "systemIds": ["sys-client-app"],
+        "requirementIds": ["req-one-view-understanding"],
+        "edgeIds": []
+      },
+      "summary": "A React-native diagram library was chosen so nodes can carry real content, not just labels.",
+      "detail": "Both packages are installed in `client/` since the bootstrap commit. The model stores no coordinates; the client computes positions with ELK at render time.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "int-isolated-worktrees",
+      "statement": "Each parallel agent works in its own git worktree with its own allocated ports.",
+      "rationale": "Agents run concurrently and each starts dev servers. Worktrees give file-level isolation and a private branch; the ports allocator prevents `EADDRINUSE` collisions and hardcoded 5173/3001.",
+      "alternativesRejected": [
+        "All agents on one checkout with feature branches",
+        "Fixed port offsets per task"
+      ],
+      "tradeoffs": "A full `npm install` per worktree and some disk use; the human does all merges by hand, fast-forward only.",
+      "appliesTo": {
+        "systemIds": ["sys-agent-workflow", "sys-worktree-scripts", "sys-ports-allocator"],
+        "requirementIds": ["req-parallel-agents-safe"],
+        "edgeIds": ["edge-dev-runner-calls-ports"]
+      },
+      "summary": "Isolation by worktree and port so agents never step on each other.",
+      "detail": "See `scripts/new-worktree.sh`, `scripts/ports.mjs` and CLAUDE.md rules 1–2. The allocator reads sibling worktrees' `.env.local` files so ports are unique across the whole checkout, not just free on the OS at that instant.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "int-trust-provenance-gaps",
+      "statement": "Trust is explicit: provenance on every claim, and the tool reports gaps instead of hiding them.",
+      "rationale": "A map that mixes verified facts with AI guesses without saying which is which is worse than no map. Showing provenance and an honest 'unexplained' list lets the reader calibrate.",
+      "alternativesRejected": [
+        "Treating all generated content as equally trustworthy",
+        "Omitting entities the model cannot explain so the diagram looks complete"
+      ],
+      "tradeoffs": "The demo will visibly show gaps and `ai-inferred` badges, which looks less polished but is the point.",
+      "appliesTo": {
+        "systemIds": ["sys-shared-model", "sys-seed-data"],
+        "requirementIds": ["req-provenance-on-claims"],
+        "edgeIds": []
+      },
+      "summary": "Every claim says who vouched for it, and the model admits what it cannot explain.",
+      "detail": "`ProvenanceSchema` is required on every entity. `computeGaps` lists systems without intent, requirements without a system, edges without intent and intents without a target; `validateProject` returns it alongside the parsed project so the server can serve it.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "int-chat-last",
+      "statement": "Chat and AI generation features come deliberately last.",
+      "rationale": "The core question is whether a human can understand a system from the map, not whether an AI can generate text about it. Building understanding first keeps the prototype focused and keeps the demo self-contained with no API keys.",
+      "alternativesRejected": [
+        "Leading with an LLM chat over the codebase",
+        "Generating the architecture model from the repo with an LLM in task 01"
+      ],
+      "tradeoffs": "The first demo has no generative feature, which some reviewers may expect.",
+      "appliesTo": {
+        "systemIds": [],
+        "requirementIds": ["req-self-contained-demo"],
+        "edgeIds": []
+      },
+      "summary": "Understanding before generation: no chat until the map works.",
+      "detail": "Task 01 explicitly forbade LLM calls and repo analysis; the seed is hand-written. No system exists for chat yet, which is why this intent applies to no system.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "int-backend-first",
+      "statement": "Build the model and backend first; design the UI look-and-feel separately with Claude Design.",
+      "rationale": "The data model is the contract everything depends on and is where the product thesis lives. Locking it first lets server and client tasks run in parallel, while visual design happens in a dedicated tool rather than by iterating CSS in code.",
+      "alternativesRejected": [
+        "UI-first prototyping with hardcoded data",
+        "Designing look-and-feel inline in React components"
+      ],
+      "tradeoffs": "The client is a bare hello page for longer than a UI-first approach would leave it.",
+      "appliesTo": {
+        "systemIds": ["sys-shared-model", "sys-server-api", "sys-client-app"],
+        "requirementIds": ["req-single-focused-interaction"],
+        "edgeIds": ["edge-client-depends-shared", "edge-server-depends-shared"]
+      },
+      "summary": "Model, then server, then UI; visual design is a separate track.",
+      "detail": "Task order: 01 schema and seed (this), then the server serving the project, then the diagram. Both server and client already depend on `@app/shared` for `HealthStatus`, and will for the whole model.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "claude-code session 2026-08-27, planning chat"
+      }
+    },
+    {
+      "id": "int-zod-single-definition",
+      "statement": "Zod defines the schema once; TypeScript types are inferred from it.",
+      "rationale": "Runtime validation at the API boundary and compile-time types must never drift. `z.infer` gives both from one definition. It is the one runtime dependency `shared/` is allowed.",
+      "alternativesRejected": [
+        "Hand-written interfaces plus a separate JSON Schema",
+        "TypeScript types only, trusting the JSON"
+      ],
+      "tradeoffs": "One dependency in the otherwise dependency-free contract package.",
+      "appliesTo": { "systemIds": ["sys-shared-model"], "requirementIds": [], "edgeIds": [] },
+      "summary": "One schema definition serves both validation and types.",
+      "detail": "See `shared/src/schema.ts`. `shared/package.json` depends on `zod@^3`; nothing else.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "docs/tasks/01-schema-and-seed.md (Context: 'Zod for schemas')"
+      }
+    },
+    {
+      "id": "int-edges-lightweight",
+      "statement": "Edges have optional summary/detail and no provenance of their own; their explanation lives in the Intent they point to.",
+      "rationale": "An edge is a fact about two systems that already carry provenance. Requiring two paragraphs and a provenance block per arrow would make the seed tedious and push authors to omit edges. Keeping edges thin and hanging the 'why' on `intentId` keeps intent as the single place decisions are explained.",
+      "alternativesRejected": [
+        "Edges as full entities with required summary, detail and provenance",
+        "Edges with no explanatory fields at all"
+      ],
+      "tradeoffs": "An edge without an `intentId` is unexplained, which the gaps report surfaces as `edgesWithoutIntent`.",
+      "appliesTo": { "systemIds": ["sys-shared-model"], "requirementIds": [], "edgeIds": [] },
+      "summary": "Arrows stay thin; the reason for an arrow is its intent.",
+      "detail": "`EdgeSchema` in `shared/src/schema.ts`: `id, from, to, kind, label?, intentId?, summary?, detail?`. The brief left this to the implementing agent, so it is marked as AI-inferred.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "task 01-schema-and-seed: agent decision, brief said 'your call'"
+      }
+    },
+    {
+      "id": "int-tests-pin-intent",
+      "statement": "Every module ships with a small test that pins its intent, not its implementation.",
+      "rationale": "With several agents editing in parallel, the danger is a silent behaviour change in something another task relies on. A test stating what the module must do fails loudly at `finish-worktree.sh` time. Coverage is not the goal.",
+      "alternativesRejected": ["Coverage thresholds", "No tests during the prototype phase"],
+      "tradeoffs": "Some duplication between tests and briefs; tests stay deliberately shallow.",
+      "appliesTo": {
+        "systemIds": ["sys-check-suite"],
+        "requirementIds": ["req-parallel-agents-safe"],
+        "edgeIds": []
+      },
+      "summary": "Tests exist to stop other agents breaking you, not to hit a number.",
+      "detail": "CLAUDE.md rule 6 states this. Marked AI-inferred because the rule was found in the repo, not confirmed in the planning conversation enumerated for this task.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T15:00:00+08:00",
+        "sessionRef": "CLAUDE.md rule 6; task 01-schema-and-seed"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-client-calls-server",
+      "from": "sys-client-app",
+      "to": "sys-server-api",
+      "kind": "calls",
+      "label": "GET /api/health",
+      "summary": "The client fetches `/api/health`; Vite proxies `/api` to the Fastify port."
+    },
+    {
+      "id": "edge-client-depends-shared",
+      "from": "sys-client-app",
+      "to": "sys-shared-model",
+      "kind": "depends",
+      "intentId": "int-backend-first",
+      "summary": "The client imports types (today `HealthStatus`) from `@app/shared` via a Vite alias to `shared/src`."
+    },
+    {
+      "id": "edge-server-depends-shared",
+      "from": "sys-server-api",
+      "to": "sys-shared-model",
+      "kind": "depends",
+      "intentId": "int-backend-first",
+      "summary": "The server types its responses with `@app/shared`."
+    },
+    {
+      "id": "edge-seed-conforms-shared",
+      "from": "sys-seed-data",
+      "to": "sys-shared-model",
+      "kind": "depends",
+      "intentId": "int-project-is-own-demo",
+      "label": "validated by",
+      "summary": "`npm run validate:data` runs `validateProject` over the seed; it must stay green."
+    },
+    {
+      "id": "edge-dev-runner-calls-ports",
+      "from": "sys-dev-runner",
+      "to": "sys-ports-allocator",
+      "kind": "calls",
+      "intentId": "int-isolated-worktrees",
+      "summary": "`dev.mjs` runs `ports.mjs` before starting servers so ports are always allocated."
+    }
+  ]
+}
