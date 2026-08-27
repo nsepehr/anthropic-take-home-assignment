@@ -25,8 +25,11 @@ const DEFAULT_ELK_OPTIONS: ElkOptions = {
   'elk.algorithm': 'layered',
   'elk.direction': 'RIGHT',
   'elk.hierarchyHandling': 'INCLUDE_CHILDREN',
-  'elk.layered.spacing.nodeNodeBetweenLayers': '60',
-  'elk.spacing.nodeNode': '30',
+  // Measured on the seed (docs/tasks/14-layout-lanes.md): NETWORK_SIMPLEX gives the fewest
+  // crossings and shortest edges; post-compaction is avoided because it breaks lane separation.
+  'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
+  'elk.layered.spacing.nodeNodeBetweenLayers': '40',
+  'elk.spacing.nodeNode': '20',
   'elk.padding': '[top=40,left=20,bottom=20,right=20]',
 };
 

@@ -1,21 +1,16 @@
-import { useCallback, useMemo } from 'react';
-import type { Project } from '@app/shared';
+import { useMemo } from 'react';
+import { laneBounds, lanePartition, type LaneIndex, type PositionedNode } from '../model/lanes';
+import { alignLaneTops, UNIFORM_LANE_HEIGHT } from './alignLanes';
 import type { PartitionOf } from './elk';
-import { laneBounds, laneIndex, type PositionedNode } from '../model/lanes';
 
-/**
- * Lane wiring for a diagram: a stable `partitionOf` to hand `useLayout`, and the lane rectangles
- * derived from the positioned nodes it returns.
- */
-export function useLanes(project: Project, positionedNodes: PositionedNode[]) {
-  const index = useMemo(() => laneIndex(project), [project]);
-  const partitionOf = useCallback<PartitionOf>(
-    (id) => {
-      const category = index.categoryById.get(id);
-      return category === undefined ? undefined : index.order.indexOf(category);
-    },
-    [index],
-  );
-  const lanes = useMemo(() => laneBounds(positionedNodes, index), [positionedNodes, index]);
-  return { partitionOf, lanes };
+/** A stable `partitionOf` for `useLayout`: each lane becomes one left-to-right partition. */
+export function useLanePartition(index: LaneIndex): PartitionOf {
+  return useMemo(() => lanePartition(index), [index]);
+}
+
+/** Positioned nodes with lane tops aligned, and the lane rectangles derived from them. */
+export function useAlignedLanes<N extends PositionedNode>(positionedNodes: N[], index: LaneIndex) {
+  const nodes = useMemo(() => alignLaneTops(positionedNodes, index), [positionedNodes, index]);
+  const lanes = useMemo(() => laneBounds(nodes, index, UNIFORM_LANE_HEIGHT), [nodes, index]);
+  return { nodes, lanes };
 }

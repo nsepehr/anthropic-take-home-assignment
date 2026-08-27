@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { seedProject } from '../test/seed';
 import { toFlowElements } from '../model/toFlow';
+import { laneBounds, laneIndex, lanePartition } from '../model/lanes';
+import { sizeLeaves } from '../features/diagram/cardSize';
 import { layoutWithElk } from './elk';
 
 const { nodes, edges } = toFlowElements(seedProject);
@@ -42,5 +44,30 @@ describe('layoutWithElk', () => {
     expect(p0.length).toBeGreaterThan(0);
     expect(p1.length).toBeGreaterThan(0);
     expect(Math.max(...p0.map(right))).toBeLessThan(Math.min(...p1.map(left)));
+  });
+});
+
+describe('layoutWithElk on the seed, partitioned by lane', () => {
+  it('keeps lanes in the computed order, left to right, and nodes free of overlaps', async () => {
+    const index = laneIndex(seedProject);
+    const partitionOf = lanePartition(index);
+    const placed = await layoutWithElk(sizeLeaves(nodes), edges, {}, partitionOf);
+    const topLevel = placed.filter((n) => !n.parentId);
+
+    const lanes = laneBounds(placed, index);
+    expect(lanes.map((l) => l.category)).toEqual(index.order);
+    for (let i = 1; i < lanes.length; i++)
+      expect(lanes[i]!.x).toBeGreaterThan(lanes[i - 1]!.x + lanes[i - 1]!.width);
+
+    for (const a of topLevel)
+      for (const b of topLevel) {
+        if (a.id >= b.id) continue;
+        const apart =
+          a.position.x + a.width! <= b.position.x ||
+          b.position.x + b.width! <= a.position.x ||
+          a.position.y + a.height! <= b.position.y ||
+          b.position.y + b.height! <= a.position.y;
+        expect(apart, `${a.id} overlaps ${b.id}`).toBe(true);
+      }
   });
 });

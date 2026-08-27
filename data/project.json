@@ -1001,6 +1001,24 @@
         "capturedAt": "2026-08-27T16:10:00+08:00",
         "sessionRef": "planning chat 2026-08-27, review of first build"
       }
+    },
+    {
+      "id": "int-lane-order-from-edges",
+      "statement": "Lanes are ordered by the direction of the edges, so the diagram reads along the dependency flow",
+      "rationale": "Ordering lanes by seed position produced backward arrows looping across the canvas; deriving the order from the data keeps the picture honest as the project grows. Ties fall back to seed order.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-client-layout", "sys-client-diagram"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "summary": "`orderLanesByFlow` counts edges between lanes and emits, repeatedly, the lane nothing remaining points at (Workflow → Client → Server → Model for this seed); a cycle is broken by dropping its lightest back-edges. Each lane is then top-aligned and the band takes the tallest lane's height.",
+      "detail": "ELK options were measured on the seed: NETWORK_SIMPLEX placement with 40/20 spacing gave 1 crossing and the shortest edges without breaking lane separation; post-compaction was rejected because it pulls nodes across lane boundaries.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T16:30:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, layout review"
+      }
     }
   ],
   "edges": [

@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useRef, type ReactNode } from 'react';
 import { ReactFlow, type EdgeMouseHandler, type NodeMouseHandler } from '@xyflow/react';
 import type { Project } from '@app/shared';
-import type { PartitionOf } from '../../layout/elk';
+import { useAlignedLanes, useLanePartition } from '../../layout/useLanes';
 import { useLayout } from '../../layout/useLayout';
 import { attachEdgeSides } from '../../model/edgeSides';
-import { laneBounds, laneIndex, type LaneBounds } from '../../model/lanes';
+import { laneIndex, type LaneBounds } from '../../model/lanes';
 import { toFlowElements } from '../../model/toFlow';
 import { useSelection } from '../../state/selection';
 import { sizeLeaves } from './cardSize';
@@ -17,6 +17,9 @@ import './diagram.css';
 const nodeTypes = { system: SystemNode };
 const edgeTypes = { system: SystemEdge };
 const defaultEdgeOptions = { type: 'system' };
+/** Fit the whole graph on load with a slim margin; the floor only matters for huge projects. */
+const FIT_VIEW = { padding: 0.08 };
+const MIN_ZOOM = 0.2;
 
 interface Props {
   project: Project;
@@ -33,17 +36,16 @@ const defaultOverlay = (lanes: LaneBounds[]) => <LaneLayer lanes={lanes} />;
 export function DiagramCanvas({ project, overlay = defaultOverlay }: Props) {
   const elements = useMemo(() => toFlowElements(project), [project]);
   const sizedNodes = useMemo(() => sizeLeaves(elements.nodes), [elements.nodes]);
-  // Lanes: categories partition the ELK layout; their bounds follow from the positioned nodes.
-  const lanes = useMemo(() => laneIndex(project), [project]);
-  const partitionOf = useCallback<PartitionOf>(
-    (id) => {
-      const category = lanes.categoryById.get(id);
-      return category === undefined ? undefined : lanes.order.indexOf(category);
-    },
-    [lanes],
-  );
-  const { nodes, status, error } = useLayout(sizedNodes, elements.edges, undefined, partitionOf);
-  const laneRects = useMemo(() => laneBounds(nodes, lanes), [nodes, lanes]);
+  // Lanes partition the ELK layout; the positioned nodes are then top-aligned per lane and
+  // edge sides are chosen last, from the final positions.
+  const index = useMemo(() => laneIndex(project), [project]);
+  const partitionOf = useLanePartition(index);
+  const {
+    nodes: placed,
+    status,
+    error,
+  } = useLayout(sizedNodes, elements.edges, undefined, partitionOf);
+  const { nodes, lanes: laneRects } = useAlignedLanes(placed, index);
   const edges = useMemo(() => attachEdgeSides(nodes, elements.edges), [nodes, elements.edges]);
   const { select, clear } = useSelection();
   // Once laid out, keep the canvas mounted through re-layouts so the viewport survives.
@@ -70,8 +72,9 @@ export function DiagramCanvas({ project, overlay = defaultOverlay }: Props) {
       nodesConnectable={false}
       zoomOnScroll
       panOnDrag
-      minZoom={0.4}
+      minZoom={MIN_ZOOM}
       fitView
+      fitViewOptions={FIT_VIEW}
       proOptions={{ hideAttribution: true }}
     >
       <ArrowMarkers />

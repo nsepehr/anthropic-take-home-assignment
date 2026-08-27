@@ -1,4 +1,5 @@
 import type { Project } from '@app/shared';
+import { orderLanesByFlow } from './laneOrder';
 
 /** A lane's rectangle in graph coordinates, enclosing every top-level node of its category. */
 export interface LaneBounds {
@@ -13,7 +14,7 @@ export interface LaneBounds {
 export const LANE_PADDING = { top: 40, side: 16 } as const;
 
 export interface LaneIndex {
-  /** Categories in lane order: first appearance among top-level systems in `project.systems`. */
+  /** Categories in lane order: along the edge flow, ties by first appearance in `project.systems`. */
   order: string[];
   /** Effective category per system id: its own, or the nearest ancestor's. */
   categoryById: Map<string, string>;
@@ -39,12 +40,12 @@ export function laneIndex(project: Project): LaneIndex {
     }
     return undefined;
   };
-  const order: string[] = [];
+  const seedOrder: string[] = [];
   for (const s of project.systems) {
     const category = resolve(s.id);
-    if (category && !s.parentId && !order.includes(category)) order.push(category);
+    if (category && !s.parentId && !seedOrder.includes(category)) seedOrder.push(category);
   }
-  return { order, categoryById };
+  return { order: orderLanesByFlow(project, categoryById, seedOrder), categoryById };
 }
 
 export function categoryOf(project: Project, systemId: string): string | undefined {
@@ -53,6 +54,14 @@ export function categoryOf(project: Project, systemId: string): string | undefin
 
 export function laneOrder(project: Project): string[] {
   return laneIndex(project).order;
+}
+
+/** Maps a node id to its lane's index in `order` (a left-to-right layout partition), if any. */
+export function lanePartition({ order, categoryById }: LaneIndex) {
+  return (id: string): number | undefined => {
+    const category = categoryById.get(id);
+    return category === undefined ? undefined : order.indexOf(category);
+  };
 }
 
 /** A node after layout; positions of top-level nodes are absolute. */
@@ -64,14 +73,26 @@ export interface PositionedNode {
   height?: number;
 }
 
+/** The lane a positioned node belongs to: only top-level nodes form lanes. */
+export function laneOf(node: PositionedNode, categoryById: Map<string, string>) {
+  return node.parentId ? undefined : categoryById.get(node.id);
+}
+
 type Extent = { x0: number; y0: number; x1: number; y1: number };
 const EMPTY_EXTENT: Extent = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
 
-/** Lane rectangles from positioned top-level nodes, padded; ordered as `order`. */
-export function laneBounds(nodes: PositionedNode[], { order, categoryById }: LaneIndex) {
+/**
+ * Lane rectangles from positioned top-level nodes, padded; ordered as `order`. With
+ * `uniformHeight`, every lane is as tall as the tallest so the band reads as one row.
+ */
+export function laneBounds(
+  nodes: PositionedNode[],
+  { order, categoryById }: LaneIndex,
+  uniformHeight = false,
+) {
   const extents = new Map<string, Extent>();
   for (const n of nodes) {
-    const category = n.parentId ? undefined : categoryById.get(n.id);
+    const category = laneOf(n, categoryById);
     if (!category) continue;
     const e = extents.get(category) ?? EMPTY_EXTENT;
     const { x, y } = n.position;
@@ -83,7 +104,7 @@ export function laneBounds(nodes: PositionedNode[], { order, categoryById }: Lan
     });
   }
   const { top, side } = LANE_PADDING;
-  return order.flatMap<LaneBounds>((category) => {
+  const lanes = order.flatMap<LaneBounds>((category) => {
     const e = extents.get(category);
     if (!e) return [];
     return {
@@ -94,4 +115,7 @@ export function laneBounds(nodes: PositionedNode[], { order, categoryById }: Lan
       height: e.y1 - e.y0 + top + side,
     };
   });
+  if (!uniformHeight) return lanes;
+  const height = Math.max(...lanes.map((l) => l.height));
+  return lanes.map((l) => ({ ...l, height }));
 }

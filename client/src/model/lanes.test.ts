@@ -19,8 +19,8 @@ describe('categoryOf', () => {
 });
 
 describe('laneOrder', () => {
-  it('lists categories by first appearance without duplicates', () => {
-    expect(laneOrder(seedProject)).toEqual(['Model', 'Server', 'Client', 'Workflow']);
+  it('orders the seed lanes along the dependency flow, each category once', () => {
+    expect(laneOrder(seedProject)).toEqual(['Workflow', 'Client', 'Server', 'Model']);
   });
 
   it('ignores categories that only nested systems carry (they cannot form a lane)', () => {
@@ -73,6 +73,15 @@ describe('laneBounds', () => {
       expect(n.position.x + n.width).toBeLessThanOrEqual(one.x + one.width);
       expect(n.position.y + n.height).toBeLessThanOrEqual(one.y + one.height);
     }
+  });
+
+  it('with uniformHeight, every lane is as tall as the tallest', () => {
+    const lanes = laneBounds(nodes, { order: ['One', 'Two'], categoryById }, true);
+    expect(lanes.map((l) => l.height)).toEqual([
+      240 - 20 + LANE_PADDING.top + LANE_PADDING.side,
+      240 - 20 + LANE_PADDING.top + LANE_PADDING.side,
+    ]);
+    expect(lanes[1]!.y).toBe(0 - LANE_PADDING.top);
   });
 
   it('omits categories that have no positioned nodes', () => {
