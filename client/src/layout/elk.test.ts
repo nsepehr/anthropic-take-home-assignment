@@ -26,4 +26,21 @@ describe('layoutWithElk', () => {
     const moved = topLevel.filter((n) => n.position.x !== 0 || n.position.y !== 0);
     expect(moved.length).toBeGreaterThan(0);
   });
+
+  it('with partitionOf, nodes of partition 0 sit left of nodes of partition 1', async () => {
+    const topLevel = nodes.filter((n) => !n.parentId).map((n) => n.id);
+    const partition = new Map(topLevel.map((id, i) => [id, i % 2]));
+    const placed = await layoutWithElk(nodes, edges, {}, (id) => partition.get(id));
+
+    const right = (id: string) => {
+      const n = placed.find((p) => p.id === id)!;
+      return n.position.x + n.width!;
+    };
+    const left = (id: string) => placed.find((p) => p.id === id)!.position.x;
+    const p0 = topLevel.filter((id) => partition.get(id) === 0);
+    const p1 = topLevel.filter((id) => partition.get(id) === 1);
+    expect(p0.length).toBeGreaterThan(0);
+    expect(p1.length).toBeGreaterThan(0);
+    expect(Math.max(...p0.map(right))).toBeLessThan(Math.min(...p1.map(left)));
+  });
 });

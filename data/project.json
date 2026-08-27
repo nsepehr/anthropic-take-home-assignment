@@ -6,6 +6,7 @@
       "id": "sys-shared-model",
       "name": "Shared data model",
       "kind": "module",
+      "category": "Model",
       "paths": [
         "shared/src/schema/",
         "shared/src/validate.ts",
@@ -25,6 +26,7 @@
       "id": "sys-server-api",
       "name": "Server API",
       "kind": "service",
+      "category": "Server",
       "paths": [
         "server/src/app.ts",
         "server/src/index.ts",
@@ -44,6 +46,7 @@
       "id": "sys-client-app",
       "name": "Client app",
       "kind": "ui",
+      "category": "Client",
       "paths": [
         "client/src/App.tsx",
         "client/src/main.tsx",
@@ -64,6 +67,7 @@
       "id": "sys-seed-data",
       "name": "Seed data",
       "kind": "store",
+      "category": "Model",
       "paths": ["data/project.json", "data/README.md"],
       "summary": "The hand-written record of this project, validated against the shared schema; it is the tool's own demo content.",
       "detail": "`data/project.json` conforms to `ProjectSchema`. It is not a mock: every entry describes the repo as it exists, captured from the planning conversation and the commit history, with `provenance` saying whether a human verified it or an AI inferred it. Every task appends its systems, requirements and intents here (CLAUDE.md rule 9) and runs `npm run validate:data`, which also prints the gaps report.",
@@ -77,6 +81,7 @@
       "id": "sys-agent-workflow",
       "name": "Agent workflow",
       "kind": "workflow",
+      "category": "Workflow",
       "paths": ["CLAUDE.md", "docs/AGENT_WORKFLOW.md", "docs/tasks/", "scripts/"],
       "summary": "The rules and scripts that let several AI coding agents work on this repo in parallel without colliding.",
       "detail": "Each task is a brief in `docs/tasks/<slug>.md` that names the files the agent owns. The agent runs in its own git worktree and branch (`agent/<slug>`) with its own allocated ports, must keep `npm run check` green, and finishes with `scripts/finish-worktree.sh`, which rebases on `main` and re-runs the checks. Merges are fast-forward only and done by the human. `CLAUDE.md` holds the short rules; `docs/AGENT_WORKFLOW.md` the long form.",
@@ -187,6 +192,24 @@
         "source": "ai-inferred",
         "capturedAt": "2026-08-27T20:00:00+08:00",
         "sessionRef": "agent: design-tokens (task 04)"
+      }
+    },
+    {
+      "id": "sys-client-lanes",
+      "name": "Category lanes",
+      "kind": "ui",
+      "parentId": "sys-client-app",
+      "paths": [
+        "client/src/features/lanes/",
+        "client/src/model/lanes.ts",
+        "client/src/layout/useLanes.ts"
+      ],
+      "summary": "Draws a translucent lane with an uppercase label behind each category of systems.",
+      "detail": "`model/lanes.ts` is pure: `categoryOf` walks `parentId` to the top-level ancestor, `laneOrder` orders categories by first appearance, `laneBounds` pads the positioned top-level nodes of each category. `useLanes` turns that into the `partitionOf` callback `useLayout` passes to ELK and the lane rectangles; `LaneLayer` renders them inside React Flow's `ViewportPortal` (z-index below nodes) so they pan and zoom with the graph. Built by task 08-category-lanes.",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T16:00:00+08:00",
+        "sessionRef": "agent: category-lanes (task 08)"
       }
     }
   ],
@@ -371,6 +394,26 @@
         "source": "human-verified",
         "capturedAt": "2026-08-27T15:00:00+08:00",
         "sessionRef": "docs/tasks/01-schema-and-seed.md; CLAUDE.md rule 9"
+      }
+    },
+    {
+      "id": "req-category-lanes",
+      "title": "The diagram reads left-to-right by system role",
+      "kind": "functional",
+      "status": "implemented",
+      "systemIds": ["sys-shared-model", "sys-client-layout", "sys-client-lanes"],
+      "evidence": [
+        "shared/src/schema/system.ts (category)",
+        "client/src/layout/elk.ts (partitionOf)",
+        "client/src/model/lanes.test.ts",
+        "client/src/layout/elk.test.ts (partition ordering)"
+      ],
+      "summary": "Every top-level system has a category; ELK lays categories out as columns; a labelled lane is drawn behind each.",
+      "detail": "Implemented by task 08-category-lanes. The lane overlay is wired into the canvas as the `overlay` prop of `DiagramCanvas` (task 06).",
+      "provenance": {
+        "source": "ai-inferred",
+        "capturedAt": "2026-08-27T16:00:00+08:00",
+        "sessionRef": "agent: category-lanes (task 08)"
       }
     }
   ],
@@ -683,6 +726,24 @@
         "source": "human-verified",
         "capturedAt": "2026-08-27T20:00:00+08:00",
         "sessionRef": "Claude Design project 'Project Atlas' - planning chat 2026-08-27"
+      }
+    },
+    {
+      "id": "int-category-is-classification",
+      "statement": "Category is a lane (classification), separate from parentId (containment); lanes give the diagram a left-to-right reading order",
+      "rationale": "Two different questions get two different fields. `parentId` says what a system is inside of; `category` says what role it plays (Model, Server, Client, Workflow) and therefore which column it belongs in. Folding category into the tree (e.g. a synthetic parent per category) was rejected because it would force every top-level system into an artificial box and break real containment. Only top-level systems carry a category; nested systems inherit their ancestor's, so they always land inside their parent's lane. ELK's `partitioning` option turns each category into a vertical column ordered by first appearance in `project.systems`, which makes the reading order a property of the data, not of the layout engine.",
+      "status": "active",
+      "appliesTo": {
+        "systemIds": ["sys-shared-model", "sys-client-layout", "sys-client-lanes"],
+        "requirementIds": ["req-category-lanes"],
+        "edgeIds": []
+      },
+      "summary": "`category` = which lane; `parentId` = which box. Lanes are ELK partitions in data order.",
+      "detail": "Schema: `System.category?: string` (additive). Layout: `elk.partitioning.activate` on the root, `elk.partitioning.partition: <lane index>` on each top-level node, direction RIGHT. Rendering: `LaneLayer` in `client/src/features/lanes/`. Out of scope: lane collapsing, filtering, per-lane colours, editing categories.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T16:00:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, design review"
       }
     }
   ],

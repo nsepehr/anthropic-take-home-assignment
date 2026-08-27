@@ -18,6 +18,9 @@ export interface LayoutEdge {
 /** ELK layout options (`elk.*` keys), merged over the defaults. Pass a stable object. */
 export type ElkOptions = Record<string, string>;
 
+/** Maps a top-level node id to its partition index; partitions become left-to-right columns. */
+export type PartitionOf = (nodeId: string) => number | undefined;
+
 const DEFAULT_ELK_OPTIONS: ElkOptions = {
   'elk.algorithm': 'layered',
   'elk.direction': 'RIGHT',
@@ -43,11 +46,16 @@ export async function layoutWithElk<N extends LayoutNode>(
   nodes: N[],
   edges: LayoutEdge[],
   options: ElkOptions = {},
+  partitionOf?: PartitionOf,
 ): Promise<N[]> {
   const graph: ElkNode = {
     id: 'root',
-    layoutOptions: { ...DEFAULT_ELK_OPTIONS, ...options },
-    children: toElkChildren(nodes, undefined),
+    layoutOptions: {
+      ...DEFAULT_ELK_OPTIONS,
+      ...(partitionOf && { 'elk.partitioning.activate': 'true' }),
+      ...options,
+    },
+    children: toElkChildren(nodes, undefined, partitionOf),
     edges: edges.map<ElkExtendedEdge>((e) => ({
       id: e.id,
       sources: [e.source],
@@ -63,14 +71,23 @@ export async function layoutWithElk<N extends LayoutNode>(
   });
 }
 
-function toElkChildren(nodes: LayoutNode[], parentId: string | undefined): ElkNode[] {
+function toElkChildren(
+  nodes: LayoutNode[],
+  parentId: string | undefined,
+  partitionOf: PartitionOf | undefined,
+): ElkNode[] {
   return nodes
     .filter((n) => n.parentId === parentId)
     .map((n) => {
-      const children = toElkChildren(nodes, n.id);
-      return children.length > 0
-        ? { id: n.id, children }
-        : { id: n.id, width: n.width, height: n.height };
+      const children = toElkChildren(nodes, n.id, undefined);
+      const partition = partitionOf?.(n.id);
+      return {
+        id: n.id,
+        ...(children.length > 0 ? { children } : { width: n.width, height: n.height }),
+        ...(partition !== undefined && {
+          layoutOptions: { 'elk.partitioning.partition': String(partition) },
+        }),
+      };
     });
 }
 

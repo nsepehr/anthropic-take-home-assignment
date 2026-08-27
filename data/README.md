@@ -19,7 +19,10 @@ edges without an intent, intents that apply to nothing. Gaps are not errors; the
 
 ## Appending (every task — CLAUDE.md rule 9)
 
-1. Add the `System`(s) you built or changed; set `paths` to the real files.
+1. Add the `System`(s) you built or changed; set `paths` to the real files. Give every
+   **top-level** system a `category` (the lane it sits in on the diagram: `Model`, `Server`,
+   `Client`, `Workflow`); nested systems inherit their ancestor's category, so leave it off them.
+   `category` is classification; `parentId` is containment — they are independent.
 2. Add or update the `Requirement`(s) they serve; set `status` honestly and cite `evidence`.
 3. Add an `Intent` for each non-obvious choice: statement, rationale (fold rejected alternatives
    and trade-offs into the prose), `status: active` (or `superseded` + `supersededBy`), and

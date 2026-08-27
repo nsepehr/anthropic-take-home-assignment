@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
-import { layoutWithElk, type ElkOptions, type LayoutEdge, type LayoutNode } from './elk';
+import {
+  layoutWithElk,
+  type ElkOptions,
+  type LayoutEdge,
+  type LayoutNode,
+  type PartitionOf,
+} from './elk';
 
 export type LayoutStatus = 'idle' | 'layouting' | 'ready' | 'error';
 
@@ -10,11 +16,15 @@ export interface LayoutResult<N extends LayoutNode> {
   error: string | null;
 }
 
-/** Resolves ELK layout for the given elements. Pass memoized inputs: a new array re-runs layout. */
+/**
+ * Resolves ELK layout for the given elements. Pass memoized inputs (including `partitionOf`):
+ * a new reference re-runs layout.
+ */
 export function useLayout<N extends LayoutNode>(
   nodes: N[],
   edges: LayoutEdge[],
   options?: ElkOptions,
+  partitionOf?: PartitionOf,
 ): LayoutResult<N> {
   const [state, setState] = useState<LayoutResult<N>>({ nodes, status: 'idle', error: null });
 
@@ -22,14 +32,14 @@ export function useLayout<N extends LayoutNode>(
     if (!nodes.length) return setState({ nodes, status: 'idle', error: null });
     let cancelled = false;
     setState((s) => ({ ...s, status: 'layouting' }));
-    layoutWithElk(nodes, edges, options).then(
+    layoutWithElk(nodes, edges, options, partitionOf).then(
       (placed) => !cancelled && setState({ nodes: placed, status: 'ready', error: null }),
       (err: unknown) => !cancelled && setState({ nodes, status: 'error', error: String(err) }),
     );
     return () => {
       cancelled = true;
     };
-  }, [nodes, edges, options]);
+  }, [nodes, edges, options, partitionOf]);
 
   return state;
 }
