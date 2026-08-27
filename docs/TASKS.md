@@ -33,7 +33,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 2   | `02-api`                 | 3     | P0       | done        | agent: api               | 01         | GET /api/project (validated), /api/health, dev-only reload                        |
 | 2b  | `02b-api-trim`           | 3     | P0       | done        | agent: api-trim          | 02         | Trim API to single payload; move store to stores/; record intent                  |
 | 3   | `03-client-foundation`   | 4     | P0       | done        | agent: client-foundation | 01, 02     | React Flow + ELK renders systems/edges/nesting                                    |
-| 3a  | `04-design-tokens`       | 4     | P0       | review      | agent: design-tokens     | 03         | Organic tokens/classes → client/src/styles; base components; brief exists         |
+| 3a  | `04-design-tokens`       | 4     | P0       | done        | agent: design-tokens     | 03         | Organic tokens/classes → client/src/styles; base components; brief exists         |
 | 3b  | `05-app-shell`           | 4     | P0       | in-progress | agent: app-shell         | 03         | Header + canvas frame + always-visible right panel with overview/detail slots     |
 | 3c  | `06-system-node`         | 4     | P0       | in-progress | agent: system-node       | 03, 04, 05 | Designed system card + edges on the canvas; replaces debug canvas                 |
 | 3d  | `07-detail-panel`        | 4     | P0       | in-progress | agent: detail-panel      | 03, 04, 05 | Entity detail + project overview panel content                                    |
@@ -85,3 +85,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 07-detail-panel → in-progress (agent: detail-panel)
 - 2026-08-27 — 08-category-lanes → in-progress (agent: category-lanes)
 - 2026-08-27 — 04-design-tokens → review (agent: design-tokens)
+- 2026-08-27 — 04-design-tokens → done (human)
