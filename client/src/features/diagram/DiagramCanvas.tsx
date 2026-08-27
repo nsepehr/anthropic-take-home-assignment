@@ -3,6 +3,7 @@ import { ReactFlow, type EdgeMouseHandler, type NodeMouseHandler } from '@xyflow
 import type { Project } from '@app/shared';
 import type { PartitionOf } from '../../layout/elk';
 import { useLayout } from '../../layout/useLayout';
+import { attachEdgeSides } from '../../model/edgeSides';
 import { laneBounds, laneIndex, type LaneBounds } from '../../model/lanes';
 import { toFlowElements } from '../../model/toFlow';
 import { useSelection } from '../../state/selection';
@@ -43,6 +44,7 @@ export function DiagramCanvas({ project, overlay = defaultOverlay }: Props) {
   );
   const { nodes, status, error } = useLayout(sizedNodes, elements.edges, undefined, partitionOf);
   const laneRects = useMemo(() => laneBounds(nodes, lanes), [nodes, lanes]);
+  const edges = useMemo(() => attachEdgeSides(nodes, elements.edges), [nodes, elements.edges]);
   const { select, clear } = useSelection();
   // Once laid out, keep the canvas mounted through re-layouts so the viewport survives.
   const laidOut = useRef(false);
@@ -57,7 +59,7 @@ export function DiagramCanvas({ project, overlay = defaultOverlay }: Props) {
     <ReactFlow
       className="diagram"
       nodes={nodes}
-      edges={elements.edges}
+      edges={edges}
       defaultEdgeOptions={defaultEdgeOptions}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}

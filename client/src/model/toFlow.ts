@@ -1,5 +1,5 @@
 import type { Edge as ModelEdge, Project, System } from '@app/shared';
-import { Position, type Edge, type Node as FlowNode } from '@xyflow/react';
+import type { Edge, Node as FlowNode } from '@xyflow/react';
 
 /** What a diagram node carries: the System itself plus how much intent/requirement hangs on it. */
 export type SystemNodeData = {
@@ -22,7 +22,8 @@ export const NODE_SIZE = { width: 210, height: 112 } as const;
 
 /**
  * Pure: Project → React Flow elements. Nodes are ordered so every parent precedes its children
- * (a React Flow requirement); positions start at 0,0 and are relative to the parent.
+ * (a React Flow requirement); positions start at 0,0 and are relative to the parent. Edge
+ * handle sides are chosen after layout by `edgeSides`.
  */
 export function toFlowElements(project: Project): FlowElements {
   const requirementCounts = countByKey(project.requirements.map((r) => r.systemIds));
@@ -32,8 +33,6 @@ export function toFlowElements(project: Project): FlowElements {
     id: system.id,
     type: 'system',
     position: { x: 0, y: 0 },
-    sourcePosition: Position.Right,
-    targetPosition: Position.Left,
     ...NODE_SIZE,
     ...(system.parentId ? { parentId: system.parentId, extent: 'parent' as const } : {}),
     data: {

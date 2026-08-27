@@ -982,6 +982,20 @@
         "capturedAt": "2026-08-27T23:00:00+08:00",
         "sessionRef": "planning chat 2026-08-27, review of first build (workflow extension)"
       }
+    },
+    {
+      "id": "int-edges-attach-nearest-side",
+      "statement": "Arrows attach to the side of a card that faces the other end",
+      "rationale": "Fixed right\u2192left handles read wrong for backward or vertical connections; the reader should follow an arrow without tracing a loop. Decided after human review of the first build.",
+      "status": "active",
+      "appliesTo": { "systemIds": ["sys-client-diagram"], "requirementIds": [], "edgeIds": [] },
+      "summary": "Every card renders four hidden handles; after ELK layout a pure `chooseHandles(sourceRect, targetRect)` picks sides by the dominant axis of the center-to-center vector and edges get those handle ids.",
+      "detail": "Option chosen over ELK orthogonal edge sections (more code, coordinate transforms for nested nodes) and React Flow floating edges (rect intersections). Ties resolve horizontally, matching the left-to-right lane flow. Container edges use the container's absolute rect, so child\u2192parent arrows meet the nearest container side.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T16:10:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, review of first build"
+      }
     }
   ],
   "edges": [
