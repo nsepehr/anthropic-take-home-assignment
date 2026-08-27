@@ -48,7 +48,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 3i  | `13-edge-routing`        | 4     | P1       | done        | agent: edges             | 06         | Edges attach to the nearest side; human inspects before merge                                    |
 | 3j  | `14-layout-lanes`        | 4     | P0       | done        | agent: layout            | 08, 13     | Lane order from edges; top-aligned compact lanes; fit; human inspects before merge               |
 | 4a  | `15-polish`              | 4     | P1       | done        | agent: polish            | 14         | Dead CSS/hooks, engines pin, click threshold                                                     |
-| 5a  | `16-modeling-rules`      | 5     | P0       | review      | agent: modeling          | 01         | docs/MODELING.md + computeAdvisories in shared; applied to seed                                  |
+| 5a  | `16-modeling-rules`      | 5     | P0       | done        | agent: modeling          | 01         | docs/MODELING.md + computeAdvisories in shared; applied to seed                                  |
 | 5b  | `17-drill-down`          | 5     | P0       | in-progress | agent: drilldown         | 14         | L0 categories → L1 systems → L2 children; breadcrumb; categories in schema; inspect before merge |
 | 4   | `04-selection-linking`   | 5     | P0       | todo        | —                        | 03         | Hero interaction: select entity → connected entities highlight                                   |
 | 11  | `11-video-and-rationale` | 9     | P0       | todo        | human                    | —          | Submission artifacts: 5-min video, rationale, transcript export                                  |
@@ -138,3 +138,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 15-polish → review: removed dead `.seg*` CSS, engines.node `22.x` + `.nvmrc` 22, `nodeClickDistance`/`paneClickDistance` on the canvas, docs/design README updated; `useLanes.ts` kept (still used by DiagramCanvas); EntityList collapses after 5 items ("Show N more" / "Show less", `collapseAfter` + `defaultExpanded` props)
 - 2026-08-27 — 15-polish → done (human): cleanup, show-more lists, rev-3 pills
 - 2026-08-27 — 16-modeling-rules → review (agent: modeling): docs/MODELING.md, computeAdvisories (10 rules) printed by validate:data, seed trimmed to one honest advisory (sys-deploy-vercel isolated)
+- 2026-08-27 — 16-modeling-rules → done (human); seed advisories: Client should split into stages
