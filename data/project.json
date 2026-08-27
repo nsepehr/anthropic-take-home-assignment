@@ -210,7 +210,14 @@
       "name": "App shell",
       "kind": "ui",
       "category": "Client UI",
-      "paths": ["client/src/features/shell/", "client/src/App.tsx", "client/src/main.tsx"],
+      "paths": [
+        "client/src/features/shell/",
+        "client/src/features/search/",
+        "client/src/model/search.ts",
+        "client/src/state/search.tsx",
+        "client/src/App.tsx",
+        "client/src/main.tsx"
+      ],
       "summary": "The single-screen frame: header, canvas region and the always-visible 400px right panel with overview/detail slots.",
       "detail": "`AppShell` is a 100vh flex column (no page scroll): `Header` shows the project name, mission, the provenance legend and the global Overview / Deep dive `.seg` control bound to `useViewMode()`; `CanvasFrame` is the rounded dotted-grid region that renders the `canvas` slot and a hint while nothing is selected; `SidePanel` scrolls on its own and switches on `useSelection().selectedId` between the `overview` and `detail` slots. Slots are props so the shell folder never imports other features — `App.tsx` (the composition root, owned here) is where the diagram and panel are plugged into the slots and the state providers are stacked; the canvas slot is a render prop that receives the loaded project. Layout-only CSS lives in `shell.css`; every color, font and radius is a token from `client/src/styles`.",
       "provenance": {
@@ -1345,6 +1352,23 @@
       "provenance": {
         "source": "human-verified",
         "capturedAt": "2026-08-27T23:45:00+08:00",
+        "sessionRef": "planning chat 2026-08-27, wrap-up"
+      }
+    },
+    {
+      "id": "int-search-should-be-semantic",
+      "statement": "Search is substring today; the right version is semantic (embeddings over summary/detail/rationale), so \"why is layout pure?\" finds the intent, not just the word",
+      "rationale": "A substring filter over names, prose and paths is honest for a prototype and needs no service, but it only finds words a developer already knows. The model's value is that intent and rationale are written down \u2014 and the question a newcomer actually asks is \"why is this like this?\", which no keyword matches. Embedding each entity's summary, detail and rationale and ranking by similarity is the version worth building; the pure `searchProject` boundary is where it would swap in.",
+      "appliesTo": {
+        "systemIds": ["sys-client-panel", "sys-client-diagram"],
+        "requirementIds": [],
+        "edgeIds": []
+      },
+      "summary": "Substring search ships now because it is cheap and exact; semantic retrieval over the recorded reasoning is the goal.",
+      "detail": "`searchProject(project, query)` is pure \u2014 whole project in, matching ids per kind out \u2014 so the ranking strategy is one module deep: swapping substring for an embedding search changes that file and nothing else. Matches ring on the canvas and non-matches drop to `--dim-opacity`, reusing the selection's own classes so search introduces no new visual language; the panel lists narrow to matches while a query is running.",
+      "provenance": {
+        "source": "human-verified",
+        "capturedAt": "2026-08-27T20:30:00+08:00",
         "sessionRef": "planning chat 2026-08-27, wrap-up"
       }
     }

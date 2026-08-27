@@ -1,0 +1,43 @@
+/* Layout-only rules for the search box and what a search does to cards. Every colour is a token
+   already used by the selection ring and the dim state — a search introduces no new colours. */
+
+.shell-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.shell-search .input {
+  font: inherit;
+  font-size: 13px;
+  width: 230px;
+  padding: 6px 13px;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.shell-search .input::placeholder {
+  color: var(--color-neutral-600);
+}
+.shell-search .input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+.shell-search-hint {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* A running search rings its matches and pushes everything else back. */
+.diagram-card.is-match,
+.diagram-group.is-match,
+.panel-card.is-match {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2.5px var(--color-accent);
+}
+.diagram-card.is-search-muted,
+.diagram-group.is-search-muted,
+.panel-card.is-search-muted {
+  opacity: var(--dim-opacity);
+}

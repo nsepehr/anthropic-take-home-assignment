@@ -54,7 +54,7 @@ Single source of truth for what's in flight. Plain markdown, edited by hand and 
 | 5d  | `19-locks`               | 5     | P1       | cut         | agent: locks (opus)      | 17         | Lock a box / a layer; persisted; header counter; feeds 18                                      |
 | 5e  | `20-lifecycle`           | 5     | P0       | done        | agent: lifecycle         | 16         | lifecycle {superseded,withdrawn} on every entity; current-only views; per-system history panel |
 | 5f  | `21-chat-scope-ui`       | 5     | P1       | done        | agent: chat (opus)       | 17         | Ask Claude drawer: @-mentions, scope chips, canvas attention, scripted reply; client-only      |
-| 5g  | `22-search`              | 5     | P1       | in-progress | agent: search (opus)     | 17         | Client-side substring search; semantic is the goal                                             |
+| 5g  | `22-search`              | 5     | P1       | review      | agent: search (opus)     | 17         | Client-side substring search; semantic is the goal                                             |
 | 5h  | `24-feature-kind`        | 5     | P1       | in-progress | agent: feature (opus)    | 16         | Requirement.kind gains feature; seed retag; pill                                               |
 | 5i  | `25-model-generator`     | 5     | P0       | done        | agent: generator (opus)  | 16         | ONBOARDING.md + capture-model Claude Code skill                                                |
 | 5j  | `23-chat-apply-demo`     | 5     | P2       | todo        | —                        | 21         | Modal explaining what Apply would do                                                           |
@@ -173,3 +173,4 @@ Append-only. Format: `YYYY-MM-DD — <slug> → <status> (<who>)`.
 - 2026-08-27 — 25-model-generator → done (human): ONBOARDING.md + capture-model skill
 - 2026-08-27 — 09-readme → review (agent: readme): root README — thesis, live demo + 5-step walkthrough, self-demo seed, run locally, architecture + folder map, phase tags, how it was built, known limits; links docs/RATIONALE.md
 - 2026-08-27 — 09-readme → done (human)
+- 2026-08-27 — 22-search → review: header search box, pure `searchProject`, match ring + dim, filtered panel lists

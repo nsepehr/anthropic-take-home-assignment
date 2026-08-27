@@ -1,6 +1,7 @@
 import type { System } from '@app/shared';
 import type { ScopeState } from '../../../model/chatScope';
 import { KindDot } from '../../../components';
+import { useSearch } from '../../../state/search';
 import type { ElementState } from '../cardState';
 import { CardTags } from './CardTags';
 
@@ -28,8 +29,11 @@ export function SystemCard({
   onOpen,
 }: Props) {
   const scopeClass = scope === 'none' ? '' : ` is-${scope === 'in' ? 'in' : 'out-of'}-scope`;
+  const search = useSearch().matchClass(system.id);
   return (
-    <div className={`diagram-card is-${state}${focus ? ' diagram-card--focus' : ''}${scopeClass}`}>
+    <div
+      className={`diagram-card is-${state}${focus ? ' diagram-card--focus' : ''}${scopeClass}${search}`}
+    >
       <div className="diagram-card__title">
         <KindDot kind={system.kind} />
         <span className="diagram-card__name">{system.name}</span>

@@ -1,4 +1,5 @@
 import { Tag } from '../../components';
+import { SearchBox } from '../search';
 import { useProject } from '../../state/projectStore';
 import { Trail } from './Trail';
 
@@ -10,6 +11,7 @@ export function Header() {
       <div className="shell-header-name">{project?.name}</div>
       {project && <Trail />}
       <div className="shell-header-tools">
+        <SearchBox />
         <div className="shell-legend" aria-label="Provenance legend">
           <Tag variant="legend-verified">Verified</Tag>
           <span>human-checked</span>
