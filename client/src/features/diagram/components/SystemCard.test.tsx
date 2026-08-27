@@ -21,7 +21,7 @@ describe('SystemCard', () => {
     expect(html).toContain('2 why');
     expect(html).toContain(system.provenance.source === 'human-verified' ? 'Verified' : 'AI');
     expect(html).toContain(system.summary);
-    expect(html).toContain(`var(--kind-${system.kind})`);
+    expect(html).toContain(`--kind-${system.kind}`);
   });
 
   it('shows detail in deep dive and reflects the selection state as a class', () => {

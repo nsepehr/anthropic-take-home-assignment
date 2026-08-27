@@ -1,4 +1,5 @@
 import type { Provenance, System } from '@app/shared';
+import { Tag } from '../../../components';
 
 interface Props {
   kind: System['kind'];
@@ -12,12 +13,10 @@ export function CardTags({ kind, requirementCount, intentCount, provenance }: Pr
   const human = provenance === 'human-verified';
   return (
     <div className="diagram-card__tags">
-      <span className="tag tag-neutral">{kind}</span>
-      <span className="tag tag-neutral">{`${requirementCount} req`}</span>
-      <span className="tag tag-accent">{`${intentCount} why`}</span>
-      <span className={`tag ${human ? 'tag-accent-2' : 'tag-outline'}`}>
-        {human ? 'Verified' : 'AI'}
-      </span>
+      <Tag>{kind}</Tag>
+      <Tag>{`${requirementCount} req`}</Tag>
+      <Tag variant="accent">{`${intentCount} why`}</Tag>
+      <Tag variant={human ? 'accent-2' : 'outline'}>{human ? 'Verified' : 'AI'}</Tag>
     </div>
   );
 }

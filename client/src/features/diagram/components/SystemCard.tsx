@@ -1,4 +1,5 @@
 import type { System } from '@app/shared';
+import { KindDot } from '../../../components';
 import type { ViewMode } from '../../../state/viewMode';
 import type { ElementState } from '../cardState';
 import { CardTags } from './CardTags';
@@ -16,7 +17,7 @@ export function SystemCard({ system, requirementCount, intentCount, mode, state 
   return (
     <div className={`diagram-card is-${state}`}>
       <div className="diagram-card__title">
-        <span className="diagram-card__kind" style={{ background: `var(--kind-${system.kind})` }} />
+        <KindDot kind={system.kind} />
         <span className="diagram-card__name">{system.name}</span>
       </div>
       <div className={`diagram-card__body is-${mode}`}>

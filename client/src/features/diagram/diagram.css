@@ -56,12 +56,6 @@
   align-items: center;
   gap: 7px;
 }
-.diagram-card__kind {
-  flex: none;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-}
 .diagram-card__name {
   font-family: var(--font-heading);
   font-size: 15px;
