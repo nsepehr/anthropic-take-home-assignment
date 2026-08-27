@@ -6,6 +6,25 @@ import { laneOf, type LaneIndex, type PositionedNode } from '../model/lanes';
  */
 export const UNIFORM_LANE_HEIGHT = true;
 
+/** Extra horizontal room between neighbouring lanes, on top of ELK's layer spacing. */
+export const LANE_GAP = 40;
+
+/**
+ * Pure post-process: push each lane right by `gap` per lane before it, so bands read as
+ * separate columns. Nested nodes move with their parent; nodes outside any lane stay put.
+ */
+export function spaceLanes<N extends PositionedNode>(
+  nodes: N[],
+  { order, categoryById }: LaneIndex,
+  gap = LANE_GAP,
+): N[] {
+  return nodes.map((n) => {
+    const category = laneOf(n, categoryById);
+    const shift = category ? Math.max(0, order.indexOf(category)) * gap : 0;
+    return shift ? { ...n, position: { x: n.position.x + shift, y: n.position.y } } : n;
+  });
+}
+
 /**
  * Pure post-process: shift each lane's top-level nodes vertically so every lane starts at the
  * same top (the highest lane's). Nested nodes move with their parent; nodes outside any lane are

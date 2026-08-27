@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { alignLaneTops } from './alignLanes';
+import { alignLaneTops, spaceLanes } from './alignLanes';
 
 const index = {
   order: ['One', 'Two'],
@@ -34,5 +34,15 @@ describe('alignLaneTops', () => {
 
   it('is the identity when nothing belongs to a lane', () => {
     expect(alignLaneTops(nodes, { order: [], categoryById: new Map() })).toBe(nodes);
+  });
+});
+
+describe('spaceLanes', () => {
+  it('shifts each lane right by the gap times its lane index, leaving y alone', () => {
+    const at = (id: string) => spaceLanes(nodes, index, 50).find((n) => n.id === id)!.position;
+    expect(at('a')).toEqual({ x: 0, y: 100 });
+    expect(at('c')).toEqual({ x: 250, y: 40 });
+    expect(at('a-child')).toEqual({ x: 5, y: 5 });
+    expect(at('loose')).toEqual({ x: 400, y: 500 });
   });
 });
