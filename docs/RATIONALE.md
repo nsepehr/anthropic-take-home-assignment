@@ -2,7 +2,7 @@
 
 _Submission for the Anthropic SWE take-home. Theme 1: Exploration & Understanding._
 _Live: https://anthropic-take-home-assignment.vercel.app · Repo: github.com/nsepehr/anthropic-take-home-assignment_
-_Time spent: **~4.5 hours** of build (tags `2-hour`, `hour-2.5`, `hour-4`, `hour-4.5` mark what existed at each point), plus this doc and the video._
+_Time spent: **~4.5 hours** of build (tags `hour-2`, `hour-2.5`, `hour-4`, `hour-4.5` mark what existed at each point), plus this doc and the video._
 
 ## Why this theme, why this approach
 

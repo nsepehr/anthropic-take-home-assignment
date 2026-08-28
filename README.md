@@ -98,7 +98,7 @@ Four tags mark what existed at each point of the build:
 
 | tag        | what existed                                                                                                                              |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `2-hour`   | The full vertical slice: schema + seed, one-payload API, designed canvas with lanes, detail panel, neighbour highlighting, live on Vercel |
+| `hour-2`   | The full vertical slice: schema + seed, one-payload API, designed canvas with lanes, detail panel, neighbour highlighting, live on Vercel |
 | `hour-2.5` | Edge routing to the nearest side, lane order derived from edge flow, layout polish                                                        |
 | `hour-4`   | Modeling rules + advisories, atlas → focus drill-down with a trail, lifecycle/history, deterministic column layout (ELK dropped)          |
 | `hour-4.5` | Ask Claude scope drawer, search, `feature` requirement kind, this README                                                                  |
